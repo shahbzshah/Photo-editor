@@ -8,6 +8,7 @@ plugins {
 android {
     namespace = "app.photopromptcodes"
     compileSdk = 34
+    buildToolsVersion = "34.0.0"
 
     defaultConfig {
         applicationId = "app.photopromptcodes"
