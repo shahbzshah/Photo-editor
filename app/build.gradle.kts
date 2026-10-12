@@ -37,6 +37,7 @@ android {
     packaging {
         resources {
             excludes += "**/linkdata/**"
+            excludes += "META-INF/*.version"
         }
     }
 }
