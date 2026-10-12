@@ -113,7 +113,7 @@ fun GalleryScreen(
         ) {
             OutlinedTextField(
                 value = vm.query,
-                onValueChange = vm::setQuery,
+                onValueChange = vm::updateQuery,
                 placeholder = { Text("Search effects, moods, lenses...", color = PaperDim) },
                 leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null, tint = PaperDim) },
                 singleLine = true,
