@@ -17,8 +17,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -98,7 +98,7 @@ fun GalleryScreen(
                 title = { Text("Photo Prompt Codes", style = MaterialTheme.typography.titleLarge) },
                 actions = {
                     IconButton(onClick = onOpenHistory) {
-                        Icon(Icons.Filled.History, contentDescription = "Edit history", tint = PaperDim)
+                        Icon(Icons.Filled.Refresh, contentDescription = "Edit history", tint = PaperDim)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = NearBlack)
@@ -207,7 +207,7 @@ private fun CodeCard(code: PromptCode, onClick: () -> Unit) {
                 )
             }
             Icon(
-                Icons.Filled.ChevronRight,
+                Icons.Filled.KeyboardArrowRight,
                 contentDescription = null,
                 tint = PaperDim
             )
