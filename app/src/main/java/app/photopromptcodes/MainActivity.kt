@@ -1,0 +1,91 @@
+package app.photopromptcodes
+
+import android.net.Uri
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import app.photopromptcodes.ui.CodeDetailScreen
+import app.photopromptcodes.ui.GalleryScreen
+import app.photopromptcodes.ui.HistoryScreen
+import app.photopromptcodes.ui.ResultDetailScreen
+import app.photopromptcodes.ui.RunScreen
+import app.photopromptcodes.ui.theme.PhotoPromptCodesTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            PhotoPromptCodesTheme {
+                AppNav()
+            }
+        }
+    }
+}
+
+@Composable
+fun AppNav() {
+    val nav = rememberNavController()
+    NavHost(navController = nav, startDestination = "gallery") {
+        composable("gallery") {
+            GalleryScreen(
+                onOpenCode = { code -> nav.navigate("detail/${Uri.encode(code)}") },
+                onOpenHistory = { nav.navigate("history") }
+            )
+        }
+        composable(
+            "detail/{code}",
+            arguments = listOf(navArgument("code") { type = NavType.StringType })
+        ) { entry ->
+            val code = Uri.decode(entry.arguments?.getString("code").orEmpty())
+            CodeDetailScreen(
+                code = code,
+                onBack = { nav.popBackStack() },
+                onEdit = { photoUri ->
+                    nav.navigate("run/${Uri.encode(code)}?photo=${Uri.encode(photoUri.toString())}")
+                }
+            )
+        }
+        composable(
+            "run/{code}?photo={photo}",
+            arguments = listOf(
+                navArgument("code") { type = NavType.StringType },
+                navArgument("photo") { type = NavType.StringType }
+            )
+        ) { entry ->
+            val code = Uri.decode(entry.arguments?.getString("code").orEmpty())
+            val photo = Uri.decode(entry.arguments?.getString("photo").orEmpty())
+            RunScreen(
+                code = code,
+                photoUriString = photo,
+                onBack = { nav.popBackStack() },
+                onDone = { recordId ->
+                    nav.navigate("result/$recordId") { popUpTo("gallery") }
+                }
+            )
+        }
+        composable("history") {
+            HistoryScreen(
+                onBack = { nav.popBackStack() },
+                onOpen = { id -> nav.navigate("result/$id") }
+            )
+        }
+        composable(
+            "result/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { entry ->
+            val id = entry.arguments?.getString("id").orEmpty()
+            ResultDetailScreen(
+                recordId = id,
+                onBack = { nav.popBackStack() }
+            )
+        }
+    }
+}

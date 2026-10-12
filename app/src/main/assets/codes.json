@@ -1,0 +1,1004 @@
+[
+  {
+    "code": "/portalshot",
+    "category": "Viral",
+    "description": "Step through a glowing portal ripped open in the scene.",
+    "prompt": "Edit this photo: tear a glowing, swirling portal open in the middle of the scene, as if reality itself has been ripped apart. The portal rim should crackle with light and energy, warping the space around it. Keep the subject of the photo fully recognizable and untouched in identity, pose and framing — only the environment around them bends toward the portal. Cinematic lighting, hyper-detailed edges where the portal meets the real world, photorealistic."
+  },
+  {
+    "code": "/cloneeffect",
+    "category": "Viral",
+    "description": "Duplicate the subject into two or three identical clones.",
+    "prompt": "Edit this photo: duplicate the main subject so two or three identical clones appear in the same scene, each in a slightly different pose or action, interacting naturally with the environment and each other. Keep faces, clothing and identity exactly consistent across every clone. Preserve the original background, lighting and camera angle. Seamless photorealistic compositing — no visible seams, matching shadows and reflections for each clone."
+  },
+  {
+    "code": "/giantperspective",
+    "category": "Viral",
+    "description": "Make the subject look gigantic next to tiny surroundings.",
+    "prompt": "Edit this photo using forced perspective: make the main subject appear gigantic — towering over the landscape, buildings or other people in the frame, like a titan. Keep the subject's identity, clothing and expression unchanged. The surroundings must shrink in scale convincingly with correct relative perspective, shadows and atmospheric haze on the distant tiny elements. Photorealistic, dramatic scale contrast."
+  },
+  {
+    "code": "/objecttransition",
+    "category": "Viral",
+    "description": "Morph an object mid-frame into something unexpected.",
+    "prompt": "Edit this photo: pick the most prominent handheld or foreground object and morph it mid-transformation into something surprising and thematically linked (for example a coffee cup dissolving into a galaxy, or a phone melting into light). Show the transition frozen halfway — half original object, half transformed — with particles, light trails and motion energy at the morph boundary. Keep the rest of the photo, including the subject, completely unchanged and photorealistic."
+  },
+  {
+    "code": "/mirrorportal",
+    "category": "Viral",
+    "description": "A mirror that opens into another world instead of reflecting.",
+    "prompt": "Edit this photo: transform any mirror, window or reflective surface in the scene into a portal — instead of a reflection it reveals a completely different world on the other side (a alien landscape, a city at night, an underwater scene). The portal surface ripples like liquid glass at the edges. Keep the subject and the rest of the room untouched and photorealistic; only the mirror's contents change, with light from the other world spilling subtly onto nearby surfaces."
+  },
+  {
+    "code": "/skyfall",
+    "category": "Viral",
+    "description": "The sky cracks and falls away in dramatic shards.",
+    "prompt": "Edit this photo: make the sky appear to be cracking and falling away in huge dramatic shards, like a breaking glass ceiling revealing a cosmic void, swirling clouds or an alien sky behind it. Keep the ground, subject and foreground completely intact and photorealistic. The falling sky fragments should catch the light with realistic reflections and cast subtle light onto the scene below. Epic, cinematic, hyper-detailed."
+  },
+  {
+    "code": "/realitybend",
+    "category": "Viral",
+    "description": "Warp and ripple the scene like melting reality.",
+    "prompt": "Edit this photo: bend and ripple reality across the frame — buildings lean, straight lines wave like heat haze, and parts of the scene stretch or swirl as if space itself is melting. Keep the main subject's face and body undistorted and fully recognizable; the distortion flows around them. Photorealistic rendering of the warp with consistent lighting, like a long-exposure glitch in the fabric of the world."
+  },
+  {
+    "code": "/doorreveal",
+    "category": "Viral",
+    "description": "A door in the scene swings open onto an impossible place.",
+    "prompt": "Edit this photo: place or reveal a door in the scene that stands slightly ajar, with brilliant light streaming through the gap onto the floor and nearby surfaces. Through the opening, show an impossible, breathtaking place — a floating island, a neon city, a sunlit meadow that cannot exist here. Keep the subject and the original environment photorealistic and unchanged; the magic is only the door and what lies beyond it, with realistic light spill and shadows."
+  },
+  {
+    "code": "/scrollstopper",
+    "category": "Viral",
+    "description": "Maximum-impact viral edit: impossible, thumb-stopping spectacle.",
+    "prompt": "Edit this photo into a scroll-stopping viral image: amplify it into something impossible yet photorealistic — defy gravity, scale or physics in one bold, instantly readable twist (subject levitating, world folded, giant elements intruding). Keep the subject's identity and face exactly recognizable. One clear impossible idea, executed with flawless lighting, shadows and detail so it looks like a real photograph of an impossible moment. High contrast, vivid, optimized to stop a scrolling thumb."
+  },
+  {
+    "code": "/goldenhour",
+    "category": "Lighting & Color",
+    "description": "Bathe the photo in warm, low golden-hour sunlight.",
+    "prompt": "Edit this photo to look as if it was taken during golden hour: bathe the scene in warm, low amber sunlight from a low angle. Add a soft golden glow on skin and surfaces, long gentle shadows, warm highlights with slightly lifted shadows, and a sun-kissed color grade — honey tones in the highlights, gentle warmth in the midtones. Keep the subject's identity, pose, clothing and the scene composition exactly the same; only relight and recolor. Photorealistic, no lens flare artifacts on faces."
+  },
+  {
+    "code": "/bluehour",
+    "category": "Lighting & Color",
+    "description": "Recolor into the deep blue tones of twilight.",
+    "prompt": "Edit this photo to look as if it was taken during blue hour, just after sunset: wash the scene in deep, cool cobalt and indigo tones. Skies go rich blue, shadows deepen to cool navy, and any artificial lights in the scene glow warm amber by contrast. Keep the subject's identity, pose and composition unchanged; only shift the light and color mood. Moody, cinematic, photorealistic twilight grade."
+  },
+  {
+    "code": "/cinematiccolor",
+    "category": "Lighting & Color",
+    "description": "Teal-and-orange blockbuster film color grade.",
+    "prompt": "Edit this photo with a cinematic blockbuster color grade: push shadows toward deep teal and highlights toward warm amber-orange, add gentle contrast with rich blacks, and give skin tones a healthy warm glow that pops against the cooler background. Keep the subject's identity, pose and composition exactly the same. The result should look like a still from a big-budget film — polished, dramatic, photorealistic."
+  },
+  {
+    "code": "/vintagecolor",
+    "category": "Lighting & Color",
+    "description": "Faded, warm analog film color grade.",
+    "prompt": "Edit this photo with a vintage analog film grade: fade the blacks slightly, warm up the midtones, add a subtle yellow-green cast reminiscent of aged 1970s film stock, soften contrast and micro-detail just a touch. Keep the subject's identity, pose and composition unchanged. It should feel like a well-preserved photograph from decades ago — nostalgic, warm, photorealistic with authentic film character, no heavy filters or borders."
+  },
+  {
+    "code": "/pastelcolor",
+    "category": "Lighting & Color",
+    "description": "Soft, dreamy pastel color palette.",
+    "prompt": "Edit this photo into a soft pastel grade: lift the shadows, desaturate strong colors into powdery pastels — blush pink, mint, baby blue, lavender — while keeping skin tones natural and flattering. Bright, airy, dreamy mood with gentle contrast. Keep the subject's identity, pose and composition exactly the same; only the color palette shifts. Clean, modern, photorealistic pastel aesthetic."
+  },
+  {
+    "code": "/warmcolor",
+    "category": "Lighting & Color",
+    "description": "Overall warm, cozy color temperature shift.",
+    "prompt": "Edit this photo with an overall warm color grade: shift the white balance warmer across the whole image — golden highlights, amber midtones, cozy brown-tinged shadows. The scene should feel like late afternoon sun even where the light is neutral. Keep the subject's identity, pose and composition unchanged, and keep skin tones natural rather than orange. Warm, inviting, photorealistic."
+  },
+  {
+    "code": "/coolcolor",
+    "category": "Lighting & Color",
+    "description": "Overall cool, crisp color temperature shift.",
+    "prompt": "Edit this photo with an overall cool color grade: shift the white balance cooler — icy blue-tinted highlights, steel-gray midtones, deep blue-green shadows. The scene should feel crisp and fresh, like an overcast morning or a modern minimalist interior. Keep the subject's identity, pose and composition unchanged, and keep skin tones believable rather than blue. Clean, cool, photorealistic."
+  },
+  {
+    "code": "/moodycolor",
+    "category": "Lighting & Color",
+    "description": "Dark, desaturated, dramatic moody grade.",
+    "prompt": "Edit this photo with a dark, moody grade: crush the blacks gently, desaturate colors by about half, deepen shadows with a cold undertone, and let only the key light on the subject stay luminous. The mood should feel dramatic and introspective, like a prestige TV drama still. Keep the subject's identity, pose and composition unchanged. Photorealistic, no crushed detail on the subject's face."
+  },
+  {
+    "code": "/vibrantcolor",
+    "category": "Lighting & Color",
+    "description": "Punchy, saturated, high-energy color pop.",
+    "prompt": "Edit this photo with a vibrant, punchy grade: boost saturation and color separation so every hue pops — lush greens, electric blues, vivid warm tones — while protecting skin tones from looking artificial. Add crisp micro-contrast and clean, bright exposure. Keep the subject's identity, pose and composition unchanged. High-energy, ultra-clean commercial photography look, photorealistic."
+  },
+  {
+    "code": "/24mmwide",
+    "category": "Lens & Depth",
+    "description": "Ultra-wide 24mm lens look with dramatic perspective.",
+    "prompt": "Edit this photo to look as if shot on a 24mm ultra-wide lens: expand the field of view with dramatic wide-angle perspective — foreground elements loom large, backgrounds stretch deep into the distance, subtle natural barrel distortion at the edges. Keep the subject's identity and the scene's content the same, reframed wider with more environment visible. Deep depth of field, everything sharp, epic wide-angle photojournalism feel, photorealistic."
+  },
+  {
+    "code": "/35mmistreet",
+    "category": "Lens & Depth",
+    "description": "Classic 35mm street-photography framing and feel.",
+    "prompt": "Edit this photo to look as if shot on a 35mm lens in classic street-photography style: natural, slightly wide framing that includes environmental context around the subject, candid unposed energy, honest documentary feel. Keep the subject's identity and the scene unchanged, reframed with the balanced, immersive perspective of a 35mm prime. Moderate depth of field, crisp detail, timeless street-photo aesthetic, photorealistic."
+  },
+  {
+    "code": "/50mmnatural",
+    "category": "Lens & Depth",
+    "description": "Natural 50mm lens look, closest to human vision.",
+    "prompt": "Edit this photo to look as if shot on a 50mm prime lens: the natural, undistorted perspective closest to human vision — no wide-angle stretch, no telephoto compression. Balanced framing, gentle background separation with soft, natural bokeh, true-to-life proportions on faces and bodies. Keep the subject's identity and scene unchanged. Clean, honest, classic photography look, photorealistic."
+  },
+  {
+    "code": "/85mmportrait",
+    "category": "Lens & Depth",
+    "description": "Creamy 85mm portrait lens with flattering compression.",
+    "prompt": "Edit this photo to look as if shot on an 85mm portrait lens: flattering slight telephoto compression on the subject's features, buttery shallow depth of field with creamy background bokeh that melts the background into soft color, tack-sharp focus on the eyes. Keep the subject's identity, expression and pose exactly the same. Dreamy, professional portrait look with beautiful subject separation, photorealistic."
+  },
+  {
+    "code": "/105mmclose",
+    "category": "Lens & Depth",
+    "description": "Tight 105mm close-up with strong background compression.",
+    "prompt": "Edit this photo to look as if shot on a 105mm short telephoto: tighter framing that pulls the viewer intimately close, strong background compression that stacks distant elements into layered, painterly backdrops, and very shallow depth of field. Keep the subject's identity and expression unchanged. Intimate, refined portrait aesthetic with exquisite background melt, photorealistic."
+  },
+  {
+    "code": "/macrolock",
+    "category": "Lens & Depth",
+    "description": "Extreme macro detail, razor-thin focus plane.",
+    "prompt": "Edit this photo to look as if shot with a macro lens at extreme close range: reveal breathtaking fine detail — skin texture, fabric weave, water droplets, tiny imperfections — with a razor-thin plane of focus and dreamy blur everywhere else. Keep the subject recognizable and the composition's intent, reframed as an intimate macro study. Hyper-detailed, tactile, photorealistic macro photography."
+  },
+  {
+    "code": "/shallowdof",
+    "category": "Lens & Depth",
+    "description": "Shallow depth of field: sharp subject, melted background.",
+    "prompt": "Edit this photo with shallow depth of field: keep the main subject tack-sharp while the background melts into a smooth, creamy blur with soft round bokeh highlights. Foreground elements near the lens may blur gently too. Keep the subject's identity, pose and the scene's content unchanged — only the focus falloff changes. Professional, polished separation between subject and background, photorealistic."
+  },
+  {
+    "code": "/deepperspective",
+    "category": "Lens & Depth",
+    "description": "Deep focus: razor sharp from foreground to horizon.",
+    "prompt": "Edit this photo with deep depth of field: render everything razor-sharp from the closest foreground detail all the way to the distant horizon, like a large-format landscape photograph. Keep the subject's identity, pose and composition unchanged. Rich micro-detail throughout the frame, no blur anywhere, grand and immersive clarity, photorealistic."
+  },
+  {
+    "code": "/anamorphic",
+    "category": "Lens & Depth",
+    "description": "Anamorphic widescreen look with oval bokeh and streaks.",
+    "prompt": "Edit this photo with an anamorphic cinema-lens character: wide cinematic aspect feel, oval-shaped bokeh in out-of-focus lights, subtle horizontal blue lens streaks on bright highlights, and a gentle widescreen compression of the frame. Keep the subject's identity, pose and scene unchanged. Premium Hollywood cinematography texture, photorealistic."
+  },
+  {
+    "code": "/leadinglines",
+    "category": "Cinematic Composition",
+    "description": "Recompose so lines in the scene lead the eye to the subject.",
+    "prompt": "Edit this photo's composition so strong leading lines — roads, rails, fences, architectural edges, light trails — guide the viewer's eye directly to the main subject. Enhance or emphasize existing linear elements in the scene, subtly straightening and strengthening them, with the subject placed at the natural vanishing convergence. Keep the subject's identity, pose and the scene's content unchanged; only recompose and emphasize. Cinematic, intentional framing, photorealistic."
+  },
+  {
+    "code": "/vanishingpoint",
+    "category": "Cinematic Composition",
+    "description": "One-point perspective converging on a distant vanishing point.",
+    "prompt": "Edit this photo into a striking one-point perspective composition: straighten the scene's geometry so all major lines — streets, corridors, rails, building edges — converge on a single distant vanishing point, with the subject positioned in powerful relation to it. Deep, hypnotic sense of depth pulling the eye into the frame. Keep the subject's identity and the scene's content unchanged. Architectural, cinematic precision, photorealistic."
+  },
+  {
+    "code": "/framewithinframe",
+    "category": "Cinematic Composition",
+    "description": "Frame the subject through a doorway, window or arch.",
+    "prompt": "Edit this photo using a frame-within-a-frame composition: present the subject seen through a natural frame in the environment — a doorway, window, archway, or gap between objects — with the foreground frame softly darker or slightly out of focus. Keep the subject's identity, pose and expression unchanged. The layered framing should add depth and a voyeuristic, cinematic intimacy. Photorealistic."
+  },
+  {
+    "code": "/foregrounddepth",
+    "category": "Cinematic Composition",
+    "description": "Add layered foreground elements for deep, dimensional depth.",
+    "prompt": "Edit this photo to add rich foreground layering: introduce softly blurred foreground elements — foliage, fabric, architectural details, light bokeh — at the frame's edges that the viewer looks past to reach the sharp subject. Keep the subject's identity, pose and the midground scene unchanged. The result should feel deep, dimensional and immersive, like peering into a real moment. Cinematic depth, photorealistic."
+  },
+  {
+    "code": "/symmetricalshot",
+    "category": "Cinematic Composition",
+    "description": "Perfect mirror symmetry, Wes Anderson-style balance.",
+    "prompt": "Edit this photo into perfect symmetrical composition: balance the frame so left mirrors right around a central axis through the subject — architecture, objects and background elements arranged in near-perfect mirror balance. Keep the subject's identity, pose and expression unchanged, centered as the anchor of the symmetry. Precise, satisfying, stylized balance with cinematic stillness. Photorealistic."
+  },
+  {
+    "code": "/negativespace",
+    "category": "Cinematic Composition",
+    "description": "Minimalist composition with vast empty space around the subject.",
+    "prompt": "Edit this photo into a minimalist composition dominated by negative space: shrink the subject's presence within a vast, clean expanse — empty sky, blank wall, open water, soft fog — placing the subject small and deliberate according to the rule of thirds. Keep the subject's identity and pose unchanged. The emptiness should feel intentional and powerful, evoking solitude and scale. Fine-art minimalism, photorealistic."
+  },
+  {
+    "code": "/reflectionshot",
+    "category": "Cinematic Composition",
+    "description": "Compose around a striking mirror reflection of the subject.",
+    "prompt": "Edit this photo to feature a striking reflection: make a mirror, still water, polished floor or glass surface in the scene carry a clear, beautiful reflection of the subject, and compose the frame so the reflection is a co-star of the image. Keep the subject's identity and pose unchanged; the reflection must match the subject exactly with realistic ripple, distortion and light behavior of the surface. Dreamy, symmetrical, photorealistic."
+  },
+  {
+    "code": "/silhouette",
+    "category": "Cinematic Composition",
+    "description": "Render the subject as a bold backlit silhouette.",
+    "prompt": "Edit this photo so the main subject becomes a bold silhouette: expose for a bright, dramatic background — sunset, glowing window, city lights — and render the subject as a dark, crisp shape with clean readable edges. Preserve the subject's pose and outline exactly so they remain identifiable by silhouette alone, with a thin rim of light tracing their contours. Dramatic, graphic, cinematic. Photorealistic backlight."
+  },
+  {
+    "code": "/epicperspective",
+    "category": "Cinematic Composition",
+    "description": "Grand, sweeping epic scale like a film establishing shot.",
+    "prompt": "Edit this photo into an epic, sweeping establishing shot: pull the composition grand and wide, dwarf the subject against vast architecture, landscapes or skies, with dramatic atmospheric depth and a sense of awe. Keep the subject's identity and pose unchanged — they become the human anchor in an immense world. Blockbuster film grandeur, rich detail at every distance, photorealistic."
+  },
+  {
+    "code": "/freezeaction",
+    "category": "Motion",
+    "description": "Freeze explosive action tack-sharp mid-moment.",
+    "prompt": "Edit this photo to freeze peak action with absolute sharpness: capture the decisive split-second — mid-jump, mid-splash, hair and fabric suspended — rendered tack-sharp with zero motion blur, as if shot at 1/8000s. Enhance the drama of the frozen instant with crisp detail on every droplet, particle and strand. Keep the subject's identity and the scene unchanged. High-speed photography intensity, photorealistic."
+  },
+  {
+    "code": "/motionblur",
+    "category": "Motion",
+    "description": "Streak the background with speed while the subject stays sharp.",
+    "prompt": "Edit this photo with dynamic motion blur: keep the main subject sharp while the background streaks horizontally with speed, as if shot with a panning technique — light trails, blurred textures rushing past. The blur direction should follow the subject's implied movement. Keep the subject's identity, pose and expression unchanged. Exhilarating sense of velocity, photorealistic panning photography."
+  },
+  {
+    "code": "/trackingshot",
+    "category": "Motion",
+    "description": "Cinematic tracking-shot feel, gliding alongside the subject.",
+    "prompt": "Edit this photo to feel like a frame from a cinematic tracking shot: the camera glides alongside the moving subject, who stays sharp and centered while the world streams past in smooth lateral blur. Slight forward momentum in the framing, anamorphic-style polish. Keep the subject's identity and the scene's content unchanged. Fluid, filmic motion energy, photorealistic."
+  },
+  {
+    "code": "/pullin",
+    "category": "Motion",
+    "description": "Dolly-zoom pull-in: the world rushes toward the viewer.",
+    "prompt": "Edit this photo with a dramatic pull-in effect: the perspective rushes toward the viewer as if the camera is dollying in fast — foreground elements stretch slightly toward the lens, background compresses, with subtle radial motion energy converging on the subject. Keep the subject's identity sharp and unchanged at the center of the rush. Heart-pounding cinematic momentum, photorealistic."
+  },
+  {
+    "code": "/pullout",
+    "category": "Motion",
+    "description": "Crane pull-out: reveal the vast world around the subject.",
+    "prompt": "Edit this photo with a majestic crane pull-out feel: expand the frame outward to reveal the vast world surrounding the subject — more sky, more landscape, more context — as if the camera is rising and pulling back. The subject stays sharp, now set within a grander revealed environment consistent with the original scene. Keep the subject's identity unchanged. Breathtaking expanding scale, photorealistic."
+  },
+  {
+    "code": "/extremepov",
+    "category": "Motion",
+    "description": "First-person extreme POV, right in the middle of the action.",
+    "prompt": "Edit this photo into an extreme first-person POV: reframe as if the viewer is inside the action — hands, feet or equipment visible at the frame edges, the world rushing or looming around them, visceral immediacy. Keep the scene's content and any visible people recognizable. Adrenaline-fueled, immersive, photorealistic POV photography."
+  },
+  {
+    "code": "/viralshot",
+    "category": "Motion",
+    "description": "High-energy viral action frame with explosive dynamism.",
+    "prompt": "Edit this photo into a high-energy viral action frame: inject explosive dynamism — the subject caught mid-motion with hair, clothing or surrounding elements flying, dramatic rim lighting, punchy contrast, and a sense of barely-contained energy. Keep the subject's identity and the scene's content unchanged. It should feel like the single most exciting frame of a viral video, photorealistic and thumb-stopping."
+  },
+  {
+    "code": "/dynamicshot",
+    "category": "Motion",
+    "description": "Diagonal, off-balance dynamic composition full of movement.",
+    "prompt": "Edit this photo with a dynamic, off-balance composition: tilt the energy with strong diagonals, the subject caught leaning into motion, asymmetric framing that feels alive and unstable in the best way. Enhance the sense that something is happening right now. Keep the subject's identity and the scene's content unchanged. Electric, kinetic, photorealistic sports-editorial energy."
+  },
+  {
+    "code": "/cinematicpov",
+    "category": "Motion",
+    "description": "Over-the-shoulder cinematic POV with shallow focus.",
+    "prompt": "Edit this photo into a cinematic point-of-view shot: reframe as if seen through a character's eyes or just over their shoulder — a hint of the observer at the frame's edge, the world ahead in sharp focus with shallow, filmic depth. Keep the scene's content and identities unchanged. Intimate, narrative, like a pivotal film moment shown from inside the story. Photorealistic."
+  },
+  {
+    "code": "/topangle",
+    "category": "Angles",
+    "description": "High top-down angle looking over the scene.",
+    "prompt": "Edit this photo to a high top-down angle: reframe as if the camera looks down at the scene from above at roughly 45 degrees, revealing the layout — the subject from above, the ground plane spreading out, objects arranged in the frame. Keep the subject's identity, clothing and the scene's content unchanged, only the viewpoint shifts. Clean, revealing, photorealistic high-angle photography."
+  },
+  {
+    "code": "/lowangle",
+    "category": "Angles",
+    "description": "Low angle looking up: powerful, heroic, monumental.",
+    "prompt": "Edit this photo to a low camera angle: reframe as if shot from near the ground looking up at the subject, making them appear powerful, heroic and monumental against the sky or ceiling. Elongate the subject's presence with the slight perspective exaggeration of a true low angle. Keep the subject's identity, clothing and expression unchanged. Dramatic, empowering, photorealistic."
+  },
+  {
+    "code": "/wideangle",
+    "category": "Angles",
+    "description": "Expansive wide-angle view packed with environment.",
+    "prompt": "Edit this photo into an expansive wide-angle view: pull back to reveal much more of the environment around the subject — the full scene, the architecture, the landscape — with the subject placed deliberately within it. Keep the subject's identity and the scene's content unchanged. Grand, contextual, immersive wide photography, photorealistic."
+  },
+  {
+    "code": "/overhead",
+    "category": "Angles",
+    "description": "Directly overhead flat-lay style composition.",
+    "prompt": "Edit this photo into a directly overhead composition: camera pointing straight down, the scene arranged like a flat-lay — subject and objects seen from directly above in a clean, graphic arrangement. Keep the subject's identity and the scene's content recognizable, translated faithfully to the top-down view. Striking, orderly, photorealistic overhead photography."
+  },
+  {
+    "code": "/birdsview",
+    "category": "Angles",
+    "description": "Bird's-eye view from high above the world.",
+    "prompt": "Edit this photo into a bird's-eye view: reframe as if captured from high above — a drone's perspective — the subject small within a sweeping view of the terrain, streets or interior below, with rich topographical detail. Keep the subject and scene content recognizable from above. Majestic, map-like, photorealistic aerial photography."
+  },
+  {
+    "code": "/wormsview",
+    "category": "Angles",
+    "description": "Worm's-eye view from ground level looking straight up.",
+    "prompt": "Edit this photo into a worm's-eye view: camera at ground level pointing straight up — towering subject, soaring architecture or trees converging overhead, sky dominating the frame. Extreme low-angle drama with strong vertical energy. Keep the subject's identity and the scene's content unchanged. Dizzying, monumental, photorealistic."
+  },
+  {
+    "code": "/closeup",
+    "category": "Angles",
+    "description": "Intimate close-up on the subject's face or key detail.",
+    "prompt": "Edit this photo into an intimate close-up: move in tight on the subject's face (or the photo's most important detail), filling the frame with expressive features — eyes sharp, skin texture real, every nuance visible. Keep the subject's identity and expression exactly unchanged. Background falls away into soft blur. Raw, personal, photorealistic close-up photography."
+  },
+  {
+    "code": "/threequarter",
+    "category": "Angles",
+    "description": "Flattering three-quarter turn portrait angle.",
+    "prompt": "Edit this photo to a three-quarter portrait angle: turn the subject slightly so we see them at roughly 45 degrees — the most flattering classic portrait angle — with dimensional modeling of the face, gentle shadow shaping the features. Keep the subject's identity and expression unchanged. Timeless, refined portraiture, photorealistic."
+  },
+  {
+    "code": "/dutchangle",
+    "category": "Angles",
+    "description": "Tilted Dutch angle for unease and edgy energy.",
+    "prompt": "Edit this photo with a Dutch angle: tilt the horizon and the whole frame diagonally for a sense of unease, tension and edgy energy — the world feels off-kilter while the subject stays sharp and compelling within it. Keep the subject's identity and the scene's content unchanged. Stylized, psychological, cinematic tilt, photorealistic."
+  },
+  {
+    "code": "/forcedperspective",
+    "category": "Perspective",
+    "description": "Playful forced-perspective optical illusion.",
+    "prompt": "Edit this photo into a playful forced-perspective illusion: rearrange the apparent scale and positions so the subject appears to interact impossibly with distant objects — holding up a building, pinching the sun, standing on a friend's hand. Keep the subject's identity and the scene's content unchanged; only the alignment creates the trick. Clever, fun, seamlessly photorealistic so the illusion reads instantly."
+  },
+  {
+    "code": "/microworld",
+    "category": "Perspective",
+    "description": "Tiny-planet effect: the world curves into a little globe.",
+    "prompt": "Edit this photo into a tiny-planet microworld: warp the scene's horizon into a perfect circle so the entire world curves into a small floating globe, with the subject standing on its surface and the sky wrapping around outside it. Keep the subject's identity and the scene's content recognizable within the warp. Whimsical, mind-bending, photorealistic tiny-planet photography."
+  },
+  {
+    "code": "/reflectionhack",
+    "category": "Perspective",
+    "description": "Fake a stunning reflection with a phone-under-lens trick look.",
+    "prompt": "Edit this photo to look like the classic phone-under-the-lens reflection hack: add a flawless mirror reflection of the scene along the bottom of the frame, as if the photo was taken with a phone screen held under the lens — crisp symmetrical doubling with realistic water-like or glass-like reflection behavior. Keep the subject and scene unchanged above the reflection line. Sleek, viral, photorealistic."
+  },
+  {
+    "code": "/throughobject",
+    "category": "Perspective",
+    "description": "Shoot through glass, leaves or fabric for textured framing.",
+    "prompt": "Edit this photo as if shot through an object: place a textured foreground layer — rain-streaked glass, out-of-focus leaves, sheer fabric, a fence — between the viewer and the sharp subject, with the texture softly blurring at the frame's edges. Keep the subject's identity and the scene unchanged behind the layer. Artistic, layered, voyeuristic depth, photorealistic."
+  },
+  {
+    "code": "/foregroundframe",
+    "category": "Perspective",
+    "description": "Use foreground shapes as a natural frame for the subject.",
+    "prompt": "Edit this photo so foreground shapes form a natural frame around the subject: branches, arches, hands, or architectural edges encircle the subject, drawing all attention inward. The frame elements sit close to the lens, softly blurred, while the subject stays tack-sharp. Keep the subject's identity and the scene unchanged. Elegant, deliberate, photorealistic natural framing."
+  },
+  {
+    "code": "/groundreflection",
+    "category": "Perspective",
+    "description": "Turn wet ground into a perfect mirror under the subject.",
+    "prompt": "Edit this photo so the ground becomes a perfect mirror: render the floor, street or earth beneath the subject as wet, polished and reflective, carrying a crisp mirror image of the subject and the scene with realistic reflection physics — slight blur with distance, accurate angles. Keep the subject's identity and the upper scene unchanged. Sleek, dramatic, photorealistic wet-street aesthetic."
+  },
+  {
+    "code": "/parallaxshot",
+    "category": "Perspective",
+    "description": "Layered parallax depth, ready for a 3D Ken Burns drift.",
+    "prompt": "Edit this photo with pronounced layered parallax depth: separate the scene into distinct depth planes — sharp foreground, midground subject, distant background — each cleanly delineated with natural atmospheric haze increasing with distance, as if prepared for a slow 3D Ken Burns camera drift. Keep the subject's identity and the scene unchanged. Deep, dimensional, photorealistic."
+  },
+  {
+    "code": "/shadowscape",
+    "category": "Creator Packs",
+    "description": "Turn shadows into a living, sculptural landscape.",
+    "prompt": "Edit this photo in the shadowscape style: transform the shadows in the scene into a living, sculptural landscape — shadows stretch, rise and take on dramatic three-dimensional forms like dark architecture or creatures of shade, while the lit areas stay clean and photorealistic. Keep the subject's identity and pose unchanged; let the shadows perform around them. High-contrast chiaroscuro, hyper-detailed shadow rendering, cinematic and surreal."
+  },
+  {
+    "code": "/realitytear",
+    "category": "Creator Packs",
+    "description": "Rip a tear in reality revealing what's underneath.",
+    "prompt": "Edit this photo with a reality tear: rip a jagged tear across the scene as if the photograph itself is paper being torn open — curled, fibrous edges revealing something impossible underneath (a starfield, an ocean, pure light). Keep the subject's identity and the surrounding scene photorealistic and intact; the tear is the single impossible event, with realistic curled-paper depth and light falling into the opening. Striking, tactile, viral."
+  },
+  {
+    "code": "/FOGYFOREST",
+    "category": "Creator Packs",
+    "description": "Envelop the scene in thick, mystical forest fog.",
+    "prompt": "Edit this photo in the FOGYFOREST style: envelop the scene in thick, mystical fog — volumetric mist rolling between trees or structures, light diffusing into soft glowing halos, background dissolving into layered white-gray depth. Keep the subject's identity and pose unchanged, emerging from the fog with gentle rim light. Ethereal, moody, photorealistic atmosphere with real depth falloff."
+  },
+  {
+    "code": "/SOULRISR",
+    "category": "Creator Packs",
+    "description": "Soul rising: luminous spirit-light lifting from the subject.",
+    "prompt": "Edit this photo in the SOULRISR style: render a luminous, ethereal light rising from the subject — like a soul or spirit made of soft glowing particles and light wisps lifting gently upward, translucent and radiant. Keep the subject's identity, pose and the scene photorealistic and grounded; the rising light is the supernatural element, beautifully integrated with realistic glow falloff on nearby surfaces. Transcendent, emotional, cinematic."
+  },
+  {
+    "code": "/DRAKSTUDIO",
+    "category": "Creator Packs",
+    "description": "Dark, premium studio portrait with dramatic low-key light.",
+    "prompt": "Edit this photo in the DRAKSTUDIO style: transform it into a dark, premium studio portrait — near-black background falling off into shadow, dramatic low-key lighting sculpting the subject with a single strong key light and deep, rich shadows. Keep the subject's identity, pose and expression exactly unchanged. High-end editorial darkness, crisp detail in the highlights, luxurious and powerful. Photorealistic studio photography."
+  },
+  {
+    "code": "/FIRE FADE",
+    "category": "Creator Packs",
+    "description": "Embers and fire fading across the frame like burning film.",
+    "prompt": "Edit this photo in the FIRE FADE style: sweep embers, sparks and licks of flame fading across the frame like burning film — glowing orange cracks, drifting ash particles, heat shimmer at the edges — while the subject remains sharp and untouched at the center. Keep the subject's identity and pose unchanged. The fire should feel photographic and real, with accurate light cast onto the subject from the flames. Fierce, cinematic, photorealistic."
+  },
+  {
+    "code": "/MIRROR SELFIE",
+    "category": "Creator Packs",
+    "description": "Stylized mirror-selfie aesthetic, flash-on cool tones.",
+    "prompt": "Edit this photo in the MIRROR SELFIE aesthetic: give it the iconic mirror-selfie look — slightly cool flash-lit tones, crisp direct-flash lighting on the subject, a hint of candid phone-photo spontaneity, clean and sharp. Keep the subject's identity, pose and the scene unchanged. It should feel like the best possible version of a flash mirror selfie: flattering, high-detail, effortlessly cool, photorealistic."
+  },
+  {
+    "code": "/TOPVIEW",
+    "category": "Creator Packs",
+    "description": "Dramatic top-down view with bold graphic composition.",
+    "prompt": "Edit this photo in the TOPVIEW style: reframe to a dramatic top-down view — camera directly above, the subject and surroundings arranged in a bold, graphic composition with strong shapes and clean geometry. Keep the subject's identity and the scene's content recognizable from above. Striking, modern, social-media-native overhead aesthetic, photorealistic."
+  },
+  {
+    "code": "/TIMECOLLAPSE",
+    "category": "Creator Packs",
+    "description": "Collapse multiple moments of time into one frame.",
+    "prompt": "Edit this photo in the TIMECOLLAPSE style: collapse multiple moments into a single frame — show the subject two or three times across the scene at different points of an action, like long-exposure chronophotography, with motion trails connecting the instants. Keep the subject's identity consistent in every instance. The background stays single and coherent. Fascinating, dynamic time-slice photography, photorealistic."
+  },
+  {
+    "code": "/CLOUDGLOW",
+    "category": "Creator Packs",
+    "description": "Bathe the scene in soft, glowing cloud-diffused light.",
+    "prompt": "Edit this photo in the CLOUDGLOW style: bathe the scene in soft, glowing cloud-diffused light — as if the sun is burning through a thin cloud layer, wrapping everything in luminous, shadowless radiance with a gentle bloom on highlights. Keep the subject's identity and pose unchanged, skin glowing softly. Dreamy, heavenly, photorealistic light."
+  },
+  {
+    "code": "/REVERSETIME",
+    "category": "Creator Packs",
+    "description": "Time running backward: splashes rise, shards reassemble.",
+    "prompt": "Edit this photo in the REVERSETIME style: depict time running backward — water droplets rising back into a splash, shattered fragments reassembling mid-air, dust and particles streaming in reverse. Keep the subject's identity and the scene's content unchanged; only the physics of a key moment runs in reverse, frozen at the most dramatic instant. Surreal, mesmerizing, photorealistic."
+  },
+  {
+    "code": "/SHADOWMORPH",
+    "category": "Creator Packs",
+    "description": "The subject's shadow morphs into something else entirely.",
+    "prompt": "Edit this photo in the SHADOWMORPH style: keep the subject fully lit and normal, but morph their cast shadow into something else entirely — a creature, a symbol, a dramatic shape that tells a second story. The shadow must obey the scene's real light direction and fall naturally on the ground plane. Keep the subject's identity and pose unchanged. Clever, symbolic, photorealistic shadow play."
+  },
+  {
+    "code": "/X-ray",
+    "category": "Creator Packs",
+    "description": "X-ray vision aesthetic revealing hidden inner structure.",
+    "prompt": "Edit this photo in the X-ray style: apply an X-ray vision aesthetic to a chosen element — reveal the hidden inner structure beneath surfaces (architecture's skeleton, an object's mechanics, ghostly translucent layers) in glowing blue-white X-ray tones, while the rest of the photo stays normal and photorealistic. Keep the subject's identity unchanged. Futuristic, revealing, scientifically beautiful."
+  },
+  {
+    "code": "/FISHEYE",
+    "category": "Creator Packs",
+    "description": "Bold fisheye distortion with extreme curved perspective.",
+    "prompt": "Edit this photo with a bold fisheye lens effect: apply strong spherical distortion — straight lines curving dramatically at the edges, the center bulging toward the viewer, extreme 180-degree field-of-view energy. Keep the subject's identity recognizable near the center where distortion is minimal. Fun, extreme, skate-video fisheye aesthetic, photorealistic."
+  },
+  {
+    "code": "/CINEMATICWORLD",
+    "category": "Creator Packs",
+    "description": "Turn the location into a full cinematic universe.",
+    "prompt": "Edit this photo in the CINEMATICWORLD style: elevate the location into a full cinematic universe — enrich the environment with film-grade atmosphere, dramatic skies, enhanced architecture or landscape detail, epic scale and depth, as if this frame belongs in a blockbuster. Keep the subject's identity and pose unchanged, now starring in a bigger world. Sweeping, immersive, photorealistic world-building."
+  },
+  {
+    "code": "/LIGHTTRAIL",
+    "category": "Creator Packs",
+    "description": "Paint the scene with long-exposure light trails.",
+    "prompt": "Edit this photo with long-exposure light trails: weave glowing ribbons of light through the scene — car trails, sparkler writing, neon streams — captured as smooth luminous paths with realistic bloom and color. Keep the subject's identity and the scene's base exposure natural and photorealistic; the light trails are the long-exposure magic layered on top. Electric, mesmerizing night-photography energy."
+  },
+  {
+    "code": "/DOLLYZOOM",
+    "category": "Creator Packs",
+    "description": "Vertigo dolly-zoom: background warps while subject stays fixed.",
+    "prompt": "Edit this photo with the vertigo dolly-zoom effect: keep the subject exactly the same size and position while the background appears to stretch and warp away from them — that classic Hitchcockian spatial distortion with subtle radial stretching at the frame edges. Keep the subject's identity unchanged. Disorienting, thrilling, psychologically intense, photorealistic."
+  },
+  {
+    "code": "/hdreal",
+    "category": "Angles & Views",
+    "description": "Crisp HD realism with clean, true-to-life detail.",
+    "prompt": "Edit this photo for crisp HD realism: enhance clarity and micro-detail to clean high-definition standards — sharp textures, accurate colors, balanced exposure — while keeping the subject's identity, pose and the scene exactly the same. No stylization, no beauty-filter smoothing; just pristine, true-to-life photographic realism."
+  },
+  {
+    "code": "/4k",
+    "category": "Angles & Views",
+    "description": "Ultra-detailed 4K sharpness and clarity.",
+    "prompt": "Edit this photo to 4K ultra-definition quality: maximize fine detail and sharpness — every texture, strand and surface rendered with pristine clarity — while keeping the subject's identity, pose and composition unchanged. Clean, premium, hyper-detailed photographic quality with no artifacts or over-sharpening halos."
+  },
+  {
+    "code": "/8k",
+    "category": "Angles & Views",
+    "description": "Maximum 8K hyper-detail, beyond human-eye sharpness.",
+    "prompt": "Edit this photo to 8K hyper-definition: push detail to the absolute maximum — microscopic texture, flawless edges, immense clarity across the entire frame — while keeping the subject's identity, pose and composition unchanged. The pinnacle of digital sharpness, clean and artifact-free, photorealistic."
+  },
+  {
+    "code": "/cinematic",
+    "category": "Angles & Views",
+    "description": "Full cinematic film-still treatment.",
+    "prompt": "Edit this photo into a cinematic film still: widescreen compositional polish, filmic contrast curve, rich color depth, subtle grain, and dramatic motivated lighting. Keep the subject's identity, pose and the scene unchanged. It should look like a paused frame from a beautifully shot movie — intentional, atmospheric, photorealistic."
+  },
+  {
+    "code": "/ultrarealistic",
+    "category": "Angles & Views",
+    "description": "Push realism to the extreme: flawless photographic truth.",
+    "prompt": "Edit this photo toward ultra-realism: refine every element to flawless photographic truth — perfect exposure, natural color science, true textures, believable light behavior on every surface. Keep the subject's identity, pose and composition unchanged. The image should be indistinguishable from a masterfully captured real photograph."
+  },
+  {
+    "code": "/droneview",
+    "category": "Angles & Views",
+    "description": "Sweeping drone perspective from above.",
+    "prompt": "Edit this photo into a sweeping drone perspective: reframe from above at a dynamic three-quarter aerial angle, revealing the scene's layout with the subject placed within a broader landscape or setting. Keep the subject's identity and the scene's content recognizable. Smooth, majestic, photorealistic drone photography with natural atmospheric depth."
+  },
+  {
+    "code": "/topdown",
+    "category": "Angles & Views",
+    "description": "Straight top-down view, graphic and clean.",
+    "prompt": "Edit this photo into a straight top-down view: camera pointing directly downward, the scene laid out in a clean graphic composition. Keep the subject's identity and the scene's content recognizable from above. Bold, orderly, photorealistic overhead photography."
+  },
+  {
+    "code": "/highangle",
+    "category": "Angles & Views",
+    "description": "Elevated high angle looking down on the subject.",
+    "prompt": "Edit this photo to an elevated high angle: camera raised above eye level looking down at the subject, who appears slightly smaller and more vulnerable within the visible surroundings. Keep the subject's identity, pose and the scene unchanged apart from the viewpoint. Classic, storytelling high-angle photography, photorealistic."
+  },
+  {
+    "code": "/sideview",
+    "category": "Angles & Views",
+    "description": "Pure profile side view of the subject.",
+    "prompt": "Edit this photo into a pure side view: reframe to a clean 90-degree profile of the subject — the elegant outline of the profile, strong graphic simplicity. Keep the subject's identity recognizable in profile and the scene's character intact. Minimal, striking, photorealistic profile photography."
+  },
+  {
+    "code": "/aerialview",
+    "category": "Angles & Views",
+    "description": "Grand aerial vista with the world spread below.",
+    "prompt": "Edit this photo into a grand aerial vista: high above the world, the landscape, city or interior spread out below in sweeping detail with the subject situated within it. Keep the subject and scene content recognizable. Expansive, awe-inspiring, photorealistic aerial photography."
+  },
+  {
+    "code": "/extremecloseup",
+    "category": "Extreme Angles",
+    "description": "Extreme close-up: a single feature fills the frame.",
+    "prompt": "Edit this photo into an extreme close-up: fill the frame with a single powerful feature — an eye, lips, hands, a textured detail — rendered with staggering sharpness and shallow depth of field. Keep the subject's identity consistent with the original. Intense, intimate, photorealistic macro-portrait energy."
+  },
+  {
+    "code": "/pov",
+    "category": "Extreme Angles",
+    "description": "Immersive point-of-view framing.",
+    "prompt": "Edit this photo into an immersive point-of-view framing: reframe as if the viewer is a participant in the scene — natural eye-level perspective, slight handheld intimacy, the world arranged around the viewer's gaze. Keep the scene's content and identities unchanged. Immediate, personal, photorealistic POV photography."
+  },
+  {
+    "code": "/overtheshoulder",
+    "category": "Extreme Angles",
+    "description": "Over-the-shoulder shot with layered depth.",
+    "prompt": "Edit this photo into an over-the-shoulder composition: place a softly blurred shoulder and partial silhouette in the immediate foreground, looking past them to the sharp subject beyond. Keep the subject's identity and the scene unchanged. Narrative, cinematic, layered depth, photorealistic."
+  },
+  {
+    "code": "/birdseyeview",
+    "category": "Extreme Angles",
+    "description": "Direct bird's-eye view straight down from the sky.",
+    "prompt": "Edit this photo into a direct bird's-eye view: straight down from high above, the world flattened into a living map with the subject visible within it. Keep the subject and scene recognizable from directly overhead. Stunning, cartographic, photorealistic."
+  },
+  {
+    "code": "/wormseyeview",
+    "category": "Extreme Angles",
+    "description": "Extreme worm's-eye view from the ground up.",
+    "prompt": "Edit this photo into an extreme worm's-eye view: from ground level looking straight up, everything towers — the subject monumental against the sky, verticals converging dramatically overhead. Keep the subject's identity and the scene unchanged. Dizzying, powerful, photorealistic."
+  },
+  {
+    "code": "/fog",
+    "category": "Atmosphere & Weather",
+    "description": "Thick fog rolling through the scene.",
+    "prompt": "Edit this photo to add thick, rolling fog: let dense mist swallow the background in soft white-gray layers while the subject emerges clearly in the foreground with gentle diffusion on their edges. Keep the subject's identity and pose unchanged. Atmospheric depth should fall off naturally with distance. Mysterious, cinematic, photorealistic fog."
+  },
+  {
+    "code": "/mist",
+    "category": "Atmosphere & Weather",
+    "description": "Delicate mist softening the air.",
+    "prompt": "Edit this photo to add a delicate mist: a fine, luminous haze softening the air, catching the light in gentle halos, background melting into dreamy softness while the subject stays clear and sharp. Keep the subject's identity and pose unchanged. Ethereal, romantic, photorealistic."
+  },
+  {
+    "code": "/rainynight",
+    "category": "Atmosphere & Weather",
+    "description": "Rain-soaked night with glowing wet reflections.",
+    "prompt": "Edit this photo into a rainy night scene: darkness lit by glowing streetlights or neon, rain streaking through the light beams, every surface wet and reflective with shimmering mirrored highlights. Keep the subject's identity and pose unchanged, lit by the moody night sources. Noir, electric, photorealistic rainy-night cinema."
+  },
+  {
+    "code": "/rain",
+    "category": "Atmosphere & Weather",
+    "description": "Gentle rain falling through the frame.",
+    "prompt": "Edit this photo to add falling rain: streaks of rain visible against darker backgrounds, subtle splashes and wet sheen on surfaces, the air feeling fresh and heavy. Keep the subject's identity, pose and the scene's lighting mood coherent. Poetic, melancholic, photorealistic rain."
+  },
+  {
+    "code": "/storm",
+    "category": "Atmosphere & Weather",
+    "description": "Dramatic storm skies with electric tension.",
+    "prompt": "Edit this photo to add a dramatic storm: brooding dark clouds churning overhead, electric tension in the air, wind-swept energy in hair, clothing and surroundings, contrast cranked with ominous depth. Keep the subject's identity and pose unchanged. Powerful, foreboding, photorealistic storm drama."
+  },
+  {
+    "code": "/snow",
+    "category": "Atmosphere & Weather",
+    "description": "Falling snow blanketing the scene in white.",
+    "prompt": "Edit this photo to add falling snow: delicate flakes drifting through the frame, surfaces dusted white, the light turning cool and diffused, breath visible in the cold air if the subject is close. Keep the subject's identity and pose unchanged. Serene, magical, photorealistic winter."
+  },
+  {
+    "code": "/sunset",
+    "category": "Atmosphere & Weather",
+    "description": "Fiery sunset skies with dramatic color.",
+    "prompt": "Edit this photo into a sunset scene: paint the sky in fiery oranges, pinks and purples, long dramatic shadows stretching across the ground, the subject rimmed in warm dying light. Keep the subject's identity and pose unchanged. Breathtaking, romantic, photorealistic golden-hour drama."
+  },
+  {
+    "code": "/sunrise",
+    "category": "Atmosphere & Weather",
+    "description": "Fresh sunrise light breaking over the scene.",
+    "prompt": "Edit this photo into a sunrise scene: soft peach and gold light breaking low across the frame, long gentle shadows, the air feeling fresh and full of promise, cool shadows balancing the warm highlights. Keep the subject's identity and pose unchanged. Hopeful, pristine, photorealistic dawn light."
+  },
+  {
+    "code": "/moonlight",
+    "category": "Atmosphere & Weather",
+    "description": "Cool silver moonlight bathing the night scene.",
+    "prompt": "Edit this photo into moonlight: bathe the scene in cool silver-blue lunar light, deep blue shadows, a luminous moon glowing in the sky, everything hushed and nocturnal. Keep the subject's identity and pose unchanged, lit softly by the moon. Dreamlike, tranquil, photorealistic night."
+  },
+  {
+    "code": "/neonlights",
+    "category": "Atmosphere & Weather",
+    "description": "Neon-soaked night with electric color glow.",
+    "prompt": "Edit this photo into a neon-lit night: drench the scene in electric neon color — magenta, cyan, violet signs and strips glowing, their colored light washing over the subject and wet surfaces. Keep the subject's identity and pose unchanged. Cyber-urban, vibrant, photorealistic neon noir."
+  },
+  {
+    "code": "/cyberpunk",
+    "category": "Atmosphere & Weather",
+    "description": "Full cyberpunk dystopia: neon, rain, holograms.",
+    "prompt": "Edit this photo into a cyberpunk scene: rain-slicked streets, towering neon signage, holographic glows, dense futuristic atmosphere with cyan-magenta color clash. Keep the subject's identity and pose unchanged, now a figure in a dystopian metropolis. Gritty, electric, photorealistic cyberpunk."
+  },
+  {
+    "code": "/darkmoody",
+    "category": "Atmosphere & Weather",
+    "description": "Dark, brooding, emotionally heavy atmosphere.",
+    "prompt": "Edit this photo into a dark, moody atmosphere: deepen shadows toward black, mute the palette to somber tones, let a single dramatic light source carve the subject out of the darkness. Keep the subject's identity and pose unchanged. Brooding, emotional, prestige-drama still, photorealistic."
+  },
+  {
+    "code": "/softlighting",
+    "category": "Professional Lighting",
+    "description": "Flattering soft, diffused studio lighting.",
+    "prompt": "Edit this photo with professional soft lighting: wrap the subject in large, diffused, flattering light — like a big softbox on an overcast day — smoothing skin, opening shadows gently, eliminating harsh highlights. Keep the subject's identity, pose and the scene unchanged. Clean, forgiving, premium portrait light, photorealistic."
+  },
+  {
+    "code": "/dramaticlighting",
+    "category": "Professional Lighting",
+    "description": "High-contrast dramatic light with deep shadows.",
+    "prompt": "Edit this photo with dramatic lighting: carve the subject with high-contrast light — bright sculpted highlights against deep, rich shadows, chiaroscuro worthy of a film poster. Keep the subject's identity and pose unchanged. Bold, theatrical, photorealistic drama."
+  },
+  {
+    "code": "/rimlight",
+    "category": "Professional Lighting",
+    "description": "Glowing rim light tracing the subject's edges.",
+    "prompt": "Edit this photo to add a strong rim light: place a bright source behind the subject so a glowing edge of light traces their silhouette — hair, shoulders, contours outlined in radiance — separating them crisply from a darker background. Keep the subject's identity, pose and the front lighting natural. Striking, dimensional, photorealistic."
+  },
+  {
+    "code": "/backlight",
+    "category": "Professional Lighting",
+    "description": "Strong backlight with luminous halo and haze.",
+    "prompt": "Edit this photo with strong backlighting: position the key light behind the subject so they glow with a luminous halo, lens haze blooming softly around them, foreground falling into gentle shadow. Keep the subject's identity and pose unchanged, features readable through the glow. Dreamy, radiant, photorealistic backlight."
+  },
+  {
+    "code": "/godrays",
+    "category": "Professional Lighting",
+    "description": "Volumetric god rays streaming through the scene.",
+    "prompt": "Edit this photo to add volumetric god rays: dramatic shafts of light streaming through the scene — through trees, windows or clouds — visible as glowing beams with floating dust particles dancing inside them. Keep the subject's identity, pose and the scene unchanged. Divine, breathtaking, photorealistic light."
+  },
+  {
+    "code": "/volumetriclight",
+    "category": "Professional Lighting",
+    "description": "Thick volumetric light with visible atmosphere.",
+    "prompt": "Edit this photo with thick volumetric lighting: make the light itself visible — beams with body and texture cutting through light haze, the atmosphere glowing where light passes. Keep the subject's identity, pose and the scene unchanged. Immersive, tangible, photorealistic atmosphere."
+  },
+  {
+    "code": "/studio",
+    "category": "Professional Lighting",
+    "description": "Clean studio backdrop with controlled pro lighting.",
+    "prompt": "Edit this photo into a clean studio portrait: replace the background with a smooth, seamless studio backdrop (neutral gray or soft gradient), lit with controlled professional three-point lighting — flattering key, gentle fill, subtle rim. Keep the subject's identity, pose and expression exactly unchanged. Polished, commercial, photorealistic studio photography."
+  },
+  {
+    "code": "/filmgrain",
+    "category": "Professional Lighting",
+    "description": "Authentic 35mm film grain texture over the image.",
+    "prompt": "Edit this photo to add authentic 35mm film grain: overlay fine, organic grain texture across the image — the tactile, living texture of analog film — with a slight softening of digital perfection. Keep the subject's identity, pose and colors unchanged. The grain should feel like real film stock, not digital noise: cinematic, textured, photorealistic."
+  },
+  {
+    "code": "/bokeh",
+    "category": "Professional Lighting",
+    "description": "Dreamy bokeh: background lights melt into glowing orbs.",
+    "prompt": "Edit this photo for dreamy bokeh: melt every background light into soft glowing orbs — round, luminous, overlapping circles of color — while the subject stays tack-sharp. Keep the subject's identity and pose unchanged. Magical, romantic, photorealistic bokeh."
+  },
+  {
+    "code": "/shallowdepth",
+    "category": "Professional Lighting",
+    "description": "Shallow depth: razor focus on subject, soft everything else.",
+    "prompt": "Edit this photo with shallow depth of field: hold razor-sharp focus on the subject while everything in front of and behind them falls into smooth, creamy softness. Keep the subject's identity, pose and the scene's content unchanged. Professional subject isolation, photorealistic."
+  },
+  {
+    "code": "/longexposure",
+    "category": "Styles & Eras",
+    "description": "Silky long-exposure smoothing of motion and water.",
+    "prompt": "Edit this photo with a long-exposure treatment: smooth all motion into silk — water turns to glass, clouds streak softly, moving lights draw gentle trails — while static elements and the subject stay sharp. Keep the subject's identity and pose unchanged. Serene, timeless, photorealistic long-exposure photography."
+  },
+  {
+    "code": "/vintage",
+    "category": "Styles & Eras",
+    "description": "Aged vintage photograph with authentic wear.",
+    "prompt": "Edit this photo into an aged vintage photograph: warm faded tones, softened contrast, gentle vignetting, and the authentic patina of decades — subtle paper texture and slight color shifts of old film. Keep the subject's identity, pose and composition unchanged. Nostalgic, honest, photorealistic aging — no gimmicky borders."
+  },
+  {
+    "code": "/retro",
+    "category": "Styles & Eras",
+    "description": "Bold retro styling: punchy 70s-90s color and vibe.",
+    "prompt": "Edit this photo with bold retro styling: punchy saturated colors, the confident aesthetic of 70s–90s photography — warm casts, strong contrast, playful era energy. Keep the subject's identity, pose and composition unchanged. Fun, stylish, photorealistic retro."
+  },
+  {
+    "code": "/oldmoney",
+    "category": "Styles & Eras",
+    "description": "Old-money elegance: quiet luxury, timeless refinement.",
+    "prompt": "Edit this photo with old-money elegance: quiet luxury in every tone — refined muted palette, soft natural light, timeless composition, an air of understated wealth and heritage. Keep the subject's identity and pose unchanged. Sophisticated, restrained, photorealistic refinement."
+  },
+  {
+    "code": "/luxury",
+    "category": "Styles & Eras",
+    "description": "High-gloss luxury: rich, polished, opulent finish.",
+    "prompt": "Edit this photo with a high-gloss luxury finish: rich deep tones, polished highlights, opulent color depth — the visual equivalent of a flagship brand campaign. Keep the subject's identity, pose and composition unchanged. Lavish, immaculate, photorealistic luxury."
+  },
+  {
+    "code": "/minimalist",
+    "category": "Styles & Eras",
+    "description": "Stripped-back minimalist aesthetic, less is more.",
+    "prompt": "Edit this photo into a minimalist aesthetic: strip away visual noise — simplify the background to clean calm tones, reduce clutter, let the subject breathe in generous empty space with balanced, quiet composition. Keep the subject's identity and pose unchanged. Pure, calm, photorealistic minimalism."
+  },
+  {
+    "code": "/editorial",
+    "category": "Styles & Eras",
+    "description": "High-fashion editorial: bold, art-directed, striking.",
+    "prompt": "Edit this photo with high-fashion editorial direction: bold art-directed styling — striking pose emphasis, dramatic lighting, confident color grade, magazine-cover attitude. Keep the subject's identity unchanged. Fearless, polished, photorealistic editorial photography."
+  },
+  {
+    "code": "/fashion",
+    "category": "Styles & Eras",
+    "description": "Runway fashion photography: sharp, glamorous, posed.",
+    "prompt": "Edit this photo into runway fashion photography: sharp glamorous lighting, crisp detail on fabrics and textures, confident posed energy, sleek professional finish. Keep the subject's identity unchanged. Glamorous, cutting-edge, photorealistic fashion."
+  },
+  {
+    "code": "/streetstyle",
+    "category": "Styles & Eras",
+    "description": "Candid street-style fashion shot, effortlessly cool.",
+    "prompt": "Edit this photo into a candid street-style shot: effortless urban cool — natural light, authentic city backdrop energy, the subject looking like they were caught mid-stride by a fashion photographer. Keep the subject's identity and the scene's character unchanged. Cool, genuine, photorealistic street style."
+  },
+  {
+    "code": "/magazinecover",
+    "category": "Formats",
+    "description": "Magazine cover treatment: bold crop, cover-ready polish.",
+    "prompt": "Edit this photo with a magazine-cover treatment: bold confident crop with headroom for masthead space, polished cover-ready retouching, punchy contrast and color that pops off the newsstand. Keep the subject's identity and pose unchanged. Iconic, powerful, photorealistic cover photography."
+  },
+  {
+    "code": "/polaroid",
+    "category": "Formats",
+    "description": "Instant Polaroid look: soft, nostalgic, imperfect.",
+    "prompt": "Edit this photo with an authentic Polaroid instant-film look: soft slightly hazy focus, gentle color shifts, creamy highlights, the intimate imperfect charm of instant photography. Keep the subject's identity, pose and composition unchanged. Nostalgic, tender, photorealistic — the image itself, not a frame border."
+  },
+  {
+    "code": "/disposablecamera",
+    "category": "Formats",
+    "description": "Disposable camera flash aesthetic: raw and candid.",
+    "prompt": "Edit this photo with a disposable-camera aesthetic: harsh direct flash, raw candid energy, slightly gritty colors and the unpolished honesty of a single-use camera. Keep the subject's identity, pose and composition unchanged. Real, spontaneous, photorealistic."
+  },
+  {
+    "code": "/35mmfilm",
+    "category": "Formats",
+    "description": "Classic 35mm film stock character and grain.",
+    "prompt": "Edit this photo with classic 35mm film character: the beloved color science of analog film — rich organic tones, gentle highlight rolloff, fine authentic grain. Keep the subject's identity, pose and composition unchanged. Timeless, tactile, photorealistic film photography."
+  },
+  {
+    "code": "/instantphoto",
+    "category": "Formats",
+    "description": "Fresh instant-photo feel: bright, immediate, fun.",
+    "prompt": "Edit this photo with a fresh instant-photo feel: bright immediate exposure, cheerful slightly-contrasty colors, the fun just-developed energy of instant film. Keep the subject's identity, pose and composition unchanged. Joyful, vivid, photorealistic."
+  },
+  {
+    "code": "/underwater",
+    "category": "Formats",
+    "description": "Submerged underwater world: blue, weightless, refracted.",
+    "prompt": "Edit this photo into an underwater scene: submerge the world in blue-green water — light refracting in dancing caustics, particles drifting, gentle weightlessness in hair and fabric, serene aquatic color grade. Keep the subject's identity and pose recognizable beneath the transformation. Ethereal, immersive, photorealistic underwater photography."
+  },
+  {
+    "code": "/space",
+    "category": "Formats",
+    "description": "Cosmic deep-space setting with stars and nebulae.",
+    "prompt": "Edit this photo into a deep-space setting: place the subject among the cosmos — starfields, glowing nebulae, the infinite dark — lit by otherworldly celestial light. Keep the subject's identity and pose unchanged, now an astronaut of the imagination. Vast, awe-inspiring, photorealistic space art."
+  },
+  {
+    "code": "/desert",
+    "category": "Formats",
+    "description": "Vast desert: dunes, heat haze, endless horizon.",
+    "prompt": "Edit this photo into a vast desert scene: rolling dunes sculpted by wind, heat haze shimmering on the horizon, harsh beautiful sunlight with deep sculpted shadows. Keep the subject's identity and pose unchanged within the transformed landscape. Epic, arid, photorealistic desert photography."
+  },
+  {
+    "code": "/forest",
+    "category": "Formats",
+    "description": "Deep forest: towering trees, dappled green light.",
+    "prompt": "Edit this photo into a deep forest scene: towering trees, shafts of green-gold light dappling through the canopy, moss and mist, rich earthy atmosphere. Keep the subject's identity and pose unchanged within the woodland. Enchanting, alive, photorealistic forest photography."
+  },
+  {
+    "code": "/mountains",
+    "category": "Formats",
+    "description": "Majestic mountain peaks with dramatic alpine light.",
+    "prompt": "Edit this photo into a majestic mountain scene: towering peaks, dramatic alpine light breaking through clouds, crisp thin air and immense scale. Keep the subject's identity and pose unchanged against the grandeur. Sublime, powerful, photorealistic mountain photography."
+  },
+  {
+    "code": "/beach",
+    "category": "Formats",
+    "description": "Sun-drenched beach: turquoise water, bright airy light.",
+    "prompt": "Edit this photo into a sun-drenched beach scene: turquoise water, pale sand, bright airy light with a fresh ocean breeze feel. Keep the subject's identity and pose unchanged. Radiant, carefree, photorealistic beach photography."
+  },
+  {
+    "code": "/futuristic",
+    "category": "Genres & Worlds",
+    "description": "Sleek futuristic world: clean tech, holographic glow.",
+    "prompt": "Edit this photo into a sleek futuristic world: clean advanced architecture, holographic glows, polished high-tech surfaces, cool luminous color palette. Keep the subject's identity and pose unchanged, now inhabiting tomorrow. Sleek, visionary, photorealistic futurism."
+  },
+  {
+    "code": "/fantasy",
+    "category": "Genres & Worlds",
+    "description": "Enchanted fantasy realm with magical atmosphere.",
+    "prompt": "Edit this photo into an enchanted fantasy realm: magical atmosphere — glowing flora, ancient stone, ethereal mist, a sense of old magic in the air. Keep the subject's identity and pose unchanged, now a figure in a storybook world. Wondrous, painterly yet photorealistic fantasy."
+  },
+  {
+    "code": "/scifi",
+    "category": "Genres & Worlds",
+    "description": "Hard sci-fi environment: spacecraft-grade detail.",
+    "prompt": "Edit this photo into a hard sci-fi environment: spacecraft-grade detail — metallic hulls, glowing interfaces, dramatic artificial lighting, the cold beauty of deep technology. Keep the subject's identity and pose unchanged. Precise, immersive, photorealistic science fiction."
+  },
+  {
+    "code": "/nightcity",
+    "category": "Genres & Worlds",
+    "description": "Glowing night city: towers of light after dark.",
+    "prompt": "Edit this photo into a glowing night city: the subject set against towers of light — illuminated skyscrapers, streaming traffic trails, electric urban energy after dark. Keep the subject's identity and pose unchanged. Dazzling, alive, photorealistic metropolitan night."
+  },
+  {
+    "code": "/noir",
+    "category": "Genres & Worlds",
+    "description": "Film noir: venetian-blind shadows, moral ambiguity.",
+    "prompt": "Edit this photo into film noir: venetian-blind shadows striping the scene, cigarette-smoke atmosphere, hard black-and-white-leaning contrast with moral ambiguity in every shadow. Keep the subject's identity and pose unchanged. Hardboiled, stylish, photorealistic noir."
+  },
+  {
+    "code": "/detective",
+    "category": "Genres & Worlds",
+    "description": "Detective-story mood: rain, case files, low lamplight.",
+    "prompt": "Edit this photo into a detective-story mood: rain-streaked windows, low lamplight, the tense quiet of an investigation — case-board energy in the atmosphere. Keep the subject's identity and pose unchanged, now the detective (or the suspect). Gritty, suspenseful, photorealistic."
+  },
+  {
+    "code": "/samurai",
+    "category": "Genres & Worlds",
+    "description": "Samurai-era Japan: honor, steel, falling petals.",
+    "prompt": "Edit this photo into samurai-era Japan: the aesthetic of honor and steel — falling cherry petals or drifting snow, traditional architecture, dramatic stillness before the duel. Keep the subject's identity and pose unchanged. Noble, cinematic, photorealistic jidaigeki atmosphere."
+  },
+  {
+    "code": "/medieval",
+    "category": "Genres & Worlds",
+    "description": "Medieval world: castles, torchlight, ancient stone.",
+    "prompt": "Edit this photo into a medieval world: ancient stone castles, torchlight flicker, mist over cobblestones, the weight of centuries. Keep the subject's identity and pose unchanged. Epic, historical, photorealistic medieval atmosphere."
+  },
+  {
+    "code": "/postapocalyptic",
+    "category": "Genres & Worlds",
+    "description": "Post-apocalyptic wasteland: ruins, dust, survival.",
+    "prompt": "Edit this photo into a post-apocalyptic wasteland: crumbling ruins, dust-choked air, overgrown decay, harsh survival light. Keep the subject's identity and pose unchanged, now a survivor in the ruins. Haunting, gritty, photorealistic."
+  },
+  {
+    "code": "/superhero",
+    "category": "Genres & Worlds",
+    "description": "Superhero key art: heroic scale, dramatic power.",
+    "prompt": "Edit this photo into superhero key art: heroic low angle, dramatic rim lighting, city or sky blazing behind, an aura of barely-contained power. Keep the subject's identity and pose's intent unchanged. Legendary, blockbuster, photorealistic heroic."
+  },
+  {
+    "code": "/cityscape",
+    "category": "Genres & Worlds",
+    "description": "Sweeping cityscape backdrop behind the subject.",
+    "prompt": "Edit this photo with a sweeping cityscape backdrop: place the subject before a breathtaking urban panorama — skyline stretching to the horizon, beautiful atmospheric depth, the city alive below. Keep the subject's identity and pose unchanged. Grand, urban, photorealistic."
+  },
+  {
+    "code": "/anime",
+    "category": "Art Styles",
+    "description": "Anime illustration style with clean cel shading.",
+    "prompt": "Edit this photo into an anime illustration: transform it into clean anime art — expressive stylized features, cel shading, vibrant color, dynamic linework — while keeping the subject's identity, pose and composition clearly recognizable. High-quality modern anime key visual, detailed and polished."
+  },
+  {
+    "code": "/comicbook",
+    "category": "Art Styles",
+    "description": "Bold comic-book art with ink lines and halftones.",
+    "prompt": "Edit this photo into bold comic-book art: strong ink outlines, dynamic halftone dots, punchy saturated colors, dramatic pop-art energy. Keep the subject's identity, pose and composition recognizable. Striking, graphic, professional comic illustration."
+  },
+  {
+    "code": "/oilpainting",
+    "category": "Art Styles",
+    "description": "Classical oil painting with visible brushwork.",
+    "prompt": "Edit this photo into a classical oil painting: rich impasto brushwork, luminous glazing, the depth and warmth of oils on canvas. Keep the subject's identity, pose and composition faithful to the original. Masterful, timeless, gallery-quality painting."
+  },
+  {
+    "code": "/watercolor",
+    "category": "Art Styles",
+    "description": "Delicate watercolor with washes and paper texture.",
+    "prompt": "Edit this photo into a delicate watercolor: soft transparent washes, gentle bleeds and blooms, visible paper texture, light and airy. Keep the subject's identity, pose and composition recognizable. Tender, artistic, beautiful watercolor painting."
+  },
+  {
+    "code": "/sketch",
+    "category": "Art Styles",
+    "description": "Hand-drawn pencil sketch with expressive lines.",
+    "prompt": "Edit this photo into a hand-drawn pencil sketch: expressive graphite lines, careful shading and hatching, the intimate feel of an artist's study. Keep the subject's identity, pose and composition faithful. Skillful, personal, beautiful drawing."
+  },
+  {
+    "code": "/claystyle",
+    "category": "Art Styles",
+    "description": "Stop-motion claymation look with handmade texture.",
+    "prompt": "Edit this photo into a claymation style: transform the scene into handmade clay — visible fingerprints in the texture, soft stop-motion forms, charming handcrafted imperfection. Keep the subject's identity, pose and composition recognizable. Whimsical, tactile, delightful."
+  },
+  {
+    "code": "/3drender",
+    "category": "Art Styles",
+    "description": "Polished 3D render with cinematic CG lighting.",
+    "prompt": "Edit this photo into a polished 3D render: smooth CG surfaces, cinematic studio lighting, subsurface scattering on skin, octane-render quality. Keep the subject's identity, pose and composition faithful. Sleek, premium, high-end 3D artwork."
+  },
+  {
+    "code": "/isometric",
+    "category": "Art Styles",
+    "description": "Isometric diorama view, tiny detailed world.",
+    "prompt": "Edit this photo into an isometric diorama: reframe the scene as a tiny detailed 3D world viewed at the classic isometric angle — crisp geometric charm, every element a miniature. Keep the scene's content recognizable. Playful, precise, delightful miniature world."
+  },
+  {
+    "code": "/miniature",
+    "category": "Art Styles",
+    "description": "Tilt-shift miniature: the world looks like a tiny model.",
+    "prompt": "Edit this photo with a tilt-shift miniature effect: blur the top and bottom into creamy bands so the scene appears to be a tiny architectural model — saturated toy-like colors, the charm of a miniature world. Keep the subject and scene content unchanged. Magical, playful, photorealistic tilt-shift."
+  },
+  {
+    "code": "/tiltshift",
+    "category": "Art Styles",
+    "description": "Selective-focus tilt-shift with razor-thin sharp band.",
+    "prompt": "Edit this photo with tilt-shift selective focus: keep one razor-thin horizontal band tack-sharp while the rest melts into smooth blur, creating the dreamy selective-focus look of a tilt-shift lens. Keep the subject's identity and composition unchanged. Artistic, dreamy, photorealistic."
+  },
+  {
+    "code": "/papercraft",
+    "category": "Art Styles",
+    "description": "Layered papercraft art with cut-paper depth.",
+    "prompt": "Edit this photo into layered papercraft art: rebuild the scene from cut paper — distinct layered sheets creating real depth, subtle shadows between layers, crisp cut edges, rich matte colors. Keep the subject's identity, pose and composition recognizable. Crafted, charming, beautiful paper art."
+  },
+  {
+    "code": "/glassart",
+    "category": "Textures & Effects",
+    "description": "Render the scene in translucent colored glass.",
+    "prompt": "Edit this photo into glass art: render the scene as translucent colored glass — light refracting through every form, luminous edges, stained-glass richness. Keep the subject's identity, pose and composition recognizable. Radiant, fragile, breathtaking glass sculpture aesthetic."
+  },
+  {
+    "code": "/chrome",
+    "category": "Textures & Effects",
+    "description": "Liquid chrome metal surfaces with mirror reflections.",
+    "prompt": "Edit this photo with a liquid-chrome treatment: transform surfaces into flowing mirror-polished chrome — perfect reflections rippling across forms, the world mirrored in liquid metal. Keep the subject's identity, pose and composition recognizable. Futuristic, luxurious, mesmerizing."
+  },
+  {
+    "code": "/holographic",
+    "category": "Textures & Effects",
+    "description": "Iridescent holographic shimmer across the image.",
+    "prompt": "Edit this photo with a holographic treatment: wash the scene in iridescent rainbow shimmer — colors shifting with the light like a hologram, prismatic edges, futuristic glow. Keep the subject's identity, pose and composition recognizable. Dazzling, otherworldly, beautiful."
+  },
+  {
+    "code": "/doubleexposure",
+    "category": "Textures & Effects",
+    "description": "Double exposure: portrait blended with a second scene.",
+    "prompt": "Edit this photo into a double exposure: blend the subject's silhouette with a second scene inside it — a forest, a city skyline, ocean waves — two photographs becoming one layered artwork. Keep the subject's identity and pose as the anchor shape. Poetic, artistic, beautifully balanced multiple exposure."
+  },
+  {
+    "code": "/reflection",
+    "category": "Textures & Effects",
+    "description": "Perfect symmetrical reflection doubling the image.",
+    "prompt": "Edit this photo with a perfect reflection: mirror the scene along a horizontal axis into flawless symmetry — as if the bottom half is still water reflecting the top — with realistic subtle ripple and light behavior. Keep the subject and scene content unchanged above the mirror line. Hypnotic, balanced, photorealistic."
+  },
+  {
+    "code": "/mirror",
+    "category": "Textures & Effects",
+    "description": "Kaleidoscopic mirror symmetry across the frame.",
+    "prompt": "Edit this photo with kaleidoscopic mirror symmetry: reflect and repeat the scene into mesmerizing symmetrical patterns — mandala-like, perfectly balanced. Keep the subject's essence at the heart of the pattern. Trippy, gorgeous, precise digital art."
+  },
+  {
+    "code": "/fire",
+    "category": "Textures & Effects",
+    "description": "Engulf elements in realistic flames and embers.",
+    "prompt": "Edit this photo with realistic fire: let flames and embers engulf chosen elements of the scene — licking edges, glowing heat, sparks rising — with accurate firelight cast onto the subject and surroundings. Keep the subject's identity and pose unchanged and safe at the composition's heart. Fierce, dramatic, photorealistic."
+  },
+  {
+    "code": "/smoke",
+    "category": "Textures & Effects",
+    "description": "Drifting smoke weaving atmosphere through the frame.",
+    "prompt": "Edit this photo with drifting smoke: weave elegant smoke through the frame — curling wisps catching the light, atmosphere thickening with mystery, the subject emerging from the haze. Keep the subject's identity and pose unchanged. Moody, sensual, photorealistic."
+  },
+  {
+    "code": "/glitch",
+    "category": "Textures & Effects",
+    "description": "Digital glitch art: RGB splits, scanlines, data corruption.",
+    "prompt": "Edit this photo with digital glitch art: corrupt the image beautifully — RGB channel splits, scanlines, pixel-sorting streaks, datamoshing artifacts — concentrated at the edges while the subject's face stays readable. Keep the subject's identity recognizable. Edgy, contemporary, striking glitch aesthetic."
+  },
+  {
+    "code": "/dreamcore",
+    "category": "Textures & Effects",
+    "description": "Surreal dreamcore: liminal spaces, hazy nostalgia.",
+    "prompt": "Edit this photo into dreamcore: shift it into surreal liminal nostalgia — hazy familiar-yet-strange spaces, soft VHS-like blur, uncanny familiar objects, the feeling of a half-remembered dream. Keep the subject recognizable within the strangeness. Haunting, nostalgic, surreal."
+  }
+]
