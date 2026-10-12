@@ -81,8 +81,8 @@ class GalleryViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { codes = CodeRepository.load(getApplication()) }
     }
 
-    fun setQuery(q: String) { query = q }
-    fun setCategory(c: String?) { category = c }
+    fun updateQuery(q: String) { query = q }
+    fun updateCategory(c: String?) { category = c }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -135,7 +135,7 @@ fun GalleryScreen(
                 item {
                     FilterChip(
                         selected = vm.category == null,
-                        onClick = { vm.setCategory(null) },
+                        onClick = { vm.updateCategory(null) },
                         label = { Text("All") },
                         colors = chipColors(vm.category == null)
                     )
@@ -143,7 +143,7 @@ fun GalleryScreen(
                 items(vm.categories) { cat ->
                     FilterChip(
                         selected = vm.category == cat,
-                        onClick = { vm.setCategory(if (vm.category == cat) null else cat) },
+                        onClick = { vm.updateCategory(if (vm.category == cat) null else cat) },
                         label = { Text(cat) },
                         colors = chipColors(vm.category == cat)
                     )
