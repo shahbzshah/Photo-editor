@@ -267,7 +267,7 @@ class ChatGptDriver {
         }
         // Strategy 2: click the attach button, then the Photos menu item
         val btnClicked = unquote(
-            evalJs("(function(){var b=${qsFirst(Selectors.attachButton)};if(!b)return 'no';b.click();return 'ok';})()")
+            evalJs(realTapJs(qsFirst(Selectors.attachButton)))
         ) == "ok"
         if (!btnClicked) {
             pendingPhoto = null
@@ -322,19 +322,38 @@ class ChatGptDriver {
         return "(function(){var s=[$arr];for(var i=0;i<s.length;i++){var el=document.querySelector(s[i]);if(el)return el;}return null;})()"
     }
 
+    /**
+     * Dispatches realistic pointer/mouse/touch events on an element.
+     * More reliable than .click() for React-based UIs like ChatGPT's.
+     */
+    private fun realTapJs(elJs: String): String {
+        return """(function(){var el=$elJs;if(!el)return 'no';
+          function ev(t,o){var e;try{e=new PointerEvent(t,o);}catch(_){e=document.createEvent('Event');e.initEvent(t,true,true);}
+            try{Object.assign(e,o);}catch(_){} el.dispatchEvent(e);}
+          var r=el.getBoundingClientRect();var o={bubbles:true,cancelable:true,clientX:r.left+r.width/2,clientY:r.top+r.height/2,pointerId:1,isPrimary:true};
+          ev('pointerdown',o);ev('mousedown',o);ev('pointerup',o);ev('mouseup',o);ev('click',o);
+          try{el.click();}catch(_){}
+          return 'ok';})()"""
+    }
+
     private fun attachMenuJs(): String {
         val hints = Selectors.attachMenuTextHints.joinToString(",") { JSONObject.quote(it) }
         return """(function(){
           var hints=[$hints];
-          // Search broadly: menu items can be buttons, divs, or list items
+          function realTap(el){
+            function ev(t,o){var e;try{e=new PointerEvent(t,o);}catch(_){e=document.createEvent('Event');e.initEvent(t,true,true);}
+              try{Object.assign(e,o);}catch(_){} el.dispatchEvent(e);}
+            var r=el.getBoundingClientRect();var o={bubbles:true,cancelable:true,clientX:r.left+r.width/2,clientY:r.top+r.height/2,pointerId:1,isPrimary:true};
+            ev('pointerdown',o);ev('mousedown',o);ev('pointerup',o);ev('mouseup',o);ev('click',o);
+            try{el.click();}catch(_){}
+          }
           var els=document.querySelectorAll('button,div[role="menuitem"],div[role="menuitemradio"],div[role="option"],li,[data-testid*="upload"],[data-testid*="photo"]');
-          // Fallback: any clickable element with short text
           if(els.length==0){ els=document.querySelectorAll('*'); }
           for(var i=0;i<els.length;i++){
             var t=(els[i].innerText||els[i].textContent||'').trim().toLowerCase();
             if(t.length==0||t.length>40) continue;
             for(var h=0;h<hints.length;h++){
-              if(t===hints[h]||t.indexOf(hints[h])>-1){ els[i].click(); return 'ok'; }
+              if(t===hints[h]||t.indexOf(hints[h])>-1){ realTap(els[i]); return 'ok'; }
             }
           }
           return 'no';
