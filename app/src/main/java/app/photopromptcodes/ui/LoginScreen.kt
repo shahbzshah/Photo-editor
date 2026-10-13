@@ -122,6 +122,7 @@ fun LoginScreen(onDone: () -> Unit) {
     val vm: LoginViewModel = viewModel()
     val scope = rememberCoroutineScope()
     var webView by remember { mutableStateOf<WebView?>(null) }
+    var cardVisible by remember { mutableStateOf(true) }
 
     DisposableEffect(Unit) {
         onDispose { try { webView?.destroy() } catch (_: Exception) {} }
@@ -169,7 +170,23 @@ fun LoginScreen(onDone: () -> Unit) {
                 }
             }
 
-            // Bottom card
+            // Small FAB to bring the card back when hidden
+            if (!cardVisible) {
+                androidx.compose.material3.FloatingActionButton(
+                    onClick = { cardVisible = true },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp),
+                    containerColor = Amber,
+                    contentColor = NearBlack
+                ) {
+                    Text("Continue", fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(horizontal = 16.dp))
+                }
+            }
+
+            // Bottom card (hideable via X, so it never blocks OAuth buttons)
+            if (cardVisible) {
             Card(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -179,11 +196,22 @@ fun LoginScreen(onDone: () -> Unit) {
                 colors = CardDefaults.cardColors(containerColor = SurfaceDark)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "Sign in to ChatGPT",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
+                    androidx.compose.foundation.layout.Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Sign in to ChatGPT",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1f)
+                        )
+                        androidx.compose.material3.IconButton(
+                            onClick = { cardVisible = false }
+                        ) {
+                            Text("✕", color = PaperDim)
+                        }
+                    }
                     Spacer(Modifier.height(8.dp))
                     if (vm.loadError != null) {
                         Text(
@@ -241,6 +269,7 @@ fun LoginScreen(onDone: () -> Unit) {
                     }
                 }
             }
+            } // cardVisible
         }
     }
 }
