@@ -47,6 +47,9 @@ object Selectors {
     val attachMenuTextHints: List<String> = listOf(
         "upload from computer",
         "photos & files",
+        "photos",
+        "camera",
+        "files",
         "upload",
         "attach"
     )

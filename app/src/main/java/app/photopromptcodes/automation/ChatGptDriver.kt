@@ -340,12 +340,15 @@ class ChatGptDriver {
         val hints = Selectors.attachMenuTextHints.joinToString(",") { JSONObject.quote(it) }
         return """(function(){
           var hints=[$hints];
-          var els=document.querySelectorAll('button,div[role="menuitem"],div[role="option"],li');
+          // Search broadly: menu items can be buttons, divs, or list items
+          var els=document.querySelectorAll('button,div[role="menuitem"],div[role="menuitemradio"],div[role="option"],li,[data-testid*="upload"],[data-testid*="photo"]');
+          // Fallback: any clickable element with short text
+          if(els.length==0){ els=document.querySelectorAll('*'); }
           for(var i=0;i<els.length;i++){
-            var t=(els[i].innerText||'').trim().toLowerCase();
-            if(t.length>60) continue;
+            var t=(els[i].innerText||els[i].textContent||'').trim().toLowerCase();
+            if(t.length==0||t.length>40) continue;
             for(var h=0;h<hints.length;h++){
-              if(t.indexOf(hints[h])>-1){ els[i].click(); return 'ok'; }
+              if(t===hints[h]||t.indexOf(hints[h])>-1){ els[i].click(); return 'ok'; }
             }
           }
           return 'no';
