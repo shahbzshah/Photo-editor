@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import kotlinx.coroutines.launch
 import app.photopromptcodes.ui.AboutScreen
+import app.photopromptcodes.ui.BatchRunScreen
 import app.photopromptcodes.ui.CodeDetailScreen
 import app.photopromptcodes.ui.FavoritesScreen
 import app.photopromptcodes.ui.GalleryScreen

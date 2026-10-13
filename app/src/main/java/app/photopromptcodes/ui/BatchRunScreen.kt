@@ -326,7 +326,7 @@ fun BatchRunScreen(
                     CircularProgressIndicator(color = Amber)
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        stepLabel(ui.step),
+                        ui.step.label,
                         style = MaterialTheme.typography.bodySmall,
                         color = PaperDim
                     )
@@ -344,13 +344,4 @@ fun BatchRunScreen(
             )
         }
     }
-}
-
-private fun stepLabel(step: RunStep): String = when (step) {
-    RunStep.OPENING_CHATGPT -> "Opening ChatGPT..."
-    RunStep.ATTACHING_PHOTO -> "Attaching photo..."
-    RunStep.SENDING_PROMPT -> "Sending prompt..."
-    RunStep.GENERATING -> "Generating image..."
-    RunStep.DOWNLOADING -> "Downloading result..."
-    RunStep.DONE -> "Done"
 }
