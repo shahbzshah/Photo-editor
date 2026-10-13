@@ -48,6 +48,7 @@ object UpdateChecker {
 
             val conn = (URL(LATEST_URL).openConnection() as HttpURLConnection).apply {
                 setRequestProperty("Accept", "application/vnd.github+json")
+                setRequestProperty("User-Agent", "PhotoPromptCodes")
                 connectTimeout = 15000
                 readTimeout = 15000
             }
@@ -89,23 +90,48 @@ object UpdateChecker {
     /**
      * Downloads the APK to cache and launches the system installer.
      * Returns true if the installer was launched.
+     * Manually follows redirects (GitHub download URLs 302 to the file).
      */
     suspend fun downloadAndInstall(ctx: Context, info: UpdateInfo): Boolean =
         withContext(Dispatchers.IO) {
             try {
-                val conn = (URL(info.apkUrl).openConnection() as HttpURLConnection).apply {
-                    setRequestProperty("Accept", "application/octet-stream")
-                    connectTimeout = 30000
-                    readTimeout = 60000
-                    instanceFollowRedirects = true
+                var url = info.apkUrl
+                var conn: HttpURLConnection? = null
+                // Manually follow redirects (up to 5 hops)
+                repeat(5) {
+                    conn = (URL(url).openConnection() as HttpURLConnection).apply {
+                        setRequestProperty("Accept", "application/octet-stream")
+                        setRequestProperty("User-Agent", "PhotoPromptCodes")
+                        connectTimeout = 30000
+                        readTimeout = 60000
+                        instanceFollowRedirects = false
+                    }
+                    val code = conn!!.responseCode
+                    if (code in 300..399) {
+                        val location = conn!!.getHeaderField("Location") ?: return@withContext false
+                        url = if (location.startsWith("http")) location else URL(URL(url), location).toString()
+                        conn!!.disconnect()
+                    } else {
+                        return@repeat
+                    }
                 }
-                if (conn.responseCode != 200) return@withContext false
+                val finalConn = conn ?: return@withContext false
+                if (finalConn.responseCode != 200) {
+                    Log.d(TAG, "Download returned ${finalConn.responseCode}")
+                    return@withContext false
+                }
 
                 val outFile = File(ctx.cacheDir, "update-${info.versionCode}.apk")
-                conn.inputStream.use { input ->
+                finalConn.inputStream.use { input ->
                     outFile.outputStream().use { output ->
                         input.copyTo(output)
                     }
+                }
+                finalConn.disconnect()
+
+                if (outFile.length() < 1024 * 1024) {
+                    Log.d(TAG, "Downloaded file too small: ${outFile.length()}")
+                    return@withContext false
                 }
 
                 val uri: Uri = FileProvider.getUriForFile(
