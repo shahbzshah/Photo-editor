@@ -62,3 +62,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.kotlinx.serialization.json)
 }
+
+configurations.all {
+    exclude(group = "androidx.collection", module = "collection-ktx")
+}
