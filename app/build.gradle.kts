@@ -1,8 +1,18 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+}
+
+// Release signing credentials live in keystore.properties (repo root, gitignored,
+// never committed). If the file is absent (e.g. CI), the release build is left unsigned.
+val keystorePropsFile = rootProject.file("keystore.properties")
+val hasReleaseKey = keystorePropsFile.exists()
+val keystoreProps = Properties().apply {
+    if (hasReleaseKey) load(keystorePropsFile.inputStream())
 }
 
 android {
@@ -19,18 +29,20 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            storeFile = file("release.keystore")
-            storePassword = "ppc-release-2026"
-            keyAlias = "photopromptcodes"
-            keyPassword = "ppc-release-2026"
+        if (hasReleaseKey) {
+            create("release") {
+                storeFile = file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
         }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
+            if (hasReleaseKey) signingConfig = signingConfigs.getByName("release")
         }
     }
 

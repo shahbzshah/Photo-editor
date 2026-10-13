@@ -17,3 +17,6 @@ local.properties
 app/release.keystore
 sample-work/
 icon-work/
+
+# Release signing credentials - NEVER commit this
+keystore.properties
