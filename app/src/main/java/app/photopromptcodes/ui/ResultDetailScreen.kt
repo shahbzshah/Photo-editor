@@ -134,22 +134,9 @@ fun ResultDetailScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            Text("EDITED", style = MaterialTheme.typography.labelSmall)
-            Spacer(Modifier.height(8.dp))
             AsyncImage(
                 model = vm.resultFile(),
                 contentDescription = "Edited photo",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-            )
-            Spacer(Modifier.height(16.dp))
-            Text("ORIGINAL", style = MaterialTheme.typography.labelSmall)
-            Spacer(Modifier.height(8.dp))
-            AsyncImage(
-                model = vm.originalFile(),
-                contentDescription = "Original photo",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxWidth()

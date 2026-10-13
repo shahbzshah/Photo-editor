@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -90,6 +91,7 @@ class GalleryViewModel(app: Application) : AndroidViewModel(app) {
 fun GalleryScreen(
     onOpenCode: (String) -> Unit,
     onOpenHistory: () -> Unit,
+    onOpenSettings: () -> Unit,
     vm: GalleryViewModel = viewModel()
 ) {
     Scaffold(
@@ -97,6 +99,9 @@ fun GalleryScreen(
             TopAppBar(
                 title = { Text("Photo Prompt Codes", style = MaterialTheme.typography.titleLarge) },
                 actions = {
+                    IconButton(onClick = onOpenSettings) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = PaperDim)
+                    }
                     IconButton(onClick = onOpenHistory) {
                         Icon(Icons.Filled.Refresh, contentDescription = "Edit history", tint = PaperDim)
                     }

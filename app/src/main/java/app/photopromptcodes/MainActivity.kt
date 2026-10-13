@@ -18,6 +18,7 @@ import app.photopromptcodes.ui.HistoryScreen
 import app.photopromptcodes.ui.LoginScreen
 import app.photopromptcodes.ui.ResultDetailScreen
 import app.photopromptcodes.ui.RunScreen
+import app.photopromptcodes.ui.SettingsScreen
 import app.photopromptcodes.ui.isLoggedInFlag
 import app.photopromptcodes.ui.theme.PhotoPromptCodesTheme
 
@@ -51,7 +52,19 @@ fun AppNav() {
         composable("gallery") {
             GalleryScreen(
                 onOpenCode = { code -> nav.navigate("detail/${Uri.encode(code)}") },
-                onOpenHistory = { nav.navigate("history") }
+                onOpenHistory = { nav.navigate("history") },
+                onOpenSettings = { nav.navigate("settings") }
+            )
+        }
+        composable("settings") {
+            SettingsScreen(
+                onBack = { nav.popBackStack() },
+                onSignIn = { nav.navigate("signin") }
+            )
+        }
+        composable("signin") {
+            LoginScreen(
+                onDone = { nav.popBackStack() }
             )
         }
         composable(

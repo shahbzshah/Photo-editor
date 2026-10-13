@@ -39,6 +39,15 @@ class HistoryRepository(private val context: Context) {
     fun originalFile(record: HistoryRecord): File = File(dir, record.originalFileName)
     fun resultFile(record: HistoryRecord): File = File(dir, record.resultFileName)
 
+    /** Deletes all history records and their image files. */
+    suspend fun clearAll() = withContext(Dispatchers.IO) {
+        readIndex().forEach { record ->
+            try { originalFile(record).delete() } catch (_: Exception) {}
+            try { resultFile(record).delete() } catch (_: Exception) {}
+        }
+        try { indexFile.delete() } catch (_: Exception) {}
+    }
+
     /** Copies the picked photo into history storage; returns the new record id. */
     suspend fun stageOriginal(code: String, photoUri: Uri): String = withContext(Dispatchers.IO) {
         val id = UUID.randomUUID().toString()
