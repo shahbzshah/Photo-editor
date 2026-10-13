@@ -130,6 +130,79 @@ class ChatGptDriver {
             }
         }
         wv.addJavascriptInterface(Bridge(), "PpcBridge")
+        // Intercept downloads (ChatGPT's image download button).
+        // We click it via JS and capture the file here with auth cookies.
+        wv.setDownloadListener { url, userAgent, contentDisposition, mimeType, _ ->
+            scope.launch {
+                try {
+                    val bytes = downloadWithCookies(wv, url, userAgent)
+                    if (bytes != null) {
+                        val b64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
+                        val dataUrl = "data:$mimeType;base64,$b64"
+                        try { imageArrived?.complete(dataUrl) } catch (_: Exception) {}
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "download failed: $e")
+                }
+            }
+        }
+    }
+
+    /**
+     * Downloads [url] using the WebView's cookies (for ChatGPT auth).
+     */
+    private suspend fun downloadWithCookies(wv: WebView, url: String, userAgent: String): ByteArray? {
+        return withContext(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val conn = java.net.URL(url).openConnection() as java.net.HttpURLConnection
+                val cookies = CookieManager.getInstance().getCookie(url)
+                if (cookies != null) conn.setRequestProperty("Cookie", cookies)
+                conn.setRequestProperty("User-Agent", userAgent)
+                conn.connect()
+                if (conn.responseCode != 200) return@withContext null
+                conn.inputStream.use { it.readBytes() }
+            } catch (_: Exception) {
+                null
+            }
+        }
+    }
+
+    /**
+     * Finds the download button on the latest generated image and clicks it.
+     * Returns 'ok' if a button was found and clicked.
+     */
+    private fun clickDownloadJs(): String {
+        return """(function(){
+          // Find download buttons (aria-label or title containing 'download')
+          var btns=document.querySelectorAll('button[aria-label*="ownload" i],button[title*="ownload" i],a[aria-label*="ownload" i],[data-testid*="download" i]');
+          if(btns.length===0){
+            // Fallback: look for buttons near the last large image
+            var imgs=document.querySelectorAll('img');
+            var lastImg=null;
+            for(var i=imgs.length-1;i>=0;i--){
+              if(imgs[i].naturalWidth>200&&imgs[i].naturalHeight>200){ lastImg=imgs[i]; break; }
+            }
+            if(!lastImg) return 'no-img';
+            var container=lastImg.closest('div');
+            for(var d=0;d<3&&container;d++){
+              var b=container.querySelector('button');
+              if(b){ btns=[b]; break; }
+              container=container.parentElement;
+            }
+          }
+          if(btns.length===0) return 'no-btn';
+          // Click the LAST download button (most recent image)
+          var btn=btns[btns.length-1];
+          function realTap(el){
+            function ev(t,o){var e;try{e=new PointerEvent(t,o);}catch(_){e=document.createEvent('Event');e.initEvent(t,true,true);}
+              try{Object.assign(e,o);}catch(_){} el.dispatchEvent(e);}
+            var r=el.getBoundingClientRect();var o={bubbles:true,cancelable:true,clientX:r.left+r.width/2,clientY:r.top+r.height/2,pointerId:1,isPrimary:true};
+            ev('pointerdown',o);ev('mousedown',o);ev('pointerup',o);ev('mouseup',o);ev('click',o);
+            try{el.click();}catch(_){}
+          }
+          realTap(btn);
+          return 'ok';
+        })()"""
     }
 
     /** Starts (or restarts) an edit run. Any in-flight run is cancelled. */
@@ -344,10 +417,21 @@ class ChatGptDriver {
         // Polling fallback: actively search for the image every 5s in case
         // the MutationObserver misses it (selector drift, timing, etc.)
         // The JS fetches and sends via PpcBridge itself.
+        // Also try ChatGPT's download button every 15s — the DownloadListener
+        // captures the file directly, bypassing URL harvesting entirely.
+        var polls = 0
         scope.launch {
             while (imageArrived?.isCompleted == false) {
                 delay(5000)
+                polls++
                 try { evalJs(pollImageJs()) } catch (_: Exception) {}
+                // Every 3rd poll (15s), try the download button
+                if (polls % 3 == 0) {
+                    try {
+                        val dl = unquote(evalJs(clickDownloadJs()))
+                        if (dl == "ok") Log.d(TAG, "clicked download button")
+                    } catch (_: Exception) {}
+                }
                 // Fail fast if ChatGPT shows an upsell/limit wall instead of generating
                 try {
                     val blocked = unquote(evalJs(checkBlockedJs()))
