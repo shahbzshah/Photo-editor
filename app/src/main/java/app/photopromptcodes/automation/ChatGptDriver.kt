@@ -233,6 +233,11 @@ class ChatGptDriver {
         emit(DriverEvent.Step(RunStep.SENDING_PROMPT))
         sendPrompt(prompt)
 
+        // Let the user message (with the uploaded photo) render fully
+        // before we snapshot. Otherwise the snapshot misses it and the
+        // harvester mistakes the upload for the generated result.
+        delay(5000)
+
         emit(DriverEvent.Step(RunStep.GENERATING))
         val dataUrl = waitForImage()
         val bytes = dataUrlToBytes(dataUrl)
@@ -409,9 +414,9 @@ class ChatGptDriver {
             candidates.push({img:img,src:src});
           }
           if(candidates.length===0)return 'none';
-          // Take the largest candidate (generated images are big)
-          candidates.sort(function(a,b){return (b.img.naturalWidth*b.img.naturalHeight)-(a.img.naturalWidth*a.img.naturalHeight);});
-          var best=candidates[0];var bsrc=best.src;
+          // Take the LAST candidate in DOM order (chat order = oldest first,
+          // so the generated image, which comes after the upload, is last)
+          var best=candidates[candidates.length-1];var bsrc=best.src;
           window.__ppcSeen.push(bsrc);
           if(bsrc.indexOf('data:image')===0){ PpcBridge.onImage(bsrc); return 'direct'; }
           fetch(bsrc).then(function(r){return r.blob();})
@@ -515,7 +520,7 @@ class ChatGptDriver {
           if(window.__ppcObs){ try{window.__ppcObs.disconnect();}catch(e){} }
           function tryHarvest(){
             var imgs=document.querySelectorAll('img');
-            var best=null;var bestArea=0;
+            var best=null;
             for(var k=0;k<imgs.length;k++){
               var img=imgs[k]; var src=snap(img);
               if(!src || window.__ppcSeen.indexOf(src)>-1) continue;
@@ -526,8 +531,8 @@ class ChatGptDriver {
               if(r.width<150||r.height<150) continue;
               var ls=src.toLowerCase();
               if(ls.indexOf('logo')>-1||ls.indexOf('icon')>-1||ls.indexOf('avatar')>-1) continue;
-              var area=img.naturalWidth*img.naturalHeight;
-              if(area>bestArea){ bestArea=area; best={img:img,src:src}; }
+              // Keep the LAST match in DOM order (newest in chat)
+              best={img:img,src:src};
             }
             if(!best) return false;
             window.__ppcSeen.push(best.src);
