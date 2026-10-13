@@ -343,12 +343,43 @@ class ChatGptDriver {
             while (imageArrived?.isCompleted == false) {
                 delay(5000)
                 try { evalJs(pollImageJs()) } catch (_: Exception) {}
+                // Fail fast if ChatGPT shows an upsell/limit wall instead of generating
+                try {
+                    val blocked = unquote(evalJs(checkBlockedJs()))
+                    if (blocked == "blocked") {
+                        try {
+                            imageArrived?.completeExceptionally(
+                                DriverException(
+                                    "ChatGPT isn't generating images right now — it's showing an upgrade prompt. " +
+                                    "You've likely hit the free image limit. Wait a while or upgrade, then try again."
+                                )
+                            )
+                        } catch (_: Exception) {}
+                    }
+                } catch (_: Exception) {}
             }
         }
-        return withTimeoutOrNull(GENERATION_TIMEOUT_MS) { imageArrived!!.await() }
-            ?: throw DriverException(
-                "Timed out waiting for the generated image (12 min). It may still appear in your ChatGPT history."
-            )
+        return try {
+            withTimeoutOrNull(GENERATION_TIMEOUT_MS) { imageArrived!!.await() }
+                ?: throw DriverException(
+                    "Timed out waiting for the generated image (12 min). It may still appear in your ChatGPT history."
+                )
+        } catch (e: DriverException) {
+            throw e
+        }
+    }
+
+    /**
+     * Detects ChatGPT's upsell / free-limit wall that appears instead of
+     * generating an image. Returns 'blocked' if found.
+     */
+    private fun checkBlockedJs(): String {
+        return """(function(){
+          var t=(document.body?document.body.innerText:'').toLowerCase();
+          var hints=['create richer images from your files','you have reached your image','image generation limit','upgrade to continue generating','daily limit'];
+          for(var i=0;i<hints.length;i++){ if(t.indexOf(hints[i])>-1) return 'blocked'; }
+          return 'ok';
+        })()"""
     }
 
     /**
