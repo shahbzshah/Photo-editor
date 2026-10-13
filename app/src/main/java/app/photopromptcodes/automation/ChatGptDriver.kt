@@ -336,10 +336,48 @@ class ChatGptDriver {
     private suspend fun waitForImage(): String {
         imageArrived = CompletableDeferred()
         evalJs(observerJs())
+        // Polling fallback: actively search for the image every 5s in case
+        // the MutationObserver misses it (selector drift, timing, etc.)
+        // The JS fetches and sends via PpcBridge itself.
+        scope.launch {
+            while (imageArrived?.isCompleted == false) {
+                delay(5000)
+                try { evalJs(pollImageJs()) } catch (_: Exception) {}
+            }
+        }
         return withTimeoutOrNull(GENERATION_TIMEOUT_MS) { imageArrived!!.await() }
             ?: throw DriverException(
                 "Timed out waiting for the generated image (12 min). It may still appear in your ChatGPT history."
             )
+    }
+
+    /**
+     * Actively searches for a generated image in assistant messages.
+     * If found, fetches it and sends via PpcBridge (same as the observer).
+     */
+    private fun pollImageJs(): String {
+        return """(function(){
+          window.__ppcSeen=window.__ppcSeen||[];
+          var sels=['[data-message-author-role="assistant"] img','main img','img[src^="https://"]','img[src^="blob:"]'];
+          for(var s=0;s<sels.length;s++){
+            var imgs=document.querySelectorAll(sels[s]);
+            for(var k=0;k<imgs.length;k++){
+              var img=imgs[k];var src=img.currentSrc||img.src||'';
+              if(!src||window.__ppcSeen.indexOf(src)>-1)continue;
+              if(!(src.indexOf('http')===0||src.indexOf('blob:')===0))continue;
+              if(!(img.complete&&img.naturalWidth>200))continue;
+              if(img.naturalWidth<200||img.naturalHeight<200)continue;
+              window.__ppcSeen.push(src);
+              fetch(src).then(function(r){return r.blob();})
+                .then(function(b){return new Promise(function(res,rej){
+                  var fr=new FileReader();fr.onload=function(){res(fr.result);};fr.onerror=rej;fr.readAsDataURL(b);});})
+                .then(function(d){PpcBridge.onImage(d);})
+                .catch(function(e){PpcBridge.onLog('poll fetch failed: '+e);});
+              return 'fetching';
+            }
+          }
+          return 'none';
+        })()"""
     }
 
     // ------------------------------------------------------------------ JS
