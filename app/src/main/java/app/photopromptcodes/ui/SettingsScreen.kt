@@ -45,8 +45,11 @@ import androidx.compose.ui.unit.sp
 import app.photopromptcodes.PpcApplication
 import app.photopromptcodes.data.HistoryRepository
 import app.photopromptcodes.update.UpdateChecker
+import androidx.compose.foundation.text.selection.SelectionContainer
 import app.photopromptcodes.ui.theme.Amber
+import app.photopromptcodes.ui.theme.Mono
 import app.photopromptcodes.ui.theme.NearBlack
+import app.photopromptcodes.ui.theme.Paper
 import app.photopromptcodes.ui.theme.PaperDim
 import app.photopromptcodes.ui.theme.SurfaceDark
 import kotlinx.coroutines.Dispatchers
@@ -391,7 +394,7 @@ fun SettingsScreen(
                                             .height(400.dp)
                                             .verticalScroll(androidx.compose.foundation.rememberScrollState())
                                     ) {
-                                        androidx.compose.material3.SelectionContainer {
+                                        SelectionContainer {
                                             Text(
                                                 reportText,
                                                 fontFamily = Mono,
