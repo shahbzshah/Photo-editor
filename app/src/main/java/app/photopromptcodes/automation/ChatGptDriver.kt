@@ -257,15 +257,34 @@ class ChatGptDriver {
 
     private suspend fun attachPhoto() {
         pendingPhoto = currentPhoto
-        val clicked = unquote(
-            evalJs("(function(){var b=${qsFirst(Selectors.attachButton)};if(!b)return 'no';b.click();return 'ok';})()")
+        // Strategy 1: click the file input directly (most reliable)
+        val inputClicked = unquote(
+            evalJs("(function(){var i=document.querySelector('input[type=\"file\"]');if(!i)return 'no';i.click();return 'ok';})()")
         ) == "ok"
-        if (!clicked) {
-            pendingPhoto = null
-            throw DriverException("Couldn't find the attach button — ChatGPT may have changed its layout (see Selectors.kt).")
+        var consumed = false
+        if (inputClicked) {
+            consumed = waitFor(ATTACH_TIMEOUT_MS, 500) { pendingPhoto == null }
         }
-        // The file chooser consumes pendingPhoto synchronously when it opens.
-        val consumed = waitFor(ATTACH_TIMEOUT_MS, 500) { pendingPhoto == null }
+        // Strategy 2: click the attach button (may open menu or file picker)
+        if (!consumed) {
+            val clicked = unquote(
+                evalJs("(function(){var b=${qsFirst(Selectors.attachButton)};if(!b)return 'no';b.click();return 'ok';})()")
+            ) == "ok"
+            if (!clicked) {
+                pendingPhoto = null
+                throw DriverException("Couldn't find the attach button — ChatGPT may have changed its layout (see Selectors.kt).")
+            }
+            // Wait a beat, then try the file input again (menu may have revealed it)
+            delay(1000)
+            val inputClicked2 = unquote(
+                evalJs("(function(){var i=document.querySelector('input[type=\"file\"]');if(!i)return 'no';i.click();return 'ok';})()")
+            ) == "ok"
+            if (inputClicked2) {
+                consumed = waitFor(ATTACH_TIMEOUT_MS, 500) { pendingPhoto == null }
+            } else {
+                consumed = waitFor(ATTACH_TIMEOUT_MS, 500) { pendingPhoto == null }
+            }
+        }
         if (!consumed) {
             // Fallback: the "+" may have opened a menu — click its upload item.
             val menuClicked = unquote(evalJs(attachMenuJs())) == "ok"
