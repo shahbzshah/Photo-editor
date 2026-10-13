@@ -133,19 +133,58 @@ class ChatGptDriver {
         // Intercept downloads (ChatGPT's image download button).
         // We click it via JS and capture the file here with auth cookies.
         wv.setDownloadListener { url, userAgent, contentDisposition, mimeType, _ ->
+            Log.d(TAG, "download started: $url ($mimeType)")
             scope.launch {
                 try {
-                    val bytes = downloadWithCookies(wv, url, userAgent)
-                    if (bytes != null) {
-                        val b64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
-                        val dataUrl = "data:$mimeType;base64,$b64"
-                        try { imageArrived?.complete(dataUrl) } catch (_: Exception) {}
+                    when {
+                        url.startsWith("data:", ignoreCase = true) -> {
+                            // Already a data URL — hand it over as-is.
+                            try { imageArrived?.complete(url) } catch (_: Exception) {}
+                        }
+                        url.startsWith("blob:", ignoreCase = true) -> {
+                            // Native code cannot open blob: URLs, so fetch the
+                            // blob inside the page (same renderer, auth applies)
+                            // and let PpcBridge.onImage complete the run.
+                            fetchDownloadBlobInPage(url)
+                        }
+                        else -> {
+                            val bytes = downloadWithCookies(wv, url, userAgent)
+                            if (bytes != null) {
+                                val b64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
+                                val dataUrl = "data:$mimeType;base64,$b64"
+                                try { imageArrived?.complete(dataUrl) } catch (_: Exception) {}
+                            } else {
+                                Log.w(TAG, "download produced no bytes: $url")
+                            }
+                        }
                     }
                 } catch (e: Exception) {
-                    Log.w(TAG, "download failed: $e")
+                    Log.w(TAG, "download failed: $url : $e")
                 }
             }
         }
+    }
+
+    /**
+     * Fetches a blob: download URL from inside the page (native code cannot
+     * open blob: URLs — only the renderer that created them can). The result
+     * arrives asynchronously via PpcBridge.onImage, which completes the run.
+     */
+    private suspend fun fetchDownloadBlobInPage(url: String) {
+        val q = JSONObject.quote(url)
+        val js = """(function(){
+          fetch($q).then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.blob(); })
+            .then(function(b){ return new Promise(function(res,rej){
+                var fr=new FileReader();
+                fr.onload=function(){res(fr.result);};
+                fr.onerror=rej;
+                fr.readAsDataURL(b); });})
+            .then(function(d){ PpcBridge.onImage(d); })
+            .catch(function(e){ PpcBridge.onLog('blob download fetch failed: '+e); });
+          return 'fetching';
+        })()"""
+        val res = unquote(evalJs(js))
+        Log.d(TAG, "blob download fetch kicked off: $res")
     }
 
     /**
