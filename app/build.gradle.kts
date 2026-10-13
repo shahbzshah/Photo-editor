@@ -40,7 +40,9 @@ android {
             excludes += "META-INF/*.version"
             excludes += "META-INF/kotlin-project-structure-metadata.json"
             excludes += "commonMain/**"
+            excludes += "nativeMain/**"
             excludes += "**/*.knm"
+            excludes += "**/manifest"
         }
     }
 }
