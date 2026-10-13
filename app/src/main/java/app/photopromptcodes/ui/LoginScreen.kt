@@ -78,7 +78,7 @@ class LoginViewModel(app: android.app.Application) : AndroidViewModel(app) {
     }
 
     override fun onCleared() {
-        driver?.detach()
+        driver?.destroy()
     }
 }
 
