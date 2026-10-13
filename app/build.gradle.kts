@@ -65,4 +65,7 @@ dependencies {
 
 configurations.all {
     exclude(group = "androidx.collection", module = "collection-ktx")
+    exclude(group = "androidx.lifecycle", module = "lifecycle-viewmodel-ktx")
+    exclude(group = "androidx.lifecycle", module = "lifecycle-runtime-ktx")
+    exclude(group = "androidx.lifecycle", module = "lifecycle-livedata-ktx")
 }
