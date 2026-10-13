@@ -17,6 +17,7 @@ import app.photopromptcodes.ui.GalleryScreen
 import app.photopromptcodes.ui.HistoryScreen
 import app.photopromptcodes.ui.LoginScreen
 import app.photopromptcodes.ui.OnboardingScreen
+import app.photopromptcodes.ui.PrivacyPolicyScreen
 import app.photopromptcodes.ui.ResultDetailScreen
 import app.photopromptcodes.ui.RunScreen
 import app.photopromptcodes.ui.SettingsScreen

@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -122,7 +121,7 @@ fun ResultDetailScreen(
                 actions = {
                     IconButton(onClick = { vm.toggleFavorite() }) {
                         Icon(
-                            if (record?.favorite == true) Icons.Filled.Star else Icons.Filled.StarBorder,
+                            Icons.Filled.Star,
                             contentDescription = "Favorite",
                             tint = if (record?.favorite == true) Amber else PaperDim
                         )
