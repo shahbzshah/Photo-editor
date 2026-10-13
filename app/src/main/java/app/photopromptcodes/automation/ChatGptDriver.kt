@@ -256,40 +256,67 @@ class ChatGptDriver {
     }
 
     private suspend fun attachPhoto() {
-        pendingPhoto = currentPhoto
-        // Strategy 1: click the file input directly (most reliable if present)
-        val inputClicked = unquote(
-            evalJs("(function(){var i=document.querySelector('input[type=\"file\"]');if(!i)return 'no';i.click();return 'ok';})()")
-        ) == "ok"
-        if (inputClicked) {
-            val consumed = waitFor(8000, 500) { pendingPhoto == null }
-            if (consumed) { delay(2500); return }
-        }
-        // Strategy 2: click the attach button, then the Photos menu item
-        val btnClicked = unquote(
-            evalJs(realTapJs(qsFirst(Selectors.attachButton)))
-        ) == "ok"
-        if (!btnClicked) {
-            pendingPhoto = null
-            throw DriverException("Couldn't find the attach button — ChatGPT may have changed its layout (see Selectors.kt).")
-        }
-        // Menu should be open now — tap the Photos/Files item right away
-        delay(1500)
-        val menuClicked = unquote(evalJs(attachMenuJs())) == "ok"
-        if (!menuClicked) {
-            pendingPhoto = null
-            throw DriverException("Couldn't tap Photos in the menu. Try again.")
-        }
-        val consumed2 = waitFor(15000, 500) { pendingPhoto == null }
-        if (!consumed2) {
-            pendingPhoto = null
-            throw DriverException("The photo picker didn't open. Try again.")
+        val photo = currentPhoto
+            ?: throw DriverException("No photo to attach. Please pick one again.")
+        // Direct injection: downscale the photo, convert to a File in the page,
+        // and set it on ChatGPT's file input. Bypasses the menu entirely.
+        val ctx = appContext()
+        val b64 = downscaleToBase64(ctx, photo)
+            ?: throw DriverException("Couldn't read the photo. Please pick it again.")
+        val js = """(function(){
+          var b64="$b64";
+          var bin=atob(b64);var arr=new Uint8Array(bin.length);
+          for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+          var file=new File([arr],"photo.jpg",{type:"image/jpeg"});
+          var dt=new DataTransfer();dt.items.add(file);
+          var input=document.querySelector('input[type="file"]');
+          if(!input){input=document.createElement('input');input.type='file';input.style.display='none';document.body.appendChild(input);}
+          input.files=dt.files;
+          input.dispatchEvent(new Event('change',{bubbles:true}));
+          return 'ok';
+        })()"""
+        val result = unquote(evalJs(js))
+        if (result != "ok") {
+            throw DriverException("Couldn't attach the photo. Try again.")
         }
         // Best-effort pause so the attachment thumbnail registers before we type.
-        delay(2500)
+        delay(3000)
+    }
+
+    /**
+     * Reads [uri], downscales to max 1024px, compresses as JPEG,
+     * and returns base64. Keeps the JS injection under ~500KB.
+     */
+    private fun downscaleToBase64(ctx: android.content.Context, uri: Uri): String? {
+        return try {
+            val input = ctx.contentResolver.openInputStream(uri) ?: return null
+            val bmp = android.graphics.BitmapFactory.decodeStream(input)
+            input.close()
+            if (bmp == null) return null
+            val maxDim = 1024
+            val scale = minOf(1f, maxDim.toFloat() / maxOf(bmp.width, bmp.height))
+            val w = (bmp.width * scale).toInt()
+            val h = (bmp.height * scale).toInt()
+            val scaled = if (scale < 1f) {
+                android.graphics.Bitmap.createScaledBitmap(bmp, w, h, true)
+            } else bmp
+            val out = java.io.ByteArrayOutputStream()
+            scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, out)
+            if (scaled != bmp) scaled.recycle()
+            bmp.recycle()
+            android.util.Base64.encodeToString(out.toByteArray(), android.util.Base64.NO_WRAP)
+        } catch (_: Exception) {
+            null
+        }
     }
 
     private var currentPhoto: Uri? = null
+
+    private fun appContext(): android.content.Context {
+        // ChatGptDriver is created with application context via ViewModel
+        return webView?.context?.applicationContext
+            ?: throw DriverException("Browser not ready. Please retry.")
+    }
 
     private suspend fun sendPrompt(prompt: String) {
         val setResult = unquote(evalJs(setPromptJs(prompt)))
