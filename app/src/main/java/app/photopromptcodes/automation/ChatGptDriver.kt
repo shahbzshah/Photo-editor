@@ -257,47 +257,34 @@ class ChatGptDriver {
 
     private suspend fun attachPhoto() {
         pendingPhoto = currentPhoto
-        // Strategy 1: click the file input directly (most reliable)
+        // Strategy 1: click the file input directly (most reliable if present)
         val inputClicked = unquote(
             evalJs("(function(){var i=document.querySelector('input[type=\"file\"]');if(!i)return 'no';i.click();return 'ok';})()")
         ) == "ok"
-        var consumed = false
         if (inputClicked) {
-            consumed = waitFor(ATTACH_TIMEOUT_MS, 500) { pendingPhoto == null }
+            val consumed = waitFor(8000, 500) { pendingPhoto == null }
+            if (consumed) { delay(2500); return }
         }
-        // Strategy 2: click the attach button (may open menu or file picker)
-        if (!consumed) {
-            val clicked = unquote(
-                evalJs("(function(){var b=${qsFirst(Selectors.attachButton)};if(!b)return 'no';b.click();return 'ok';})()")
-            ) == "ok"
-            if (!clicked) {
-                pendingPhoto = null
-                throw DriverException("Couldn't find the attach button — ChatGPT may have changed its layout (see Selectors.kt).")
-            }
-            // Wait a beat, then try the file input again (menu may have revealed it)
-            delay(1000)
-            val inputClicked2 = unquote(
-                evalJs("(function(){var i=document.querySelector('input[type=\"file\"]');if(!i)return 'no';i.click();return 'ok';})()")
-            ) == "ok"
-            if (inputClicked2) {
-                consumed = waitFor(ATTACH_TIMEOUT_MS, 500) { pendingPhoto == null }
-            } else {
-                consumed = waitFor(ATTACH_TIMEOUT_MS, 500) { pendingPhoto == null }
-            }
+        // Strategy 2: click the attach button, then the Photos menu item
+        val btnClicked = unquote(
+            evalJs("(function(){var b=${qsFirst(Selectors.attachButton)};if(!b)return 'no';b.click();return 'ok';})()")
+        ) == "ok"
+        if (!btnClicked) {
+            pendingPhoto = null
+            throw DriverException("Couldn't find the attach button — ChatGPT may have changed its layout (see Selectors.kt).")
         }
-        if (!consumed) {
-            // Fallback: the "+" may have opened a menu — click its upload item.
-            val menuClicked = unquote(evalJs(attachMenuJs())) == "ok"
-            if (menuClicked) {
-                val consumed2 = waitFor(15000, 500) { pendingPhoto == null }
-                if (!consumed2) {
-                    pendingPhoto = null
-                    throw DriverException("The photo picker didn't open. Try again.")
-                }
-            } else {
-                pendingPhoto = null
-                throw DriverException("The photo picker didn't open. Try again.")
-            }
+        // Menu should be open now — tap the Photos/Files item right away
+        delay(1500)
+        val menuClicked = unquote(evalJs(attachMenuJs())) == "ok"
+        if (!menuClicked) {
+            pendingPhoto = null
+            throw DriverException("Couldn't tap Photos in the menu. Try again.")
+        }
+        val consumed2 = waitFor(15000, 500) { pendingPhoto == null }
+        if (!consumed2) {
+            pendingPhoto = null
+            throw DriverException("The photo picker didn't open. Try again.")
+        }
         }
         // Best-effort pause so the attachment thumbnail registers before we type.
         delay(2500)
