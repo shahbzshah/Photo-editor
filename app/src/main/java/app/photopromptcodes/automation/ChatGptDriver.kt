@@ -389,30 +389,37 @@ class ChatGptDriver {
     private fun pollImageJs(): String {
         return """(function(){
           window.__ppcSeen=window.__ppcSeen||[];
-          // STRICT: only images inside ChatGPT's (assistant) messages.
-          // Never the user's uploaded photo.
-          var sels=['[data-message-author-role="assistant"] img'];
-          for(var s=0;s<sels.length;s++){
-            var imgs=document.querySelectorAll(sels[s]);
-            for(var k=0;k<imgs.length;k++){
-              var img=imgs[k];var src=img.currentSrc||img.src||'';
-              if(!src||window.__ppcSeen.indexOf(src)>-1)continue;
-              if(!(src.indexOf('http')===0||src.indexOf('blob:')===0))continue;
-              if(!(img.complete&&img.naturalWidth>200))continue;
-              if(img.naturalWidth<200||img.naturalHeight<200)continue;
-              // Skip the attachment thumbnail (small preview of the upload)
-              var r=img.getBoundingClientRect();
-              if(r.width<150||r.height<150)continue;
-              window.__ppcSeen.push(src);
-              fetch(src).then(function(r){return r.blob();})
-                .then(function(b){return new Promise(function(res,rej){
-                  var fr=new FileReader();fr.onload=function(){res(fr.result);};fr.onerror=rej;fr.readAsDataURL(b);});})
-                .then(function(d){PpcBridge.onImage(d);})
-                .catch(function(e){PpcBridge.onLog('poll fetch failed: '+e);});
-              return 'fetching';
-            }
+          // AGGRESSIVE: check every image on the page. The __ppcSeen snapshot
+          // (taken when waiting started) already excludes the uploaded photo,
+          // so any NEW large image must be the generated result.
+          var imgs=document.querySelectorAll('img');
+          var candidates=[];
+          for(var k=0;k<imgs.length;k++){
+            var img=imgs[k];var src=img.currentSrc||img.src||'';
+            if(!src||window.__ppcSeen.indexOf(src)>-1)continue;
+            // Accept http, https, blob, and data URLs
+            if(!(src.indexOf('http')===0||src.indexOf('blob:')===0||src.indexOf('data:image')===0))continue;
+            if(!img.complete)continue;
+            if(img.naturalWidth<200||img.naturalHeight<200)continue;
+            var r=img.getBoundingClientRect();
+            if(r.width<150||r.height<150)continue;
+            // Skip UI icons/logos by checking the src
+            var ls=src.toLowerCase();
+            if(ls.indexOf('logo')>-1||ls.indexOf('icon')>-1||ls.indexOf('avatar')>-1)continue;
+            candidates.push({img:img,src:src});
           }
-          return 'none';
+          if(candidates.length===0)return 'none';
+          // Take the largest candidate (generated images are big)
+          candidates.sort(function(a,b){return (b.img.naturalWidth*b.img.naturalHeight)-(a.img.naturalWidth*a.img.naturalHeight);});
+          var best=candidates[0];var bsrc=best.src;
+          window.__ppcSeen.push(bsrc);
+          if(bsrc.indexOf('data:image')===0){ PpcBridge.onImage(bsrc); return 'direct'; }
+          fetch(bsrc).then(function(r){return r.blob();})
+            .then(function(b){return new Promise(function(res,rej){
+              var fr=new FileReader();fr.onload=function(){res(fr.result);};fr.onerror=rej;fr.readAsDataURL(b);});})
+            .then(function(d){PpcBridge.onImage(d);})
+            .catch(function(e){PpcBridge.onLog('poll fetch failed: '+e);});
+          return 'fetching';
         })()"""
     }
 
@@ -498,7 +505,6 @@ class ChatGptDriver {
      * URL back over the PpcBridge.
      */
     private fun observerJs(): String {
-        val sel = Selectors.generatedImage[0].replace("\"", "\\\"")
         return """(function(){
           window.__ppcSeen=window.__ppcSeen||[];
           function snap(el){ return el.currentSrc||el.src||''; }
@@ -506,32 +512,39 @@ class ChatGptDriver {
           // photo) so we never mistake them for the generated result.
           var all=document.querySelectorAll('img');
           for(var a=0;a<all.length;a++){ var s0=snap(all[a]); if(s0) window.__ppcSeen.push(s0); }
-          var pre=document.querySelectorAll('$sel');
-          for(var p=0;p<pre.length;p++){ window.__ppcSeen.push(snap(pre[p])); }
           if(window.__ppcObs){ try{window.__ppcObs.disconnect();}catch(e){} }
-          var obs=new MutationObserver(function(){
-            var imgs=document.querySelectorAll('$sel');
+          function tryHarvest(){
+            var imgs=document.querySelectorAll('img');
+            var best=null;var bestArea=0;
             for(var k=0;k<imgs.length;k++){
               var img=imgs[k]; var src=snap(img);
               if(!src || window.__ppcSeen.indexOf(src)>-1) continue;
-              if(!(src.indexOf('http')===0 || src.indexOf('blob:')===0)) continue;
-              if(!(img.complete && img.naturalWidth>200)) continue;
+              if(!(src.indexOf('http')===0||src.indexOf('blob:')===0||src.indexOf('data:image')===0)) continue;
+              if(!img.complete) continue;
+              if(img.naturalWidth<200||img.naturalHeight<200) continue;
               var r=img.getBoundingClientRect();
               if(r.width<150||r.height<150) continue;
-              window.__ppcSeen.push(src);
-              try{obs.disconnect();}catch(e){}
-              fetch(src).then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.blob(); })
-                .then(function(b){ return new Promise(function(res,rej){
-                    var fr=new FileReader();
-                    fr.onload=function(){res(fr.result);};
-                    fr.onerror=rej;
-                    fr.readAsDataURL(b);
-                });})
-                .then(function(d){ PpcBridge.onImage(d); })
-                .catch(function(e){ PpcBridge.onLog('image fetch failed: '+e); });
-              return;
+              var ls=src.toLowerCase();
+              if(ls.indexOf('logo')>-1||ls.indexOf('icon')>-1||ls.indexOf('avatar')>-1) continue;
+              var area=img.naturalWidth*img.naturalHeight;
+              if(area>bestArea){ bestArea=area; best={img:img,src:src}; }
             }
-          });
+            if(!best) return false;
+            window.__ppcSeen.push(best.src);
+            try{window.__ppcObs.disconnect();}catch(e){}
+            if(best.src.indexOf('data:image')===0){ PpcBridge.onImage(best.src); return true; }
+            fetch(best.src).then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.blob(); })
+              .then(function(b){ return new Promise(function(res,rej){
+                  var fr=new FileReader();
+                  fr.onload=function(){res(fr.result);};
+                  fr.onerror=rej;
+                  fr.readAsDataURL(b);
+              });})
+              .then(function(d){ PpcBridge.onImage(d); })
+              .catch(function(e){ PpcBridge.onLog('image fetch failed: '+e); });
+            return true;
+          }
+          var obs=new MutationObserver(function(){ tryHarvest(); });
           window.__ppcObs=obs;
           obs.observe(document.body,{childList:true,subtree:true});
           return 'observing';
