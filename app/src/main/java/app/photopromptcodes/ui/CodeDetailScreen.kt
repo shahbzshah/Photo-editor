@@ -158,6 +158,50 @@ fun CodeDetailScreen(
 
             Spacer(Modifier.height(16.dp))
             Text(
+                "SAMPLE RESULT",
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.weight(1f)) {
+                    AsyncImage(
+                        model = PromptCode.BASE_SAMPLE_ASSET,
+                        contentDescription = "Before sample",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(160.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Before",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = PaperDim
+                    )
+                }
+                Spacer(Modifier.width(8.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    AsyncImage(
+                        model = c.sampleAsset,
+                        contentDescription = "After sample: ${c.code}",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(160.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "After",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Amber
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+            Text(
                 "PROMPT SENT TO CHATGPT",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.padding(bottom = 8.dp)

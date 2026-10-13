@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -39,6 +41,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
@@ -46,6 +50,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.photopromptcodes.data.CodeRepository
 import app.photopromptcodes.data.PromptCode
+import coil.compose.AsyncImage
 import app.photopromptcodes.ui.theme.Amber
 import app.photopromptcodes.ui.theme.Mono
 import app.photopromptcodes.ui.theme.NearBlack
@@ -177,9 +182,19 @@ private fun CodeCard(code: PromptCode, onClick: () -> Unit) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Sample thumbnail
+            AsyncImage(
+                model = code.sampleAsset,
+                contentDescription = "Sample: ${code.code}",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(72.dp)
+                    .clip(RoundedCornerShape(10.dp))
+            )
+            Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = code.code,
@@ -191,7 +206,8 @@ private fun CodeCard(code: PromptCode, onClick: () -> Unit) {
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = code.description,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
