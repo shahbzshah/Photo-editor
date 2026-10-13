@@ -2,6 +2,7 @@ package app.photopromptcodes.ui
 
 import android.content.Context
 import android.webkit.CookieManager
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import app.photopromptcodes.PpcApplication
 import app.photopromptcodes.data.HistoryRepository
 import app.photopromptcodes.update.UpdateChecker
@@ -338,6 +340,37 @@ fun SettingsScreen(
                     if (crashCount > 0) {
                         Spacer(Modifier.height(12.dp))
                         var cleared by remember { mutableStateOf(false) }
+                        var showReport by remember { mutableStateOf<String?>(null) }
+                        val latestReport = remember {
+                            PpcApplication.listReports(ctx).firstOrNull()?.readText()
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { showReport = latestReport },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("View report")
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    latestReport?.let { text ->
+                                        val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                            type = "text/plain"
+                                            putExtra(android.content.Intent.EXTRA_SUBJECT, "Photo Prompt Codes crash report")
+                                            putExtra(android.content.Intent.EXTRA_TEXT, text)
+                                        }
+                                        ctx.startActivity(android.content.Intent.createChooser(intent, "Share crash report"))
+                                    }
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Share report")
+                            }
+                        }
+                        Spacer(Modifier.height(8.dp))
                         OutlinedButton(
                             onClick = {
                                 PpcApplication.clearReports(ctx)
@@ -346,6 +379,35 @@ fun SettingsScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(if (cleared) "Cleared" else "Clear crash reports")
+                        }
+                        showReport?.let { reportText ->
+                            androidx.compose.material3.AlertDialog(
+                                onDismissRequest = { showReport = null },
+                                title = { Text("Crash report", fontSize = 16.sp) },
+                                text = {
+                                    androidx.compose.foundation.layout.Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(400.dp)
+                                            .verticalScroll(androidx.compose.foundation.rememberScrollState())
+                                    ) {
+                                        androidx.compose.material3.SelectionContainer {
+                                            Text(
+                                                reportText,
+                                                fontFamily = Mono,
+                                                fontSize = 11.sp,
+                                                color = Paper
+                                            )
+                                        }
+                                    }
+                                },
+                                confirmButton = {
+                                    androidx.compose.material3.TextButton(onClick = { showReport = null }) {
+                                        Text("Close", color = Amber)
+                                    }
+                                },
+                                containerColor = SurfaceDark
+                            )
                         }
                     }
                 }
