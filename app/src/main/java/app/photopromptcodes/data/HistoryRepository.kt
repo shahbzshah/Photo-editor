@@ -16,7 +16,8 @@ data class HistoryRecord(
     val code: String,
     val timestamp: Long,
     val originalFileName: String,
-    val resultFileName: String
+    val resultFileName: String,
+    val favorite: Boolean = false
 )
 
 /**
@@ -76,6 +77,12 @@ class HistoryRepository(private val context: Context) {
         originalFile(record).delete()
         resultFile(record).delete()
         writeIndex(readIndex().filterNot { it.id == record.id })
+    }
+
+    suspend fun toggleFavorite(record: HistoryRecord): Boolean = withContext(Dispatchers.IO) {
+        val updated = record.copy(favorite = !record.favorite)
+        writeIndex(readIndex().map { if (it.id == record.id) updated else it })
+        updated.favorite
     }
 
     private fun readIndex(): List<HistoryRecord> {

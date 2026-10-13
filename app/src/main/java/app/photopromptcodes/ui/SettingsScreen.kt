@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import app.photopromptcodes.PpcApplication
 import app.photopromptcodes.data.HistoryRepository
 import app.photopromptcodes.ui.theme.Amber
 import app.photopromptcodes.ui.theme.NearBlack
@@ -54,7 +55,8 @@ import kotlinx.coroutines.withContext
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
-    onSignIn: () -> Unit
+    onSignIn: () -> Unit,
+    onPrivacy: () -> Unit
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -205,6 +207,56 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = PaperDim
                     )
+                    Spacer(Modifier.height(12.dp))
+                    TextButton(onClick = onPrivacy) {
+                        Text("Privacy Policy", color = Amber)
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            // --- Diagnostics ---
+            Text(
+                "DIAGNOSTICS",
+                style = MaterialTheme.typography.labelSmall,
+                color = PaperDim
+            )
+            Spacer(Modifier.height(8.dp))
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    val crashCount = remember {
+                        PpcApplication.listReports(ctx).size
+                    }
+                    Text(
+                        "Crash reports",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        if (crashCount == 0) "No crashes recorded."
+                        else "$crashCount report(s) saved on this device.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = PaperDim
+                    )
+                    if (crashCount > 0) {
+                        Spacer(Modifier.height(12.dp))
+                        var cleared by remember { mutableStateOf(false) }
+                        OutlinedButton(
+                            onClick = {
+                                PpcApplication.clearReports(ctx)
+                                cleared = true
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(if (cleared) "Cleared" else "Clear crash reports")
+                        }
+                    }
                 }
             }
         }

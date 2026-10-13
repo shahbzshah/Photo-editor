@@ -16,10 +16,12 @@ import app.photopromptcodes.ui.CodeDetailScreen
 import app.photopromptcodes.ui.GalleryScreen
 import app.photopromptcodes.ui.HistoryScreen
 import app.photopromptcodes.ui.LoginScreen
+import app.photopromptcodes.ui.OnboardingScreen
 import app.photopromptcodes.ui.ResultDetailScreen
 import app.photopromptcodes.ui.RunScreen
 import app.photopromptcodes.ui.SettingsScreen
 import app.photopromptcodes.ui.isLoggedInFlag
+import app.photopromptcodes.ui.isOnboarded
 import app.photopromptcodes.ui.theme.PhotoPromptCodesTheme
 
 class MainActivity : ComponentActivity() {
@@ -38,8 +40,23 @@ class MainActivity : ComponentActivity() {
 fun AppNav() {
     val nav = rememberNavController()
     val ctx = androidx.compose.ui.platform.LocalContext.current
-    val start = remember { if (isLoggedInFlag(ctx)) "gallery" else "login" }
+    val start = remember {
+        when {
+            !isOnboarded(ctx) -> "onboarding"
+            !isLoggedInFlag(ctx) -> "login"
+            else -> "gallery"
+        }
+    }
     NavHost(navController = nav, startDestination = start) {
+        composable("onboarding") {
+            OnboardingScreen(
+                onDone = {
+                    nav.navigate(if (isLoggedInFlag(ctx)) "gallery" else "login") {
+                        popUpTo("onboarding") { inclusive = true }
+                    }
+                }
+            )
+        }
         composable("login") {
             LoginScreen(
                 onDone = {
@@ -59,8 +76,12 @@ fun AppNav() {
         composable("settings") {
             SettingsScreen(
                 onBack = { nav.popBackStack() },
-                onSignIn = { nav.navigate("signin") }
+                onSignIn = { nav.navigate("signin") },
+                onPrivacy = { nav.navigate("privacy") }
             )
+        }
+        composable("privacy") {
+            PrivacyPolicyScreen(onBack = { nav.popBackStack() })
         }
         composable("signin") {
             LoginScreen(

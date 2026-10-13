@@ -17,6 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -78,6 +80,14 @@ class ResultDetailViewModel(app: Application) : AndroidViewModel(app) {
             onDone()
         }
     }
+
+    fun toggleFavorite() {
+        val r = record ?: return
+        viewModelScope.launch {
+            val fav = repo.toggleFavorite(r)
+            record = r.copy(favorite = fav)
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,6 +120,13 @@ fun ResultDetailScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { vm.toggleFavorite() }) {
+                        Icon(
+                            if (record?.favorite == true) Icons.Filled.Star else Icons.Filled.StarBorder,
+                            contentDescription = "Favorite",
+                            tint = if (record?.favorite == true) Amber else PaperDim
+                        )
+                    }
                     IconButton(onClick = { vm.delete(onBack) }) {
                         Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = PaperDim)
                     }

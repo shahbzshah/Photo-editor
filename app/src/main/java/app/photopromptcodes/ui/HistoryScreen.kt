@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,7 +62,16 @@ import java.util.Locale
 class HistoryViewModel(app: Application) : AndroidViewModel(app) {
     var records by mutableStateOf<List<HistoryRecord>>(emptyList())
         private set
+    var favoritesOnly by mutableStateOf(false)
+        private set
     private val repo = HistoryRepository(app)
+
+    val displayedRecords: List<HistoryRecord>
+        get() = if (favoritesOnly) records.filter { it.favorite } else records
+
+    fun toggleFavoritesOnly() {
+        favoritesOnly = !favoritesOnly
+    }
 
     init {
         refresh()
@@ -121,7 +131,27 @@ fun HistoryScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            items(vm.records, key = { it.id }) { record ->
+            // Favorites toggle
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    androidx.compose.material3.FilterChip(
+                        selected = vm.favoritesOnly,
+                        onClick = { vm.toggleFavoritesOnly() },
+                        label = { Text("Favorites") },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Filled.Star,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    )
+                }
+            }
+            items(vm.displayedRecords, key = { it.id }) { record ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()

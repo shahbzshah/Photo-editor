@@ -12,3 +12,6 @@ local.properties
 *.apk
 *.aab
 !gradle-wrapper.jar
+
+# Release signing keystore - NEVER commit this
+app/release.keystore
