@@ -1,25 +1,30 @@
 package app.photopromptcodes.ui
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +48,7 @@ import kotlinx.coroutines.launch
 
 private const val PREFS = "ppc_prefs"
 private const val KEY_LOGGED_IN = "chatgpt_logged_in"
+private const val LOGIN_URL = "https://chatgpt.com/auth/login"
 
 fun isLoggedInFlag(ctx: Context): Boolean =
     ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_LOGGED_IN, false)
@@ -59,17 +65,46 @@ fun clearLoggedInFlag(ctx: Context) {
 
 class LoginViewModel(app: android.app.Application) : AndroidViewModel(app) {
     private var driver: ChatGptDriver? = null
-    var detected by mutableStateOf(false)
+    var pageLoaded by mutableStateOf(false)
+        private set
+    var loadError by mutableStateOf<String?>(null)
         private set
 
     fun attach(wv: WebView, onDetected: () -> Unit) {
         if (driver != null) return
         driver = ChatGptDriver().also { d ->
             d.attach(wv)
-            d.loadChatGpt()
-            // Poll for login state — auto-advance when the user signs in
-            d.startLoginWatch { detected = true; onDetected() }
+            // Keep the driver's WebViewClient but hook page events for our UI
+            val outer = wv.webViewClient
+            wv.webViewClient = object : WebViewClient() {
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    outer?.onPageStarted(view, url, favicon)
+                    pageLoaded = false
+                    loadError = null
+                }
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    outer?.onPageFinished(view, url)
+                    pageLoaded = true
+                }
+                override fun onReceivedError(
+                    view: WebView?,
+                    request: android.webkit.WebResourceRequest?,
+                    error: android.webkit.WebResourceError?
+                ) {
+                    outer?.onReceivedError(view, request, error)
+                    if (request?.isForMainFrame == true) {
+                        loadError = "Couldn't load the page (${error?.description}). Check your connection and tap Reload."
+                    }
+                }
+            }
+            wv.loadUrl(LOGIN_URL)
+            d.startLoginWatch { onDetected() }
         }
+    }
+
+    fun reload() {
+        loadError = null
+        pageLoaded = false
     }
 
     fun markLoggedIn() {
@@ -85,12 +120,11 @@ class LoginViewModel(app: android.app.Application) : AndroidViewModel(app) {
 @Composable
 fun LoginScreen(onDone: () -> Unit) {
     val vm: LoginViewModel = viewModel()
-    val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
     var webView by remember { mutableStateOf<WebView?>(null) }
 
     DisposableEffect(Unit) {
-        onDispose { webView?.destroy() }
+        onDispose { try { webView?.destroy() } catch (_: Exception) {} }
     }
 
     Scaffold(containerColor = NearBlack) { padding ->
@@ -104,18 +138,38 @@ fun LoginScreen(onDone: () -> Unit) {
                     WebView(c).also { wv ->
                         webView = wv
                         vm.attach(wv) {
-                            // Auto-detected login — save and move on
                             scope.launch {
-                                delay(1500) // let cookies settle
+                                delay(1500)
                                 vm.markLoggedIn()
                                 onDone()
                             }
                         }
                     }
                 },
+                update = { wv ->
+                    // Reload requested
+                    if (vm.loadError == null && !vm.pageLoaded) {
+                        // still loading, do nothing
+                    }
+                },
                 modifier = Modifier.fillMaxSize()
             )
-            // Bottom card: instructions + manual continue
+
+            // Loading spinner while the page loads
+            if (!vm.pageLoaded && vm.loadError == null) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = Amber)
+                        Spacer(Modifier.height(12.dp))
+                        Text("Loading ChatGPT…", color = PaperDim)
+                    }
+                }
+            }
+
+            // Bottom card
             Card(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -131,25 +185,59 @@ fun LoginScreen(onDone: () -> Unit) {
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(8.dp))
-                    Text(
-                        "Log in with your email and password in the browser above. " +
-                            "You only do this once — the app remembers you.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = PaperDim
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    Button(
-                        onClick = {
-                            vm.markLoggedIn()
-                            onDone()
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Amber,
-                            contentColor = NearBlack
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("I've signed in — continue", fontWeight = FontWeight.SemiBold)
+                    if (vm.loadError != null) {
+                        Text(
+                            vm.loadError!!,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Row {
+                            OutlinedButton(
+                                onClick = {
+                                    vm.reload()
+                                    webView?.loadUrl(LOGIN_URL)
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Reload")
+                            }
+                            Spacer(Modifier.width(8.dp))
+                            Button(
+                                onClick = {
+                                    vm.markLoggedIn()
+                                    onDone()
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Amber,
+                                    contentColor = NearBlack
+                                ),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Continue", fontWeight = FontWeight.SemiBold)
+                            }
+                        }
+                    } else {
+                        Text(
+                            "Log in with your email and password above. " +
+                                "You only do this once — the app remembers you.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = PaperDim
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Button(
+                            onClick = {
+                                vm.markLoggedIn()
+                                onDone()
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Amber,
+                                contentColor = NearBlack
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("I've signed in — continue", fontWeight = FontWeight.SemiBold)
+                        }
                     }
                 }
             }
