@@ -1,6 +1,7 @@
 package app.photopromptcodes.ui
 
 import android.app.Application
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -66,6 +68,10 @@ class GalleryViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var category by mutableStateOf<String?>(null)
         private set
+    var recentCodes by mutableStateOf<List<PromptCode>>(emptyList())
+        private set
+    var promptOfTheDay by mutableStateOf<PromptCode?>(null)
+        private set
 
     val categories: List<String> get() = CodeRepository.categories(codes)
 
@@ -82,7 +88,21 @@ class GalleryViewModel(app: Application) : AndroidViewModel(app) {
         }
 
     init {
-        viewModelScope.launch { codes = CodeRepository.load(getApplication()) }
+        viewModelScope.launch {
+            codes = CodeRepository.load(getApplication())
+            refreshRecent()
+            // Deterministic daily pick: day-of-year rotates through all codes
+            if (codes.isNotEmpty()) {
+                val dayOfYear = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR)
+                promptOfTheDay = codes[dayOfYear % codes.size]
+            }
+        }
+    }
+
+    fun refreshRecent() {
+        val recent = app.photopromptcodes.data.RecentCodes.get(getApplication())
+        val byCode = codes.associateBy { it.code }
+        recentCodes = recent.mapNotNull { byCode[it] }
     }
 
     fun updateQuery(q: String) { query = q }
@@ -93,8 +113,99 @@ class GalleryViewModel(app: Application) : AndroidViewModel(app) {
 @Composable
 fun GalleryScreen(
     onOpenCode: (String) -> Unit,
+    onCustomPrompt: (String, Uri) -> Unit,
     vm: GalleryViewModel = viewModel()
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    // Refresh recent codes whenever the screen resumes (e.g. after a run)
+    val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    androidx.compose.runtime.DisposableEffect(lifecycle) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                vm.refreshRecent()
+            }
+        }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
+    }
+    var showCustomDialog by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var customText by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
+    var pendingCustomText by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>(null) }
+
+    val pickVisual = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        val text = pendingCustomText
+        if (uri != null && text != null) onCustomPrompt(text, uri)
+        pendingCustomText = null
+    }
+    val takePictureUri = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<Uri?>(null) }
+    val takePicture = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.TakePicture()
+    ) { success ->
+        val text = pendingCustomText
+        val uri = takePictureUri.value
+        if (success && uri != null && text != null) onCustomPrompt(text, uri)
+        pendingCustomText = null
+    }
+
+    fun launchCustomPhoto(text: String, useCamera: Boolean) {
+        pendingCustomText = text
+        showCustomDialog = false
+        if (useCamera) {
+            val file = java.io.File(context.cacheDir, "shared/camera_${System.currentTimeMillis()}.jpg")
+            file.parentFile?.mkdirs()
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                context, "app.photopromptcodes.fileprovider", file
+            )
+            takePictureUri.value = uri
+            takePicture.launch(uri)
+        } else {
+            pickVisual.launch(
+                androidx.activity.result.PickVisualMediaRequest(
+                    androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+                )
+            )
+        }
+    }
+
+    if (showCustomDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showCustomDialog = false },
+            title = { Text("Custom edit") },
+            text = {
+                androidx.compose.material3.OutlinedTextField(
+                    value = customText,
+                    onValueChange = { customText = it },
+                    placeholder = { Text("Describe the edit — e.g. make the sky dramatic and add film grain", color = PaperDim) },
+                    minLines = 3,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Paper,
+                        unfocusedTextColor = Paper,
+                        focusedBorderColor = Amber
+                    )
+                )
+            },
+            confirmButton = {
+                Row {
+                    androidx.compose.material3.TextButton(
+                        onClick = { if (customText.isNotBlank()) launchCustomPhoto(customText, useCamera = false) }
+                    ) { Text("Gallery", color = Amber) }
+                    androidx.compose.material3.TextButton(
+                        onClick = { if (customText.isNotBlank()) launchCustomPhoto(customText, useCamera = true) }
+                    ) { Text("Camera", color = Amber) }
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showCustomDialog = false }) {
+                    Text("Cancel", color = PaperDim)
+                }
+            },
+            containerColor = SurfaceDark
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -147,11 +258,147 @@ fun GalleryScreen(
                     )
                 }
             }
+            if (vm.recentCodes.isNotEmpty() && vm.query.isBlank() && vm.category == null) {
+                Text(
+                    "RECENTLY USED",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = PaperDim,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                ) {
+                    items(vm.recentCodes, key = { it.code }) { code ->
+                        Card(
+                            modifier = Modifier
+                                .width(140.dp)
+                                .clickable { onOpenCode(code.code) },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                        ) {
+                            Column {
+                                AsyncImage(
+                                    model = code.sampleAsset,
+                                    contentDescription = "Sample: ${code.code}",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(90.dp)
+                                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                                )
+                                Text(
+                                    text = code.code,
+                                    fontFamily = Mono,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Amber,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(8.dp),
+                                    maxLines = 1
+                                )
+                            }
+                        }
+                    }
+                }
+            }
             LazyColumn(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
+                vm.promptOfTheDay?.let { potd ->
+                    if (vm.query.isBlank() && vm.category == null) {
+                        item {
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onOpenCode(potd.code) },
+                                shape = RoundedCornerShape(14.dp),
+                                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+                                border = BorderStroke(1.dp, Amber)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    AsyncImage(
+                                        model = potd.sampleAsset,
+                                        contentDescription = "Prompt of the day",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .size(64.dp)
+                                            .clip(RoundedCornerShape(10.dp))
+                                    )
+                                    Spacer(Modifier.width(12.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            "PROMPT OF THE DAY",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Amber
+                                        )
+                                        Spacer(Modifier.height(2.dp))
+                                        Text(
+                                            text = potd.code,
+                                            fontFamily = Mono,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Paper,
+                                            style = MaterialTheme.typography.titleMedium
+                                        )
+                                        Text(
+                                            text = potd.description,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = PaperDim,
+                                            maxLines = 1
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showCustomDialog = true },
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+                        border = BorderStroke(1.dp, Amber)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Filled.Edit,
+                                contentDescription = null,
+                                tint = Amber,
+                                modifier = Modifier.size(28.dp)
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Custom edit",
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Amber,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Spacer(Modifier.height(2.dp))
+                                Text(
+                                    text = "Describe any edit in your own words",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = PaperDim
+                                )
+                            }
+                        }
+                    }
+                }
                 items(vm.filtered, key = { it.code }) { code ->
                     CodeCard(code = code, onClick = { onOpenCode(code.code) })
                 }

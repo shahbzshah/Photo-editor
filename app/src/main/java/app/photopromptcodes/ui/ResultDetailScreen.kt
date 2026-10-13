@@ -2,12 +2,18 @@ package app.photopromptcodes.ui
 
 import android.app.Application
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -38,8 +44,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
@@ -50,9 +60,11 @@ import app.photopromptcodes.data.HistoryRepository
 import app.photopromptcodes.ui.theme.Amber
 import app.photopromptcodes.ui.theme.Mono
 import app.photopromptcodes.ui.theme.NearBlack
+import app.photopromptcodes.ui.theme.Paper
 import app.photopromptcodes.ui.theme.PaperDim
 import app.photopromptcodes.util.saveImageToGallery
 import app.photopromptcodes.util.shareImage
+import app.photopromptcodes.util.shareImageToApp
 import coil.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -150,13 +162,81 @@ fun ResultDetailScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            AsyncImage(
-                model = vm.resultFile(),
-                contentDescription = "Edited photo",
-                contentScale = ContentScale.Fit,
+            // Before/after comparison slider
+            var sliderPos by remember { mutableStateOf(0.5f) }
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
+            ) {
+                val widthPx = with(LocalDensity.current) { maxWidth.toPx() }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .pointerInput(Unit) {
+                            detectHorizontalDragGestures { change, dragAmount ->
+                                change.consume()
+                                sliderPos = (sliderPos + dragAmount / widthPx).coerceIn(0.02f, 0.98f)
+                            }
+                        }
+                ) {
+                    // After image (full, bottom layer)
+                    AsyncImage(
+                        model = vm.resultFile(),
+                        contentDescription = "Edited photo",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    // Before image (clipped to left of slider, top layer)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(sliderPos)
+                            .clipToBounds()
+                    ) {
+                        AsyncImage(
+                            model = vm.originalFile(),
+                            contentDescription = "Original photo",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    // Divider line
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(2.dp)
+                            .background(Amber)
+                            .align(Alignment.CenterStart)
+                            .offset(x = (maxWidth * sliderPos) - 1.dp)
+                    )
+                    // Labels
+                    Text(
+                        "BEFORE",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Paper,
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(8.dp)
+                            .background(NearBlack.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                    Text(
+                        "AFTER",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Paper,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .background(NearBlack.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                }
+            }
+            Text(
+                "Drag to compare before / after",
+                style = MaterialTheme.typography.labelSmall,
+                color = PaperDim,
+                modifier = Modifier.padding(top = 4.dp)
             )
             Spacer(Modifier.height(20.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -198,6 +278,42 @@ fun ResultDetailScreen(
                     Spacer(Modifier.width(8.dp))
                     Text("Share")
                 }
+            }
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "SHARE TO",
+                style = MaterialTheme.typography.labelSmall,
+                color = PaperDim
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        vm.resultFile()?.let {
+                            shareImageToApp(context, it, "com.whatsapp", "WhatsApp")
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                ) { Text("WhatsApp") }
+                OutlinedButton(
+                    onClick = {
+                        vm.resultFile()?.let {
+                            shareImageToApp(context, it, "com.zhiliaoapp.musically", "TikTok")
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                ) { Text("TikTok") }
+                OutlinedButton(
+                    onClick = {
+                        vm.resultFile()?.let {
+                            shareImageToApp(context, it, "com.instagram.android", "Instagram")
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                ) { Text("Instagram") }
             }
             Spacer(Modifier.height(8.dp))
             Text(

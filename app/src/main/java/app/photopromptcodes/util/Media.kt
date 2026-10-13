@@ -61,3 +61,38 @@ fun shareImage(context: Context, file: File, mimeType: String = "image/png") {
     }
     context.startActivity(Intent.createChooser(intent, "Share edited photo"))
 }
+
+/**
+ * Shares directly to a specific app by package name.
+ * Returns false if the app isn't installed.
+ */
+fun shareImageToApp(context: Context, file: File, packageName: String, appName: String): Boolean {
+    // Check if app is installed
+    try {
+        context.packageManager.getPackageInfo(packageName, 0)
+    } catch (e: Exception) {
+        android.widget.Toast.makeText(context, "$appName isn't installed", android.widget.Toast.LENGTH_SHORT).show()
+        return false
+    }
+    val sharedDir = File(context.cacheDir, "shared").apply { mkdirs() }
+    val copy = File(sharedDir, file.name)
+    file.copyTo(copy, overwrite = true)
+    val uri = FileProvider.getUriForFile(
+        context,
+        "app.photopromptcodes.fileprovider",
+        copy
+    )
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "image/png"
+        putExtra(Intent.EXTRA_STREAM, uri)
+        setPackage(packageName)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    return try {
+        context.startActivity(intent)
+        true
+    } catch (e: Exception) {
+        android.widget.Toast.makeText(context, "Couldn't open $appName", android.widget.Toast.LENGTH_SHORT).show()
+        false
+    }
+}

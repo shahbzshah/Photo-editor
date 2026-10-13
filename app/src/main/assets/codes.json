@@ -1000,5 +1000,35 @@
     "category": "Textures & Effects",
     "description": "Surreal dreamcore: liminal spaces, hazy nostalgia.",
     "prompt": "Edit this photo into dreamcore: shift it into surreal liminal nostalgia — hazy familiar-yet-strange spaces, soft VHS-like blur, uncanny familiar objects, the feeling of a half-remembered dream. Keep the subject recognizable within the strangeness. Haunting, nostalgic, surreal."
+  },
+  {
+    "code": "/unblur",
+    "category": "Enhance",
+    "description": "Remove blur and sharpen a soft or shaky photo.",
+    "prompt": "Edit this photo: remove all blur, motion blur and camera shake. Restore razor-sharp focus and crisp detail throughout — sharp edges, clear textures, clean lines. Keep the subject's identity, pose, clothing and the scene composition exactly the same; only deblur and sharpen. Photorealistic, natural sharpness without halos or artifacts."
+  },
+  {
+    "code": "/upscale",
+    "category": "Enhance",
+    "description": "Boost resolution and fine detail in a low-quality photo.",
+    "prompt": "Edit this photo: upscale it to high resolution with rich fine detail. Reconstruct crisp textures in skin, hair, fabric and background — add realistic micro-detail where the original is soft or pixelated. Keep the subject's identity, pose, clothing and the scene composition exactly the same; only increase clarity and detail. Photorealistic, clean, no AI-looking smoothness."
+  },
+  {
+    "code": "/restore",
+    "category": "Enhance",
+    "description": "Restore an old, faded or damaged photo to clean quality.",
+    "prompt": "Edit this photo: restore it as if professionally repaired — remove scratches, dust, stains, creases and fading. Rebalance the color to natural, accurate tones and restore contrast lost to age. Reconstruct any damaged areas seamlessly. Keep the subject's identity, pose, clothing and the scene composition exactly the same; only clean and restore. Photorealistic archival restoration."
+  },
+  {
+    "code": "/faceenhance",
+    "category": "Enhance",
+    "description": "Sharpen facial details — eyes, skin and hair look crisp.",
+    "prompt": "Edit this photo: enhance the face with refined, natural detail — crisp clear eyes with catchlights, clean natural skin texture (keep real pores, no plastic smoothing), defined hair strands. Subtly improve lighting on the face for a professional portrait look. Keep the subject's identity, expression, pose and the scene exactly the same; only refine facial detail. Photorealistic, never artificial."
+  },
+  {
+    "code": "/denoise",
+    "category": "Enhance",
+    "description": "Remove grain and noise from a dark or high-ISO photo.",
+    "prompt": "Edit this photo: remove all digital noise, grain and color speckling — especially in shadows and flat areas. Restore smooth clean tones while preserving real texture and fine detail. Keep the subject's identity, pose, clothing and the scene composition exactly the same; only clean the noise. Photorealistic, no waxy over-smoothing."
   }
 ]

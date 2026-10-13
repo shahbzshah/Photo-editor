@@ -90,16 +90,27 @@ class RunViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun ensureStarted(codeName: String, photoUriString: String) {
+    fun ensureStarted(codeName: String, photoUriString: String, customPrompt: String? = null) {
         if (started) return
         started = true
         val photoUri = Uri.parse(photoUriString)
         viewModelScope.launch {
-            val code = CodeRepository.load(getApplication()).firstOrNull { it.code == codeName }
+            val code = if (codeName == "__custom__" && customPrompt != null) {
+                PromptCode(
+                    code = "/custom",
+                    category = "Custom",
+                    description = customPrompt.take(80),
+                    prompt = "Edit this photo: $customPrompt Keep the subject's identity and pose recognizable unless the instruction says otherwise. Photorealistic."
+                )
+            } else {
+                CodeRepository.load(getApplication()).firstOrNull { it.code == codeName }
+            }
             if (code == null) {
                 ui = ui.copy(error = "Code not found: $codeName")
                 return@launch
             }
+            // Track as recently used
+            app.photopromptcodes.data.RecentCodes.record(getApplication(), code.code)
             ui = ui.copy(code = code, photoUri = photoUri)
             stageId = try {
                 history.stageOriginal(code.code, photoUri)
@@ -148,11 +159,12 @@ class RunViewModel(app: Application) : AndroidViewModel(app) {
 fun RunScreen(
     code: String,
     photoUriString: String,
+    customPrompt: String? = null,
     onBack: () -> Unit,
     onDone: (String) -> Unit,
     vm: RunViewModel = viewModel()
 ) {
-    LaunchedEffect(code, photoUriString) { vm.ensureStarted(code, photoUriString) }
+    LaunchedEffect(code, photoUriString) { vm.ensureStarted(code, photoUriString, customPrompt) }
     LaunchedEffect(Unit) { vm.doneEvents.collect { onDone(it) } }
     val ui = vm.ui
 

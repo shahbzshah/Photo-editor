@@ -167,7 +167,10 @@ fun AppNav() {
         }
         composable("gallery") {
             GalleryScreen(
-                onOpenCode = { code -> nav.navigate("detail/${Uri.encode(code)}") }
+                onOpenCode = { code -> nav.navigate("detail/${Uri.encode(code)}") },
+                onCustomPrompt = { prompt, photoUri ->
+                    nav.navigate("runcustom?photo=${Uri.encode(photoUri.toString())}&prompt=${Uri.encode(prompt)}")
+                }
             )
         }
         composable("settings") {
@@ -195,6 +198,10 @@ fun AppNav() {
                 onBack = { nav.popBackStack() },
                 onEdit = { photoUri ->
                     nav.navigate("run/${Uri.encode(code)}?photo=${Uri.encode(photoUri.toString())}")
+                },
+                onBatch = { uris ->
+                    val photos = uris.joinToString(",") { Uri.encode(it.toString()) }
+                    nav.navigate("batchrun/${Uri.encode(code)}?photos=${Uri.encode(photos)}")
                 }
             )
         }
@@ -214,6 +221,42 @@ fun AppNav() {
                 onDone = { recordId ->
                     nav.navigate("result/$recordId") { popUpTo("gallery") }
                 }
+            )
+        }
+        composable(
+            "runcustom?photo={photo}&prompt={prompt}",
+            arguments = listOf(
+                navArgument("photo") { type = NavType.StringType },
+                navArgument("prompt") { type = NavType.StringType }
+            )
+        ) { entry ->
+            val photo = Uri.decode(entry.arguments?.getString("photo").orEmpty())
+            val prompt = Uri.decode(entry.arguments?.getString("prompt").orEmpty())
+            RunScreen(
+                code = "__custom__",
+                photoUriString = photo,
+                customPrompt = prompt,
+                onBack = { nav.popBackStack() },
+                onDone = { recordId ->
+                    nav.navigate("result/$recordId") { popUpTo("gallery") }
+                }
+            )
+        }
+        composable(
+            "batchrun/{code}?photos={photos}",
+            arguments = listOf(
+                navArgument("code") { type = NavType.StringType },
+                navArgument("photos") { type = NavType.StringType }
+            )
+        ) { entry ->
+            val code = Uri.decode(entry.arguments?.getString("code").orEmpty())
+            val photos = Uri.decode(entry.arguments?.getString("photos").orEmpty())
+                .split(",").filter { it.isNotEmpty() }
+            BatchRunScreen(
+                code = code,
+                photoUriStrings = photos,
+                onBack = { nav.popBackStack() },
+                onDone = { nav.navigate("history") { popUpTo("gallery") } }
             )
         }
         composable("history") {

@@ -77,6 +77,7 @@ fun CodeDetailScreen(
     code: String,
     onBack: () -> Unit,
     onEdit: (Uri) -> Unit,
+    onBatch: (List<Uri>) -> Unit,
     vm: CodeDetailViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -95,6 +96,11 @@ fun CodeDetailScreen(
     ) { success ->
         if (success && cameraUri != null) photoUri = cameraUri
     }
+    val pickMultiple = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickMultipleVisualMedia(10)
+    ) { uris ->
+        if (uris.isNotEmpty()) onBatch(uris)
+    }
 
     fun choosePhoto() {
         if (ActivityResultContracts.PickVisualMedia.isPhotoPickerAvailable(context)) {
@@ -112,6 +118,10 @@ fun CodeDetailScreen(
         )
         cameraUri = uri
         takePicture.launch(uri)
+    }
+
+    fun batchEdit() {
+        pickMultiple.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
     Scaffold(
@@ -239,7 +249,7 @@ fun CodeDetailScreen(
                     onClick = ::choosePhoto,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text(if (photoUri == null) "Gallery" else "Gallery")
+                    Text("Gallery")
                 }
                 Spacer(Modifier.width(8.dp))
                 OutlinedButton(
@@ -247,6 +257,13 @@ fun CodeDetailScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("Camera")
+                }
+                Spacer(Modifier.width(8.dp))
+                OutlinedButton(
+                    onClick = ::batchEdit,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Batch")
                 }
             }
             Spacer(Modifier.height(12.dp))
