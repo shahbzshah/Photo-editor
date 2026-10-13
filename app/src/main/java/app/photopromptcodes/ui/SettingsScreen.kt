@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.photopromptcodes.PpcApplication
 import app.photopromptcodes.data.HistoryRepository
+import app.photopromptcodes.update.UpdateChecker
 import app.photopromptcodes.ui.theme.Amber
 import app.photopromptcodes.ui.theme.NearBlack
 import app.photopromptcodes.ui.theme.PaperDim
@@ -53,7 +54,8 @@ import kotlinx.coroutines.withContext
 @Composable
 fun SettingsScreen(
     onSignIn: () -> Unit,
-    onPrivacy: () -> Unit
+    onPrivacy: () -> Unit,
+    onAbout: () -> Unit
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -195,13 +197,109 @@ fun SettingsScreen(
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Version 1.0 • 167 prompt codes",
+                        "Version 1.1 • 167 prompt codes",
                         style = MaterialTheme.typography.bodySmall,
                         color = PaperDim
                     )
                     Spacer(Modifier.height(12.dp))
-                    TextButton(onClick = onPrivacy) {
-                        Text("Privacy Policy", color = Amber)
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        TextButton(onClick = onAbout) {
+                            Text("About", color = Amber)
+                        }
+                        TextButton(onClick = onPrivacy) {
+                            Text("Privacy Policy", color = Amber)
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            // --- Updates ---
+            var updateState by remember { mutableStateOf("idle") } // idle|checking|available|none|downloading|done|error
+            var updateInfo by remember { mutableStateOf<UpdateChecker.UpdateInfo?>(null) }
+            Text(
+                "UPDATES",
+                style = MaterialTheme.typography.labelSmall,
+                color = PaperDim
+            )
+            Spacer(Modifier.height(8.dp))
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        "App updates",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        when (updateState) {
+                            "checking" -> "Checking for updates…"
+                            "available" -> "Version ${updateInfo?.versionName} is available."
+                            "none" -> "You're on the latest version."
+                            "downloading" -> "Downloading update…"
+                            "done" -> "Download complete — tap to install."
+                            "error" -> "Couldn't check for updates. Try again later."
+                            else -> "Check for new versions of the app."
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = PaperDim
+                    )
+                    if (updateInfo?.notes?.isNotBlank() == true && updateState == "available") {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            updateInfo!!.notes.take(300),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = PaperDim
+                        )
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    when (updateState) {
+                        "available" -> Button(
+                            onClick = {
+                                updateState = "downloading"
+                                scope.launch {
+                                    val ok = UpdateChecker.downloadAndInstall(
+                                        ctx, updateInfo!!
+                                    )
+                                    updateState = if (ok) "done" else "error"
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Amber,
+                                contentColor = NearBlack
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Download & install", fontWeight = FontWeight.SemiBold)
+                        }
+                        "checking", "downloading" -> {
+                            androidx.compose.material3.CircularProgressIndicator(
+                                color = Amber,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        else -> OutlinedButton(
+                            onClick = {
+                                updateState = "checking"
+                                scope.launch {
+                                    val info = UpdateChecker.checkForUpdate(ctx)
+                                    if (info != null) {
+                                        updateInfo = info
+                                        updateState = "available"
+                                    } else {
+                                        updateState = "none"
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Check for updates")
+                        }
                     }
                 }
             }
