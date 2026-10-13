@@ -32,6 +32,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,7 +48,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class FavoritesViewModel(app: Application) : AndroidViewModel(app) {
-    var records by androidx.compose.runtime.mutableStateOf<List<HistoryRecord>>(emptyList())
+    var records by mutableStateOf<List<HistoryRecord>>(emptyList())
         private set
     private val repo = HistoryRepository(app)
 

@@ -19,7 +19,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavType
@@ -76,8 +78,8 @@ fun AppNav() {
     val nav = rememberNavController()
     val ctx = androidx.compose.ui.platform.LocalContext.current
     val scope = androidx.compose.runtime.rememberCoroutineScope()
-    var pendingUpdate by androidx.compose.runtime.remember {
-        androidx.compose.runtime.mutableStateOf<app.photopromptcodes.update.UpdateChecker.UpdateInfo?>(null)
+    var pendingUpdate by remember {
+        mutableStateOf<app.photopromptcodes.update.UpdateChecker.UpdateInfo?>(null)
     }
     // Silent update check on launch
     androidx.compose.runtime.LaunchedEffect(Unit) {
@@ -246,8 +248,8 @@ fun AppNav() {
     // Update-available dialog
     val update = pendingUpdate
     if (update != null) {
-        var downloading by androidx.compose.runtime.remember {
-            androidx.compose.runtime.mutableStateOf(false)
+        var downloading by remember {
+            mutableStateOf(false)
         }
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { pendingUpdate = null },
