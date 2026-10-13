@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -81,6 +82,7 @@ fun CodeDetailScreen(
     val context = LocalContext.current
     LaunchedEffect(code) { vm.load(context, code) }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
     val pickVisual = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
@@ -88,6 +90,11 @@ fun CodeDetailScreen(
     val pickLegacy = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri -> if (uri != null) photoUri = uri }
+    val takePicture = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && cameraUri != null) photoUri = cameraUri
+    }
 
     fun choosePhoto() {
         if (ActivityResultContracts.PickVisualMedia.isPhotoPickerAvailable(context)) {
@@ -95,6 +102,16 @@ fun CodeDetailScreen(
         } else {
             pickLegacy.launch("image/*")
         }
+    }
+
+    fun takePhoto() {
+        val file = java.io.File(context.cacheDir, "shared/camera_${System.currentTimeMillis()}.jpg")
+        file.parentFile?.mkdirs()
+        val uri = androidx.core.content.FileProvider.getUriForFile(
+            context, "app.photopromptcodes.fileprovider", file
+        )
+        cameraUri = uri
+        takePicture.launch(uri)
     }
 
     Scaffold(
@@ -178,7 +195,14 @@ fun CodeDetailScreen(
                     onClick = ::choosePhoto,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text(if (photoUri == null) "Choose photo" else "Change photo")
+                    Text(if (photoUri == null) "Gallery" else "Gallery")
+                }
+                Spacer(Modifier.width(8.dp))
+                OutlinedButton(
+                    onClick = ::takePhoto,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Camera")
                 }
             }
             Spacer(Modifier.height(12.dp))
