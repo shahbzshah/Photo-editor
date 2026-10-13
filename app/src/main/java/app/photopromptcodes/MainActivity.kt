@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,8 +15,10 @@ import androidx.navigation.navArgument
 import app.photopromptcodes.ui.CodeDetailScreen
 import app.photopromptcodes.ui.GalleryScreen
 import app.photopromptcodes.ui.HistoryScreen
+import app.photopromptcodes.ui.LoginScreen
 import app.photopromptcodes.ui.ResultDetailScreen
 import app.photopromptcodes.ui.RunScreen
+import app.photopromptcodes.ui.isLoggedInFlag
 import app.photopromptcodes.ui.theme.PhotoPromptCodesTheme
 
 class MainActivity : ComponentActivity() {
@@ -33,7 +36,18 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNav() {
     val nav = rememberNavController()
-    NavHost(navController = nav, startDestination = "gallery") {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val start = remember { if (isLoggedInFlag(ctx)) "gallery" else "login" }
+    NavHost(navController = nav, startDestination = start) {
+        composable("login") {
+            LoginScreen(
+                onDone = {
+                    nav.navigate("gallery") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
+            )
+        }
         composable("gallery") {
             GalleryScreen(
                 onOpenCode = { code -> nav.navigate("detail/${Uri.encode(code)}") },

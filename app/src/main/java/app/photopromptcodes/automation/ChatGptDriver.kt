@@ -153,6 +153,35 @@ class ChatGptDriver {
         loginGate?.complete(Unit)
     }
 
+    /** Loads ChatGPT's home page in the attached WebView (for the login screen). */
+    fun loadChatGpt() {
+        val wv = webView ?: return
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            wv.loadUrl(CHATGPT_URL)
+        }
+    }
+
+    /**
+     * Polls the page for a signed-in state and calls [onLogin] once.
+     * Used by the first-run login screen for auto-detection.
+     */
+    fun startLoginWatch(onLogin: () -> Unit) {
+        scope.launch {
+            var fired = false
+            while (!fired) {
+                kotlinx.coroutines.delay(2500)
+                try {
+                    if (loginState() == "in") {
+                        fired = true
+                        CookieManager.getInstance().flush()
+                        withContext(kotlinx.coroutines.Dispatchers.Main) { onLogin() }
+                    }
+                } catch (_: Exception) {
+                }
+            }
+        }
+    }
+
     fun destroy() {
         runJob?.cancel()
         scope.cancel()
