@@ -174,27 +174,40 @@ fun GalleryScreen(
             onDismissRequest = { showCustomDialog = false },
             title = { Text("Custom edit") },
             text = {
-                androidx.compose.material3.OutlinedTextField(
-                    value = customText,
-                    onValueChange = { customText = it },
-                    placeholder = { Text("Describe the edit — e.g. make the sky dramatic and add film grain", color = PaperDim) },
-                    minLines = 3,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Paper,
-                        unfocusedTextColor = Paper,
-                        focusedBorderColor = Amber
+                Column {
+                    androidx.compose.material3.OutlinedTextField(
+                        value = customText,
+                        onValueChange = { customText = it },
+                        placeholder = { Text("Describe the edit — e.g. make the sky dramatic and add film grain", color = PaperDim) },
+                        minLines = 3,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Paper,
+                            unfocusedTextColor = Paper,
+                            focusedBorderColor = Amber
+                        )
                     )
-                )
+                    if (customText.isBlank()) {
+                        Text(
+                            "Type your edit first — then pick Gallery or Camera.",
+                            color = PaperDim,
+                            style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 6.dp)
+                        )
+                    }
+                }
             },
             confirmButton = {
+                val hasText = customText.isNotBlank()
                 Row {
                     androidx.compose.material3.TextButton(
-                        onClick = { if (customText.isNotBlank()) launchCustomPhoto(customText, useCamera = false) }
-                    ) { Text("Gallery", color = Amber) }
+                        onClick = { launchCustomPhoto(customText, useCamera = false) },
+                        enabled = hasText
+                    ) { Text("Gallery", color = if (hasText) Amber else PaperDim) }
                     androidx.compose.material3.TextButton(
-                        onClick = { if (customText.isNotBlank()) launchCustomPhoto(customText, useCamera = true) }
-                    ) { Text("Camera", color = Amber) }
+                        onClick = { launchCustomPhoto(customText, useCamera = true) },
+                        enabled = hasText
+                    ) { Text("Camera", color = if (hasText) Amber else PaperDim) }
                 }
             },
             dismissButton = {
