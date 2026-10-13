@@ -358,7 +358,9 @@ class ChatGptDriver {
     private fun pollImageJs(): String {
         return """(function(){
           window.__ppcSeen=window.__ppcSeen||[];
-          var sels=['[data-message-author-role="assistant"] img','main img','img[src^="https://"]','img[src^="blob:"]'];
+          // STRICT: only images inside ChatGPT's (assistant) messages.
+          // Never the user's uploaded photo.
+          var sels=['[data-message-author-role="assistant"] img'];
           for(var s=0;s<sels.length;s++){
             var imgs=document.querySelectorAll(sels[s]);
             for(var k=0;k<imgs.length;k++){
@@ -367,6 +369,9 @@ class ChatGptDriver {
               if(!(src.indexOf('http')===0||src.indexOf('blob:')===0))continue;
               if(!(img.complete&&img.naturalWidth>200))continue;
               if(img.naturalWidth<200||img.naturalHeight<200)continue;
+              // Skip the attachment thumbnail (small preview of the upload)
+              var r=img.getBoundingClientRect();
+              if(r.width<150||r.height<150)continue;
               window.__ppcSeen.push(src);
               fetch(src).then(function(r){return r.blob();})
                 .then(function(b){return new Promise(function(res,rej){
@@ -466,6 +471,10 @@ class ChatGptDriver {
         return """(function(){
           window.__ppcSeen=window.__ppcSeen||[];
           function snap(el){ return el.currentSrc||el.src||''; }
+          // Snapshot ALL images in the DOM (including the user's uploaded
+          // photo) so we never mistake them for the generated result.
+          var all=document.querySelectorAll('img');
+          for(var a=0;a<all.length;a++){ var s0=snap(all[a]); if(s0) window.__ppcSeen.push(s0); }
           var pre=document.querySelectorAll('$sel');
           for(var p=0;p<pre.length;p++){ window.__ppcSeen.push(snap(pre[p])); }
           if(window.__ppcObs){ try{window.__ppcObs.disconnect();}catch(e){} }
@@ -475,7 +484,9 @@ class ChatGptDriver {
               var img=imgs[k]; var src=snap(img);
               if(!src || window.__ppcSeen.indexOf(src)>-1) continue;
               if(!(src.indexOf('http')===0 || src.indexOf('blob:')===0)) continue;
-              if(!(img.complete && img.naturalWidth>50)) continue;
+              if(!(img.complete && img.naturalWidth>200)) continue;
+              var r=img.getBoundingClientRect();
+              if(r.width<150||r.height<150) continue;
               window.__ppcSeen.push(src);
               try{obs.disconnect();}catch(e){}
               fetch(src).then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.blob(); })
