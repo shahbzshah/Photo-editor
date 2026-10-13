@@ -285,7 +285,6 @@ class ChatGptDriver {
             pendingPhoto = null
             throw DriverException("The photo picker didn't open. Try again.")
         }
-        }
         // Best-effort pause so the attachment thumbnail registers before we type.
         delay(2500)
     }
