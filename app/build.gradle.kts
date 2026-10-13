@@ -38,6 +38,7 @@ android {
         resources {
             excludes += "**/linkdata/**"
             excludes += "META-INF/*.version"
+            excludes += "META-INF/kotlin-project-structure-metadata.json"
         }
     }
 }
