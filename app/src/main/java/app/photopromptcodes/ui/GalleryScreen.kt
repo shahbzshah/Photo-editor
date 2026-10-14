@@ -25,8 +25,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,6 +38,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -241,11 +240,11 @@ fun GalleryScreen(
             TopAppBar(
                 title = { Text("Photo Prompt Codes", style = MaterialTheme.typography.titleLarge) },
                 actions = {
-                    IconButton(onClick = { vm.toggleViewMode() }) {
-                        Icon(
-                            if (vm.viewMode == "list") Icons.Filled.Apps else Icons.Filled.List,
-                            contentDescription = if (vm.viewMode == "list") "Grid view" else "List view",
-                            tint = PaperDim
+                    TextButton(onClick = { vm.toggleViewMode() }) {
+                        Text(
+                            if (vm.viewMode == "list") "Grid" else "List",
+                            color = Amber,
+                            style = MaterialTheme.typography.labelLarge
                         )
                     }
                 },
