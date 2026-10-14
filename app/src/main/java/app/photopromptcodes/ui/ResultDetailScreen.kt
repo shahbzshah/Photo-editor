@@ -34,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -166,6 +167,7 @@ fun ResultDetailScreen(
         ) {
             // Before/after comparison slider
             var sliderPos by remember { mutableStateOf(0.5f) }
+            var showBefore by remember { mutableStateOf(true) }
             BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -190,39 +192,43 @@ fun ResultDetailScreen(
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.fillMaxWidth()
                     )
-                    // Before image (clipped to left of slider, top layer)
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(sliderPos)
-                            .clipToBounds()
-                    ) {
-                        AsyncImage(
-                            model = vm.originalFile(),
-                            contentDescription = "Original photo",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxWidth()
+                    // Before image (clipped to left of slider, top layer) — only when visible
+                    if (showBefore) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(sliderPos)
+                                .clipToBounds()
+                        ) {
+                            AsyncImage(
+                                model = vm.originalFile(),
+                                contentDescription = "Original photo",
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        // Divider line
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(2.dp)
+                                .background(Amber)
+                                .align(Alignment.CenterStart)
+                                .offset(x = sliderOffset - 1.dp)
                         )
                     }
-                    // Divider line
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(2.dp)
-                            .background(Amber)
-                            .align(Alignment.CenterStart)
-                            .offset(x = sliderOffset - 1.dp)
-                    )
                     // Labels
-                    Text(
-                        "BEFORE",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Paper,
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(8.dp)
-                            .background(NearBlack.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                    )
+                    if (showBefore) {
+                        Text(
+                            "BEFORE",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Paper,
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(8.dp)
+                                .background(NearBlack.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
                     Text(
                         "AFTER",
                         style = MaterialTheme.typography.labelSmall,
@@ -233,10 +239,24 @@ fun ResultDetailScreen(
                             .background(NearBlack.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     )
+                    // Minimizer toggle — hide/show the before image
+                    TextButton(
+                        onClick = { showBefore = !showBefore },
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(8.dp)
+                            .background(NearBlack.copy(alpha = 0.6f), RoundedCornerShape(20.dp))
+                    ) {
+                        Text(
+                            if (showBefore) "Hide before" else "Show before",
+                            color = Amber,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
                 }
             }
             Text(
-                "Drag to compare before / after",
+                if (showBefore) "Drag anywhere on the image to compare" else "Before image hidden — tap Show before to compare",
                 style = MaterialTheme.typography.labelSmall,
                 color = PaperDim,
                 modifier = Modifier.padding(top = 4.dp)
