@@ -25,9 +25,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -243,7 +243,7 @@ fun GalleryScreen(
                 actions = {
                     IconButton(onClick = { vm.toggleViewMode() }) {
                         Icon(
-                            if (vm.viewMode == "list") Icons.Filled.GridView else Icons.Filled.ViewList,
+                            if (vm.viewMode == "list") Icons.Filled.Apps else Icons.Filled.List,
                             contentDescription = if (vm.viewMode == "list") "Grid view" else "List view",
                             tint = PaperDim
                         )
