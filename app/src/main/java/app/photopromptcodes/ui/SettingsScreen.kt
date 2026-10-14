@@ -258,7 +258,7 @@ fun SettingsScreen(
                             "none" -> "You're on the latest version."
                             "downloading" -> "Downloading update…"
                             "done" -> "Download complete — tap to install."
-                            "error" -> "Couldn't check for updates. Try again later."
+                            "error" -> "Download failed. Try the browser instead."
                             else -> "Check for new versions of the app."
                         },
                         style = MaterialTheme.typography.bodySmall,
@@ -274,6 +274,22 @@ fun SettingsScreen(
                     }
                     Spacer(Modifier.height(12.dp))
                     when (updateState) {
+                        "error" -> OutlinedButton(
+                            onClick = {
+                                val url = "https://github.com/shahbzshah/Photo-editor/releases/latest"
+                                try {
+                                    ctx.startActivity(
+                                        android.content.Intent(
+                                            android.content.Intent.ACTION_VIEW,
+                                            android.net.Uri.parse(url)
+                                        )
+                                    )
+                                } catch (_: Exception) { }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Open in browser", color = Amber)
+                        }
                         "available" -> Button(
                             onClick = {
                                 updateState = "downloading"
