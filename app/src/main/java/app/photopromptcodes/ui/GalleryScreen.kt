@@ -17,12 +17,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -103,6 +108,18 @@ class GalleryViewModel(app: Application) : AndroidViewModel(app) {
         val recent = app.photopromptcodes.data.RecentCodes.get(getApplication())
         val byCode = codes.associateBy { it.code }
         recentCodes = recent.mapNotNull { byCode[it] }
+    }
+
+    var viewMode by mutableStateOf(
+        getApplication<Application>().getSharedPreferences("ppc_prefs", android.content.Context.MODE_PRIVATE)
+            .getString("gallery_view_mode", "list") ?: "list"
+    )
+        private set
+
+    fun toggleViewMode() {
+        viewMode = if (viewMode == "list") "grid" else "list"
+        getApplication<Application>().getSharedPreferences("ppc_prefs", android.content.Context.MODE_PRIVATE)
+            .edit().putString("gallery_view_mode", viewMode).apply()
     }
 
     fun updateQuery(q: String) { query = q }
@@ -223,6 +240,15 @@ fun GalleryScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Photo Prompt Codes", style = MaterialTheme.typography.titleLarge) },
+                actions = {
+                    IconButton(onClick = { vm.toggleViewMode() }) {
+                        Icon(
+                            if (vm.viewMode == "list") Icons.Filled.GridView else Icons.Filled.ViewList,
+                            contentDescription = if (vm.viewMode == "list") "Grid view" else "List view",
+                            tint = PaperDim
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = NearBlack)
             )
         },
@@ -316,6 +342,20 @@ fun GalleryScreen(
                     }
                 }
             }
+            if (vm.viewMode == "grid") {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(vm.filtered, key = { it.code }) { code ->
+                        GridCodeCard(code = code, onClick = { onOpenCode(code.code) })
+                    }
+                    item { Spacer(Modifier.height(24.dp)) }
+                }
+            } else {
             LazyColumn(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -416,6 +456,48 @@ fun GalleryScreen(
                     CodeCard(code = code, onClick = { onOpenCode(code.code) })
                 }
                 item { Spacer(Modifier.height(24.dp)) }
+            }
+            } // end list mode
+        }
+    }
+}
+
+@Composable
+private fun GridCodeCard(code: PromptCode, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    ) {
+        Column {
+            AsyncImage(
+                model = code.sampleAsset,
+                contentDescription = "Sample: ${code.code}",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(140.dp)
+                    .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
+            )
+            Column(modifier = Modifier.padding(10.dp)) {
+                Text(
+                    text = code.code,
+                    fontFamily = Mono,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Amber,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = code.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = PaperDim,
+                    maxLines = 2
+                )
             }
         }
     }
