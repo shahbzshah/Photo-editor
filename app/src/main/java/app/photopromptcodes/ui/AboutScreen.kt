@@ -25,6 +25,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,10 +39,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.photopromptcodes.R
+import app.photopromptcodes.data.CodeRepository
 import app.photopromptcodes.ui.theme.Amber
 import app.photopromptcodes.ui.theme.NearBlack
 import app.photopromptcodes.ui.theme.PaperDim
 import app.photopromptcodes.ui.theme.SurfaceDark
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,6 +56,13 @@ fun AboutScreen(
 ) {
     val ctx = LocalContext.current
     val versionName = rememberVersionName(ctx)
+    var codeCount by remember { mutableStateOf<Int?>(null) }
+    LaunchedEffect(Unit) {
+        codeCount = withContext(Dispatchers.IO) {
+            CodeRepository.load(ctx).size
+        }
+    }
+    val countText = codeCount?.toString() ?: "…"
 
     Scaffold(
         topBar = {
@@ -102,7 +117,7 @@ fun AboutScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "167 viral AI photo-editing prompts in your pocket. " +
+                        "$countText viral AI photo-editing prompts in your pocket. " +
                             "Pick a code, pick a photo — the app sends both to ChatGPT " +
                             "and brings back the edit. No copying prompts, no switching apps.",
                         style = MaterialTheme.typography.bodyMedium,
@@ -126,7 +141,7 @@ fun AboutScreen(
                     )
                     Spacer(Modifier.height(8.dp))
                     listOf(
-                        "1. Browse the 167 prompt codes",
+                        "1. Browse the $countText prompt codes",
                         "2. Tap one and choose your photo",
                         "3. The app drives ChatGPT for you",
                         "4. Save or share your edit"
@@ -150,7 +165,7 @@ fun AboutScreen(
 }
 
 @Composable
-private fun rememberVersionName(ctx: android.content.Context): String {
+internal fun rememberVersionName(ctx: android.content.Context): String {
     return try {
         val pInfo = ctx.packageManager.getPackageInfo(ctx.packageName, 0)
         pInfo.versionName ?: "1.0"

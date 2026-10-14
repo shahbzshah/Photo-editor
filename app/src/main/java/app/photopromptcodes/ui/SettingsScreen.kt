@@ -31,6 +31,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import app.photopromptcodes.data.CodeRepository
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -202,8 +204,15 @@ fun SettingsScreen(
                         fontWeight = FontWeight.SemiBold
                     )
                     Spacer(Modifier.height(4.dp))
+                    val settingsVersion = rememberVersionName(ctx)
+                    var settingsCodeCount by remember { mutableStateOf<Int?>(null) }
+                    LaunchedEffect(Unit) {
+                        settingsCodeCount = withContext(Dispatchers.IO) {
+                            CodeRepository.load(ctx).size
+                        }
+                    }
                     Text(
-                        "Version 1.1 • 167 prompt codes",
+                        "Version $settingsVersion • ${settingsCodeCount ?: "…"} prompt codes",
                         style = MaterialTheme.typography.bodySmall,
                         color = PaperDim
                     )
