@@ -290,23 +290,46 @@ fun SettingsScreen(
                         ) {
                             Text("Open in browser", color = Amber)
                         }
-                        "available" -> Button(
-                            onClick = {
-                                updateState = "downloading"
-                                scope.launch {
-                                    val ok = UpdateChecker.downloadAndInstall(
-                                        ctx, updateInfo!!
-                                    )
-                                    updateState = if (ok) "done" else "error"
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Amber,
-                                contentColor = NearBlack
-                            ),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Download & install", fontWeight = FontWeight.SemiBold)
+                        "available" -> {
+                            val canInstall = UpdateChecker.canInstallPackages(ctx)
+                            Button(
+                                onClick = {
+                                    if (!canInstall) {
+                                        // First tap: take him to the system toggle.
+                                        // After he allows it, tapping again downloads & installs.
+                                        UpdateChecker.openInstallPermissionSettings(ctx)
+                                    } else {
+                                        updateState = "downloading"
+                                        scope.launch {
+                                            val ok = UpdateChecker.downloadAndInstall(
+                                                ctx, updateInfo!!
+                                            )
+                                            updateState = if (ok) "done" else "error"
+                                        }
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Amber,
+                                    contentColor = NearBlack
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    if (canInstall) "Download & install"
+                                    else "Allow app installs",
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                            if (!canInstall) {
+                                Spacer(Modifier.height(8.dp))
+                                Text(
+                                    "One-time step: Android asks you to allow this app " +
+                                        "to install updates. Turn it on, come back here, " +
+                                        "and tap the button again.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = PaperDim
+                                )
+                            }
                         }
                         "checking", "downloading" -> {
                             androidx.compose.material3.CircularProgressIndicator(

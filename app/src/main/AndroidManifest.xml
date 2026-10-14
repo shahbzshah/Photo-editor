@@ -8,6 +8,9 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
+    <!-- In-app updater: Android 8+ requires this for an app to hand an APK to the system installer. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <!-- Let the app see WhatsApp/TikTok/Instagram for direct sharing (Android 11+ package visibility). -->
     <queries>
         <package android:name="com.whatsapp" />

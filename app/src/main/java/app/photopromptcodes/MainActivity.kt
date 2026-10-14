@@ -295,24 +295,34 @@ fun AppNav() {
         var downloading by remember {
             mutableStateOf(false)
         }
+        val canInstallNow = app.photopromptcodes.update.UpdateChecker.canInstallPackages(ctx)
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { pendingUpdate = null },
             title = { Text("Update available") },
             text = {
                 Text(
                     "Version ${update.versionName} is ready." +
-                        (if (update.notes.isNotBlank()) "\n\n${update.notes.take(300)}" else "")
+                        (if (update.notes.isNotBlank()) "\n\n${update.notes.take(300)}" else "") +
+                        (if (!canInstallNow)
+                            "\n\nFirst tap opens a system setting — allow this app " +
+                            "to install updates there, then tap Update now again."
+                         else "")
                 )
             },
             confirmButton = {
                 androidx.compose.material3.TextButton(
                     onClick = {
-                        downloading = true
-                        scope.launch {
-                            val ok = app.photopromptcodes.update.UpdateChecker
-                                .downloadAndInstall(ctx, update)
-                            if (ok) pendingUpdate = null
-                            downloading = false
+                        if (!app.photopromptcodes.update.UpdateChecker.canInstallPackages(ctx)) {
+                            app.photopromptcodes.update.UpdateChecker
+                                .openInstallPermissionSettings(ctx)
+                        } else {
+                            downloading = true
+                            scope.launch {
+                                val ok = app.photopromptcodes.update.UpdateChecker
+                                    .downloadAndInstall(ctx, update)
+                                if (ok) pendingUpdate = null
+                                downloading = false
+                            }
                         }
                     },
                     enabled = !downloading

@@ -33,8 +33,28 @@ object UpdateChecker {
         val versionCode: Int,
         val versionName: String,
         val apkUrl: String,
+        val apkApiUrl: String?,
         val notes: String
     )
+
+    /**
+     * Whether Android will let this app hand an APK to the system installer.
+     * On API 26+ the user must grant "Install unknown apps" for this app once,
+     * even with REQUEST_INSTALL_PACKAGES declared in the manifest.
+     */
+    fun canInstallPackages(ctx: Context): Boolean =
+        if (Build.VERSION.SDK_INT >= 26)
+            ctx.packageManager.canRequestPackageInstalls()
+        else true
+
+    /** Opens the system screen where the user grants "Install unknown apps" for this app. */
+    fun openInstallPermissionSettings(ctx: Context) {
+        val intent = Intent(
+            android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+            Uri.parse("package:${ctx.packageName}")
+        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        ctx.startActivity(intent)
+    }
 
     /** Returns UpdateInfo if a newer version exists, null otherwise. */
     suspend fun checkForUpdate(ctx: Context): UpdateInfo? = withContext(Dispatchers.IO) {
@@ -63,11 +83,13 @@ object UpdateChecker {
 
             val assets = json.optJSONArray("assets") ?: return@withContext null
             var apkUrl: String? = null
+            var apkApiUrl: String? = null
             for (i in 0 until assets.length()) {
                 val asset = assets.getJSONObject(i)
                 val name = asset.optString("name", "")
                 if (name.endsWith(".apk", ignoreCase = true)) {
                     apkUrl = asset.optString("browser_download_url", null)
+                    apkApiUrl = asset.optString("url", null)
                     break
                 }
             }
@@ -79,6 +101,7 @@ object UpdateChecker {
                 versionCode = latestCode,
                 versionName = tag,
                 apkUrl = apkUrl,
+                apkApiUrl = apkApiUrl,
                 notes = json.optString("body", "")
             )
         } catch (e: Exception) {
@@ -90,73 +113,84 @@ object UpdateChecker {
     /**
      * Downloads the APK to cache and launches the system installer.
      * Returns true if the installer was launched.
-     * Manually follows redirects (GitHub download URLs 302 to the file).
+     * Tries the GitHub API asset endpoint first (Accept: application/octet-stream),
+     * falls back to the browser_download_url. Manually follows redirects.
      */
     suspend fun downloadAndInstall(ctx: Context, info: UpdateInfo): Boolean =
         withContext(Dispatchers.IO) {
-            try {
-                var url = info.apkUrl
-                var finalConn: HttpURLConnection? = null
-                // Manually follow redirects (up to 5 hops)
-                for (i in 0 until 5) {
-                    val conn = (URL(url).openConnection() as HttpURLConnection).apply {
-                        setRequestProperty("Accept", "application/octet-stream")
-                        setRequestProperty("User-Agent", "PhotoPromptCodes")
-                        connectTimeout = 30000
-                        readTimeout = 60000
-                        instanceFollowRedirects = false
-                    }
-                    val code = conn.responseCode
-                    if (code in 300..399) {
-                        val location = conn.getHeaderField("Location")
-                        conn.disconnect()
-                        if (location == null) return@withContext false
-                        url = if (location.startsWith("http")) location
-                              else URL(URL(url), location).toString()
-                        // continue to next hop
-                    } else {
-                        finalConn = conn
-                        break
-                    }
-                }
-                val conn = finalConn ?: return@withContext false
-                if (conn.responseCode != 200) {
-                    Log.d(TAG, "Download returned ${conn.responseCode}")
-                    conn.disconnect()
-                    return@withContext false
-                }
-
-                val outFile = File(ctx.cacheDir, "update-${info.versionCode}.apk")
-                try {
-                    conn.inputStream.use { input ->
-                        outFile.outputStream().use { output ->
-                            input.copyTo(output)
-                        }
-                    }
-                } finally {
-                    conn.disconnect()
-                }
-
-                if (outFile.length() < 1024 * 1024) {
-                    Log.d(TAG, "Downloaded file too small: ${outFile.length()}")
-                    return@withContext false
-                }
-
-                val uri: Uri = FileProvider.getUriForFile(
-                    ctx,
-                    "app.photopromptcodes.fileprovider",
-                    outFile
-                )
-                val install = Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(uri, "application/vnd.android.package-archive")
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
-                ctx.startActivity(install)
-                true
-            } catch (e: Exception) {
-                Log.d(TAG, "Download/install failed: $e")
-                false
+            // Try API endpoint first, then browser URL
+            val urls = listOfNotNull(info.apkApiUrl, info.apkUrl).distinct()
+            for (startUrl in urls) {
+                if (downloadOne(ctx, startUrl, info.versionCode)) return@withContext true
+                Log.d(TAG, "Download failed for $startUrl, trying next")
             }
+            false
         }
+
+    private fun downloadOne(ctx: Context, startUrl: String, versionCode: Int): Boolean {
+        return try {
+            var url = startUrl
+            var finalConn: HttpURLConnection? = null
+            // Manually follow redirects (up to 5 hops)
+            for (i in 0 until 5) {
+                val conn = (URL(url).openConnection() as HttpURLConnection).apply {
+                    setRequestProperty("Accept", "application/octet-stream")
+                    setRequestProperty("User-Agent", "PhotoPromptCodes")
+                    connectTimeout = 30000
+                    readTimeout = 60000
+                    instanceFollowRedirects = false
+                }
+                val code = conn.responseCode
+                if (code in 300..399) {
+                    val location = conn.getHeaderField("Location")
+                    conn.disconnect()
+                    if (location == null) return false
+                    url = if (location.startsWith("http")) location
+                          else URL(URL(url), location).toString()
+                    // continue to next hop
+                } else {
+                    finalConn = conn
+                    break
+                }
+            }
+            val conn = finalConn ?: return false
+            if (conn.responseCode != 200) {
+                Log.d(TAG, "Download returned ${conn.responseCode}")
+                conn.disconnect()
+                return false
+            }
+
+            val outFile = File(ctx.cacheDir, "update-$versionCode.apk")
+            try {
+                conn.inputStream.use { input ->
+                    outFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+            } finally {
+                conn.disconnect()
+            }
+
+            if (outFile.length() < 1024 * 1024) {
+                Log.d(TAG, "Downloaded file too small: ${outFile.length()}")
+                return false
+            }
+
+            val uri: Uri = FileProvider.getUriForFile(
+                ctx,
+                "app.photopromptcodes.fileprovider",
+                outFile
+            )
+            val install = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "application/vnd.android.package-archive")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            ctx.startActivity(install)
+            true
+        } catch (e: Exception) {
+            Log.d(TAG, "Download/install failed: $e")
+            false
+        }
+    }
 }
