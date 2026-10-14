@@ -90,6 +90,18 @@ class RunViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /**
+     * Called when the screen's AndroidView releases the WebView (navigated
+     * away, backstack entry left behind). Frees the browser's native memory
+     * immediately instead of waiting for ViewModel clear — on a 4GB device,
+     * several live WebViews (one per run left in the backstack) add up to an
+     * OOM crash "after some usage".
+     */
+    fun releaseWebView() {
+        driver?.destroy()
+        driver = null
+    }
+
     fun ensureStarted(codeName: String, photoUriString: String, customPrompt: String? = null) {
         if (started) return
         started = true
@@ -196,7 +208,17 @@ fun RunScreen(
         ) {
             AndroidView(
                 factory = { ctx -> WebView(ctx).also { vm.attachWebView(it) } },
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                onRelease = { wv ->
+                    vm.releaseWebView()
+                    try {
+                        wv.stopLoading()
+                        wv.loadUrl("about:blank")
+                        wv.removeAllViews()
+                        wv.destroy()
+                    } catch (_: Exception) {
+                    }
+                }
             )
             // Progress overlay docked at the bottom; the WebView stays
             // interactive behind it (needed for the manual sign-in step).

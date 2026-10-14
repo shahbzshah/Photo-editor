@@ -93,6 +93,18 @@ class BatchRunViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /**
+     * Called when the screen's AndroidView releases the WebView (navigated
+     * away, backstack entry left behind). Frees the browser's native memory
+     * immediately instead of waiting for ViewModel clear — on a 4GB device,
+     * several live WebViews (one per run left in the backstack) add up to an
+     * OOM crash "after some usage".
+     */
+    fun releaseWebView() {
+        driver?.destroy()
+        driver = null
+    }
+
     fun ensureStarted(codeName: String, photoUriStrings: List<String>, customPrompt: String? = null) {
         if (started) return
         started = true
@@ -340,7 +352,17 @@ fun BatchRunScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(1.dp)
+                    .height(1.dp),
+                onRelease = { wv ->
+                    vm.releaseWebView()
+                    try {
+                        wv.stopLoading()
+                        wv.loadUrl("about:blank")
+                        wv.removeAllViews()
+                        wv.destroy()
+                    } catch (_: Exception) {
+                    }
+                }
             )
         }
     }
