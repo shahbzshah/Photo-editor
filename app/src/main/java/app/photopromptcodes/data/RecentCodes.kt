@@ -14,8 +14,7 @@ object RecentCodes {
     fun record(context: Context, code: String) {
         if (code == "/custom" || code == "__custom__") return
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val current = prefs.getStringSet(KEY, emptySet())?.toMutableList() ?: mutableListOf()
-        // getStringSet doesn't preserve order, so we store as comma-joined string instead
+        // Stored as comma-joined string (getStringSet doesn't preserve order)
         val ordered = (prefs.getString(KEY, "") ?: "")
             .split(",")
             .filter { it.isNotEmpty() }
