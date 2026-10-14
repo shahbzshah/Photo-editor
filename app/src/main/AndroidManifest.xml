@@ -8,6 +8,13 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
+    <!-- Let the app see WhatsApp/TikTok/Instagram for direct sharing (Android 11+ package visibility). -->
+    <queries>
+        <package android:name="com.whatsapp" />
+        <package android:name="com.zhiliaoapp.musically" />
+        <package android:name="com.instagram.android" />
+    </queries>
+
     <application
         android:name=".PpcApplication"
         android:allowBackup="true"
