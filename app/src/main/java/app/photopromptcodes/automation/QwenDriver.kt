@@ -263,9 +263,14 @@ class QwenDriver : EngineDriver {
             if (menuOpened) return@repeat
             Log.d(TAG, "menu did not open, retrying (${it + 1}/3)")
         }
-        if (!menuOpened) throw DriverException(
-            "Couldn't open the mode menu. Please retry."
-        )
+        if (!menuOpened) {
+            val diagnostics = collectDiagnostics(wv)
+            Log.w(TAG, "menu open failed. diagnostics: $diagnostics")
+            throw DriverExceptionWithDebug(
+                "Couldn't open the mode menu. Please retry.",
+                diagnostics
+            )
+        }
         // Click "Create Image" — search broadly for any element with that text
         val selected = evalJs(wv, """(function(){
           function clickCreateImage(){
