@@ -25,10 +25,11 @@ object QwenSelectors {
         ".ant-modal-title"
     )
 
-    /** The "+" mode-select button in the composer. */
+    /** The "+" mode-select button in the composer. NOTE: it is a DIV with role="button", NOT a <button> element. */
     val modeButton: List<String> = listOf(
-        "button[aria-label=\"Select Mode\"]",
-        "[aria-label=\"Select Mode\"]"
+        "[aria-label=\"Select Mode\"]",
+        "div[role=\"button\"][aria-label=\"Select Mode\"]",
+        ".mode-select-open"
     )
 
     /** "Create Image" menu item in the mode dropdown. */

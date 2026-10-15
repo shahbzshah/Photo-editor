@@ -224,19 +224,17 @@ class QwenDriver : EngineDriver {
             Log.d(TAG, "already in image mode")
             return
         }
-        // Click the "+" mode button (try several selector strategies)
+        // Click the "+" mode button (try several selector strategies).
+        // NOTE: it is a DIV with role="button", not a <button> element.
         val opened = evalJs(wv, """(function(){
           var sels=[${QwenSelectors.modeButton.joinToString(",") { JSONObject.quote(it) }}];
           for(var i=0;i<sels.length;i++){
             var el=document.querySelector(sels[i]);
             if(el){ el.click(); return true; }
           }
-          // Fallback: find any button with a "+" or add icon near the composer
-          var btns=document.querySelectorAll('button');
-          for(var i=0;i<btns.length;i++){
-            var t=(btns[i].getAttribute('aria-label')||'')+' '+(btns[i].textContent||'');
-            if(t.indexOf('+')>=0 || t.toLowerCase().indexOf('mode')>=0){ btns[i].click(); return true; }
-          }
+          // Fallback: find any element with the mode-select-open class
+          var ms=document.querySelector('.mode-select-open');
+          if(ms){ ms.click(); return true; }
           return false;
         })()""") == "true"
         if (!opened) throw DriverException("Couldn't open the mode menu. Please retry.")
