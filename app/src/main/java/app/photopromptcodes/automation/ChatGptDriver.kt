@@ -42,10 +42,10 @@ sealed interface DriverEvent {
     data class Step(val step: RunStep) : DriverEvent
     data object LoginRequired : DriverEvent
     data class Finished(val imageBytes: ByteArray) : DriverEvent
-    data class Failed(val message: String) : DriverEvent
+    data class Failed(val message: String, val debugInfo: String? = null) : DriverEvent
 }
 
-class DriverException(message: String) : Exception(message)
+open class DriverException(message: String) : Exception(message)
 
 /**
  * Drives ChatGPT's web photo editor inside a WebView.

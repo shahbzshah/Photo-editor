@@ -122,6 +122,9 @@ class QwenDriver : EngineDriver {
                 runEdit(photo, prompt)
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
+            } catch (e: DriverExceptionWithDebug) {
+                Log.w(TAG, "run failed", e)
+                emit(DriverEvent.Failed(e.message ?: "Qwen edit failed.", e.debugInfo))
             } catch (e: Exception) {
                 Log.w(TAG, "run failed", e)
                 emit(DriverEvent.Failed(e.message ?: "Qwen edit failed. Please retry."))
@@ -271,19 +274,56 @@ class QwenDriver : EngineDriver {
           return clickCreateImage();
         })()""") == "true"
         if (!selected) {
-            // Debug: dump what menu items ARE visible
-            val debug = evalJs(wv, """(function(){
-              var items=document.querySelectorAll('[role="menuitem"]');
-              var texts=[];
-              for(var i=0;i<items.length;i++){ texts.push(items[i].textContent.trim().slice(0,40)); }
-              return JSON.stringify(texts);
-            })()""")
-            Log.w(TAG, "menu items found: $debug")
-            throw DriverException("Couldn't select Create Image mode. Please retry.")
+            // Capture full diagnostics for the error report
+            val diagnostics = collectDiagnostics(wv)
+            Log.w(TAG, "mode select failed. diagnostics: $diagnostics")
+            throw DriverExceptionWithDebug(
+                "Couldn't select Create Image mode. Please retry.",
+                diagnostics
+            )
         }
         delay(2000)
         Log.d(TAG, "image mode selected")
     }
+
+    /** Dumps page state to help debug automation failures. Shown via "Copy details". */
+    private suspend fun collectDiagnostics(wv: WebView): String {
+        val sb = StringBuilder()
+        sb.appendLine("=== QWEN DIAGNOSTICS ===")
+        sb.appendLine("URL: ${evalJs(wv, "window.location.href")}")
+        sb.appendLine("Title: ${evalJs(wv, "document.title")}")
+        sb.appendLine()
+        sb.appendLine("--- Mode button candidates ---")
+        sb.appendLine(evalJs(wv, """(function(){
+          var out=[];
+          var els=document.querySelectorAll('[aria-label="Select Mode"], .mode-select-open, div[role="button"]');
+          for(var i=0;i<Math.min(els.length,10);i++){
+            var e=els[i];
+            out.push(e.tagName+'.'+(e.className||'').toString().slice(0,60)+' aria-label='+(e.getAttribute('aria-label')||'none'));
+          }
+          return out.length? out.join('\n') : 'NONE FOUND';
+        })()"""))
+        sb.appendLine()
+        sb.appendLine("--- Menu items (role=menuitem) ---")
+        sb.appendLine(evalJs(wv, """(function(){
+          var items=document.querySelectorAll('[role="menuitem"]');
+          if(!items.length) return 'NONE FOUND';
+          var texts=[];
+          for(var i=0;i<items.length;i++){ texts.push((i+1)+'. '+items[i].textContent.trim().slice(0,50)); }
+          return texts.join('\n');
+        })()"""))
+        sb.appendLine()
+        sb.appendLine("--- Composer ---")
+        sb.appendLine("textarea found: ${evalJs(wv, "!!document.querySelector('textarea.message-input-textarea')")}")
+        sb.appendLine("image mode chip: ${evalJs(wv, "!!document.querySelector('.mode-select-current-mode')")}")
+        sb.appendLine()
+        sb.appendLine("--- Body text sample ---")
+        sb.appendLine(evalJs(wv, "(document.body?document.body.innerText:'').slice(0,500)"))
+        return sb.toString()
+    }
+
+    /** Exception carrying diagnostic info for the error report. */
+    class DriverExceptionWithDebug(message: String, val debugInfo: String) : DriverException(message)
 
     /** Injects the photo into Qwen's hidden file input via DataTransfer. */
     private suspend fun attachPhoto() {

@@ -1,6 +1,9 @@
 package app.photopromptcodes.ui
 
 import android.app.Application
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.net.Uri
 import android.webkit.WebView
 import androidx.compose.foundation.BorderStroke
@@ -21,6 +24,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -37,7 +41,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -70,6 +76,7 @@ data class RunUi(
     val step: RunStep = RunStep.OPENING_ENGINE,
     val loginRequired: Boolean = false,
     val error: String? = null,
+    val errorDebug: String? = null,
     val code: PromptCode? = null,
     val photoUri: Uri? = null
 )
@@ -143,7 +150,7 @@ class RunViewModel(app: Application) : AndroidViewModel(app) {
     fun retry() {
         val code = ui.code ?: return
         val photo = ui.photoUri ?: return
-        ui = ui.copy(error = null, loginRequired = false, step = RunStep.OPENING_ENGINE)
+        ui = ui.copy(error = null, errorDebug = null, loginRequired = false, step = RunStep.OPENING_ENGINE)
         driver?.start(photo, code.prompt)
     }
 
@@ -154,14 +161,14 @@ class RunViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun onEvent(event: DriverEvent) {
         when (event) {
-            is DriverEvent.Step -> ui = ui.copy(step = event.step, error = null)
+            is DriverEvent.Step -> ui = ui.copy(step = event.step, error = null, errorDebug = null)
             DriverEvent.LoginRequired -> ui = ui.copy(loginRequired = true)
             is DriverEvent.Finished -> viewModelScope.launch {
                 val id = stageId ?: return@launch
                 val record = history.saveResult(id, ui.code?.code.orEmpty(), event.imageBytes)
                 _done.emit(record.id)
             }
-            is DriverEvent.Failed -> ui = ui.copy(error = event.message)
+            is DriverEvent.Failed -> ui = ui.copy(error = event.message, errorDebug = event.debugInfo)
         }
     }
 
@@ -257,6 +264,22 @@ fun RunScreen(
                             Icon(Icons.Filled.Refresh, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
                             Text("Retry", fontWeight = FontWeight.SemiBold)
+                        }
+                        // Copy error details for debugging (shows when diagnostics available)
+                        if (ui.errorDebug != null) {
+                            Spacer(Modifier.height(8.dp))
+                            val ctx = LocalContext.current
+                            var copied by remember { mutableStateOf(false) }
+                            OutlinedButton(
+                                onClick = {
+                                    val cm = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    cm.setPrimaryClip(ClipData.newPlainText("error", ui.errorDebug))
+                                    copied = true
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(if (copied) "Copied!" else "Copy error details")
+                            }
                         }
                     } else if (ui.loginRequired) {
                         Text(
