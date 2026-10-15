@@ -258,7 +258,9 @@ class QwenDriver : EngineDriver {
             })()""")
             delay(2500)
             menuOpened = evalJs(wv,
-                "document.querySelectorAll('[role=\"menuitem\"]').length>0"
+                "(document.querySelectorAll('[role=\"menuitem\"]').length>0 || " +
+                "document.querySelectorAll('.mode-selector-drawer-list-item').length>0 || " +
+                "document.querySelectorAll('.qwen-chat-v2-dropdown-menu-item').length>0)"
             ) == "true"
             if (menuOpened) return@repeat
             Log.d(TAG, "menu did not open, retrying (${it + 1}/3)")
@@ -273,30 +275,43 @@ class QwenDriver : EngineDriver {
         }
         // Click "Create Image" — search broadly for any element with that text
         val selected = evalJs(wv, """(function(){
+          function realClick(el){
+            var r=el.getBoundingClientRect();
+            var x=r.left+r.width/2, y=r.top+r.height/2;
+            var opts={bubbles:true,cancelable:true,view:window,clientX:x,clientY:y};
+            el.dispatchEvent(new MouseEvent('mousedown',opts));
+            el.dispatchEvent(new MouseEvent('mouseup',opts));
+            el.dispatchEvent(new MouseEvent('click',opts));
+          }
           function clickCreateImage(){
-            // Strategy 1: known menu structure
+            // Strategy 1: drawer list items (mobile/tablet layout)
+            var drawers=document.querySelectorAll('.mode-selector-drawer-list-item');
+            for(var i=0;i<drawers.length;i++){
+              if(drawers[i].textContent.indexOf('Create Image')>=0){ realClick(drawers[i]); return true; }
+            }
+            // Strategy 2: known dropdown menu structure (desktop layout)
             var items=document.querySelectorAll('.qwen-chat-v2-dropdown-menu-item');
             for(var i=0;i<items.length;i++){
               var name=items[i].querySelector('.mode-select-dropdown-item-name');
-              if(name && name.textContent.trim()==='Create Image'){ items[i].click(); return true; }
+              if(name && name.textContent.trim()==='Create Image'){ realClick(items[i]); return true; }
             }
-            // Strategy 2: any clickable element whose text is exactly "Create Image"
+            // Strategy 3: any clickable element whose text is exactly "Create Image"
             var all=document.querySelectorAll('div,span,button,li');
             for(var i=0;i<all.length;i++){
               if(all[i].textContent.trim()==='Create Image'){
                 var el=all[i];
-                // climb to nearest clickable parent
                 while(el && el.tagName!=='BUTTON' && !el.getAttribute('role')){
                   if(el.className && el.className.indexOf('menu-item')>=0) break;
+                  if(el.className && el.className.indexOf('drawer-list-item')>=0) break;
                   el=el.parentElement;
                 }
-                if(el){ el.click(); return true; }
+                if(el){ realClick(el); return true; }
               }
             }
-            // Strategy 3: partial text match on menu-like elements
-            var menus=document.querySelectorAll('[role="menuitem"], .dropdown-menu-item, li');
+            // Strategy 4: partial text match on menu-like elements
+            var menus=document.querySelectorAll('[role="menuitem"], .dropdown-menu-item, li, .mode-selector-drawer-list-item');
             for(var i=0;i<menus.length;i++){
-              if(menus[i].textContent.indexOf('Create Image')>=0){ menus[i].click(); return true; }
+              if(menus[i].textContent.indexOf('Create Image')>=0){ realClick(menus[i]); return true; }
             }
             return false;
           }
@@ -333,12 +348,12 @@ class QwenDriver : EngineDriver {
           return out.length? out.join('\n') : 'NONE FOUND';
         })()"""))
         sb.appendLine()
-        sb.appendLine("--- Menu items (role=menuitem) ---")
+        sb.appendLine("--- Menu items (role=menuitem / drawer-list-item) ---")
         sb.appendLine(evalJs(wv, """(function(){
-          var items=document.querySelectorAll('[role="menuitem"]');
+          var items=document.querySelectorAll('[role="menuitem"], .mode-selector-drawer-list-item, .qwen-chat-v2-dropdown-menu-item');
           if(!items.length) return 'NONE FOUND';
           var texts=[];
-          for(var i=0;i<items.length;i++){ texts.push((i+1)+'. '+items[i].textContent.trim().slice(0,50)); }
+          for(var i=0;i<Math.min(items.length,12);i++){ texts.push((i+1)+'. '+items[i].textContent.trim().slice(0,50)); }
           return texts.join('\n');
         })()"""))
         sb.appendLine()
