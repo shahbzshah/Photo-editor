@@ -29,7 +29,7 @@ import kotlin.coroutines.resume
 
 /** Progress steps shown on the run screen, in order. */
 enum class RunStep(val label: String) {
-    OPENING_CHATGPT("Opening ChatGPT"),
+    OPENING_ENGINE("Opening AI engine"),
     CHECKING_LOGIN("Checking sign-in"),
     ATTACHING_PHOTO("Attaching photo"),
     SENDING_PROMPT("Sending prompt"),
@@ -310,7 +310,7 @@ class ChatGptDriver : EngineDriver {
         val wv = webView ?: throw DriverException("Browser not ready. Please retry.")
         currentPhoto = photo
 
-        emit(DriverEvent.Step(RunStep.OPENING_CHATGPT))
+        emit(DriverEvent.Step(RunStep.OPENING_ENGINE))
         withContext(Dispatchers.Main) { wv.loadUrl(CHATGPT_URL) }
         val settled = waitFor(PAGE_TIMEOUT_MS) {
             val state = loginState()

@@ -143,7 +143,7 @@ class QwenDriver : EngineDriver {
         val wv = webView ?: throw DriverException("Browser not ready. Please retry.")
         currentPhoto = photo
 
-        emit(DriverEvent.Step(RunStep.OPENING_CHATGPT))
+        emit(DriverEvent.Step(RunStep.OPENING_ENGINE))
         withContext(Dispatchers.Main) { wv.loadUrl(QWEN_URL) }
         val loaded = waitFor(PAGE_TIMEOUT_MS) { pageReady() }
         if (!loaded) throw DriverException(

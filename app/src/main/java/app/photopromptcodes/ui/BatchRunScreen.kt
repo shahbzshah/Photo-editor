@@ -68,7 +68,7 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 
 data class BatchUi(
-    val step: RunStep = RunStep.OPENING_CHATGPT,
+    val step: RunStep = RunStep.OPENING_ENGINE,
     val loginRequired: Boolean = false,
     val error: String? = null,
     val code: PromptCode? = null,
@@ -151,14 +151,14 @@ class BatchRunViewModel(app: Application) : AndroidViewModel(app) {
                 startNext()
                 return@launch
             }
-            ui = ui.copy(step = RunStep.OPENING_CHATGPT, error = null, loginRequired = false)
+            ui = ui.copy(step = RunStep.OPENING_ENGINE, error = null, loginRequired = false)
             driver?.start(photoUri, ui.code?.prompt ?: "")
                 ?: run { ui = ui.copy(error = "Browser not ready. Please retry.") }
         }
     }
 
     fun retry() {
-        ui = ui.copy(error = null, loginRequired = false, step = RunStep.OPENING_CHATGPT)
+        ui = ui.copy(error = null, loginRequired = false, step = RunStep.OPENING_ENGINE)
         val photoUri = photoQueue.getOrNull(ui.currentIndex) ?: return
         driver?.start(photoUri, ui.code?.prompt ?: "")
     }

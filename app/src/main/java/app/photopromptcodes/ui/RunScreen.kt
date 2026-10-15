@@ -67,7 +67,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 data class RunUi(
-    val step: RunStep = RunStep.OPENING_CHATGPT,
+    val step: RunStep = RunStep.OPENING_ENGINE,
     val loginRequired: Boolean = false,
     val error: String? = null,
     val code: PromptCode? = null,
@@ -143,7 +143,7 @@ class RunViewModel(app: Application) : AndroidViewModel(app) {
     fun retry() {
         val code = ui.code ?: return
         val photo = ui.photoUri ?: return
-        ui = ui.copy(error = null, loginRequired = false, step = RunStep.OPENING_CHATGPT)
+        ui = ui.copy(error = null, loginRequired = false, step = RunStep.OPENING_ENGINE)
         driver?.start(photo, code.prompt)
     }
 
