@@ -47,6 +47,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.photopromptcodes.automation.ChatGptDriver
+import app.photopromptcodes.automation.Engine
+import app.photopromptcodes.automation.EngineDriver
+import app.photopromptcodes.automation.QwenDriver
+import app.photopromptcodes.data.EnginePrefs
 import app.photopromptcodes.automation.DriverEvent
 import app.photopromptcodes.automation.RunStep
 import app.photopromptcodes.data.CodeRepository
@@ -77,14 +81,15 @@ class RunViewModel(app: Application) : AndroidViewModel(app) {
     private val _done = MutableSharedFlow<String>()
     val doneEvents: SharedFlow<String> = _done
 
-    private var driver: ChatGptDriver? = null
+    private var driver: EngineDriver? = null
     private var started = false
     private val history = HistoryRepository(app)
     private var stageId: String? = null
 
     fun attachWebView(wv: WebView) {
         if (driver != null) return
-        driver = ChatGptDriver().also {
+        val engine = EnginePrefs.get(getApplication())
+        driver = (if (engine == Engine.QWEN) QwenDriver() else ChatGptDriver()).also {
             it.setListener(::onEvent)
             it.attach(wv)
         }

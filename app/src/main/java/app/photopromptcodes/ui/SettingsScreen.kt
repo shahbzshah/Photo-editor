@@ -2,6 +2,7 @@ package app.photopromptcodes.ui
 
 import android.content.Context
 import android.webkit.CookieManager
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +27,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -45,6 +48,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.photopromptcodes.PpcApplication
+import app.photopromptcodes.automation.Engine
+import app.photopromptcodes.data.EnginePrefs
 import app.photopromptcodes.data.HistoryRepository
 import app.photopromptcodes.update.UpdateChecker
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -87,6 +92,71 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
+            // --- AI Engine selector ---
+            Text(
+                "AI ENGINE",
+                style = MaterialTheme.typography.labelSmall,
+                color = PaperDim
+            )
+            Spacer(Modifier.height(8.dp))
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    var selectedEngine by remember {
+                        mutableStateOf(EnginePrefs.get(ctx))
+                    }
+                    Text(
+                        "Choose which AI edits your photos.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = PaperDim
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Engine.values().forEach { engine ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedEngine = engine
+                                    EnginePrefs.set(ctx, engine)
+                                }
+                                .padding(vertical = 8.dp)
+                        ) {
+                            RadioButton(
+                                selected = selectedEngine == engine,
+                                onClick = {
+                                    selectedEngine = engine
+                                    EnginePrefs.set(ctx, engine)
+                                },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = Amber,
+                                    unselectedColor = PaperDim
+                                )
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    engine.displayName,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    if (engine == Engine.CHATGPT)
+                                        "Needs your ChatGPT login. Best quality."
+                                    else
+                                        "No login needed. Free, works as guest.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = PaperDim
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(24.dp))
             // --- ChatGPT account ---
             Text(
                 "CHATGPT ACCOUNT",

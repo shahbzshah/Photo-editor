@@ -57,7 +57,7 @@ class DriverException(message: String) : Exception(message)
  * All public methods are safe to call from the main thread; the driver hops
  * to Dispatchers.Main internally wherever WebView demands it.
  */
-class ChatGptDriver {
+class ChatGptDriver : EngineDriver {
 
     companion object {
         private const val TAG = "ChatGptDriver"
@@ -77,7 +77,7 @@ class ChatGptDriver {
     private var runJob: Job? = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    fun setListener(l: (DriverEvent) -> Unit) {
+    override fun setListener(l: (DriverEvent) -> Unit) {
         listener = l
     }
 
@@ -89,7 +89,7 @@ class ChatGptDriver {
      * Configures a WebView created by the UI layer. Must be called on the
      * main thread (AndroidView's factory runs there).
      */
-    fun attach(wv: WebView) {
+    override fun attach(wv: WebView) {
         webView = wv
         val cm = CookieManager.getInstance()
         cm.setAcceptCookie(true)
@@ -245,7 +245,7 @@ class ChatGptDriver {
     }
 
     /** Starts (or restarts) an edit run. Any in-flight run is cancelled. */
-    fun start(photo: Uri, prompt: String) {
+    override fun start(photo: Uri, prompt: String) {
         runJob?.cancel()
         imageHandled.set(false)
         runJob = scope.launch {
@@ -260,7 +260,7 @@ class ChatGptDriver {
     }
 
     /** Called by the UI after the user finishes the manual sign-in. */
-    fun notifyLoginCompleted() {
+    override fun notifyLoginCompleted() {
         CookieManager.getInstance().flush()
         loginGate?.complete(Unit)
     }
@@ -294,7 +294,7 @@ class ChatGptDriver {
         }
     }
 
-    fun destroy() {
+    override fun destroy() {
         runJob?.cancel()
         scope.cancel()
         try {

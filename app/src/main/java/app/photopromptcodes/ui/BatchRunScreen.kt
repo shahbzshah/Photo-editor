@@ -48,6 +48,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.photopromptcodes.automation.ChatGptDriver
+import app.photopromptcodes.automation.Engine
+import app.photopromptcodes.automation.EngineDriver
+import app.photopromptcodes.automation.QwenDriver
+import app.photopromptcodes.data.EnginePrefs
 import app.photopromptcodes.automation.DriverEvent
 import app.photopromptcodes.automation.RunStep
 import app.photopromptcodes.data.CodeRepository
@@ -79,7 +83,7 @@ class BatchRunViewModel(app: Application) : AndroidViewModel(app) {
     var ui by mutableStateOf(BatchUi())
         private set
 
-    private var driver: ChatGptDriver? = null
+    private var driver: EngineDriver? = null
     private var started = false
     private val history = HistoryRepository(app)
     private var photoQueue: List<Uri> = emptyList()
@@ -87,7 +91,8 @@ class BatchRunViewModel(app: Application) : AndroidViewModel(app) {
 
     fun attachWebView(wv: WebView) {
         if (driver != null) return
-        driver = ChatGptDriver().also {
+        val engine = EnginePrefs.get(getApplication())
+        driver = (if (engine == Engine.QWEN) QwenDriver() else ChatGptDriver()).also {
             it.setListener(::onEvent)
             it.attach(wv)
         }
