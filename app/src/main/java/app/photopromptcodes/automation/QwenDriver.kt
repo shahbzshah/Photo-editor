@@ -215,33 +215,74 @@ class QwenDriver : EngineDriver {
         val inMode = evalJs(wv, """(function(){
           var sels=[${QwenSelectors.imageModeChip.joinToString(",") { JSONObject.quote(it) }}];
           for(var i=0;i<sels.length;i++){ if(document.querySelector(sels[i])) return true; }
+          // Also check for image-mode placeholder text in composer
+          var ta=document.querySelector('textarea');
+          if(ta && ta.placeholder && ta.placeholder.toLowerCase().indexOf('image')>=0) return true;
           return false;
         })()""") == "true"
         if (inMode) {
             Log.d(TAG, "already in image mode")
             return
         }
-        // Click the "+" mode button
+        // Click the "+" mode button (try several selector strategies)
         val opened = evalJs(wv, """(function(){
           var sels=[${QwenSelectors.modeButton.joinToString(",") { JSONObject.quote(it) }}];
           for(var i=0;i<sels.length;i++){
             var el=document.querySelector(sels[i]);
             if(el){ el.click(); return true; }
           }
-          return false;
-        })()""") == "true"
-        if (!opened) throw DriverException("Couldn't open the mode menu. Please retry.")
-        delay(1500)
-        // Click "Create Image" menu item (match by text)
-        val selected = evalJs(wv, """(function(){
-          var items=document.querySelectorAll('.qwen-chat-v2-dropdown-menu-item');
-          for(var i=0;i<items.length;i++){
-            var name=items[i].querySelector('.mode-select-dropdown-item-name');
-            if(name && name.textContent.trim()==='Create Image'){ items[i].click(); return true; }
+          // Fallback: find any button with a "+" or add icon near the composer
+          var btns=document.querySelectorAll('button');
+          for(var i=0;i<btns.length;i++){
+            var t=(btns[i].getAttribute('aria-label')||'')+' '+(btns[i].textContent||'');
+            if(t.indexOf('+')>=0 || t.toLowerCase().indexOf('mode')>=0){ btns[i].click(); return true; }
           }
           return false;
         })()""") == "true"
-        if (!selected) throw DriverException("Couldn't select Create Image mode. Please retry.")
+        if (!opened) throw DriverException("Couldn't open the mode menu. Please retry.")
+        delay(2000)
+        // Click "Create Image" — search broadly for any element with that text
+        val selected = evalJs(wv, """(function(){
+          function clickCreateImage(){
+            // Strategy 1: known menu structure
+            var items=document.querySelectorAll('.qwen-chat-v2-dropdown-menu-item');
+            for(var i=0;i<items.length;i++){
+              var name=items[i].querySelector('.mode-select-dropdown-item-name');
+              if(name && name.textContent.trim()==='Create Image'){ items[i].click(); return true; }
+            }
+            // Strategy 2: any clickable element whose text is exactly "Create Image"
+            var all=document.querySelectorAll('div,span,button,li');
+            for(var i=0;i<all.length;i++){
+              if(all[i].textContent.trim()==='Create Image'){
+                var el=all[i];
+                // climb to nearest clickable parent
+                while(el && el.tagName!=='BUTTON' && !el.getAttribute('role')){
+                  if(el.className && el.className.indexOf('menu-item')>=0) break;
+                  el=el.parentElement;
+                }
+                if(el){ el.click(); return true; }
+              }
+            }
+            // Strategy 3: partial text match on menu-like elements
+            var menus=document.querySelectorAll('[role="menuitem"], .dropdown-menu-item, li');
+            for(var i=0;i<menus.length;i++){
+              if(menus[i].textContent.indexOf('Create Image')>=0){ menus[i].click(); return true; }
+            }
+            return false;
+          }
+          return clickCreateImage();
+        })()""") == "true"
+        if (!selected) {
+            // Debug: dump what menu items ARE visible
+            val debug = evalJs(wv, """(function(){
+              var items=document.querySelectorAll('[role="menuitem"]');
+              var texts=[];
+              for(var i=0;i<items.length;i++){ texts.push(items[i].textContent.trim().slice(0,40)); }
+              return JSON.stringify(texts);
+            })()""")
+            Log.w(TAG, "menu items found: $debug")
+            throw DriverException("Couldn't select Create Image mode. Please retry.")
+        }
         delay(2000)
         Log.d(TAG, "image mode selected")
     }
