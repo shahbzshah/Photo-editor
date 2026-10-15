@@ -27,24 +27,29 @@ import app.photopromptcodes.ui.theme.PaperDim
 private val SECTIONS = listOf(
     "What this app does" to
         "Photo Prompt Codes helps you apply AI photo-editing prompts to your own photos. " +
-        "You pick a prompt code, choose a photo, and the app sends both to ChatGPT (via chatgpt.com) " +
-        "which generates the edited image. The result is saved on your device.",
+        "You pick a prompt code, choose a photo, and the app sends both to your chosen AI engine " +
+        "(ChatGPT via chatgpt.com, or Qwen via chat.qwen.ai) which generates the edited image. " +
+        "The result is saved on your device.",
     "Information we collect" to
         "The app does not run its own servers and does not send your data to us. " +
-        "• Photos you choose are sent to ChatGPT (OpenAI) so it can generate the edit. " +
+        "• Photos you choose are sent to your chosen AI engine — ChatGPT (OpenAI), or Qwen " +
+        "(Alibaba, used as a guest with no login) — so it can generate the edit. " +
         "• Your ChatGPT login session (cookies) stays on your device, inside the app's WebView. " +
+        "Qwen needs no login, so there is no session to store. " +
         "• Edit history (your photos and results) is stored only on your device.",
     "Information we do NOT collect" to
         "We do not create accounts, do not track you, do not use analytics, and do not sell or share " +
         "any personal information. There is nothing to opt out of because nothing leaves your device " +
-        "except what you send to ChatGPT to generate an edit.",
+        "except what you send to your chosen AI engine to generate an edit.",
     "Third parties" to
-        "ChatGPT (OpenAI) processes the photo and prompt you send when you generate an edit. " +
-        "OpenAI's own privacy policy applies to that processing: https://openai.com/policies/privacy-policy",
+        "ChatGPT (OpenAI) or Qwen (Alibaba) processes the photo and prompt you send when you generate " +
+        "an edit, depending on the engine you selected in Settings → AI Engine. " +
+        "The respective provider's own privacy policy applies to that processing: " +
+        "https://openai.com/policies/privacy-policy",
     "Your control" to
         "You can delete your edit history at any time from Settings → Clear history. " +
         "You can sign out of ChatGPT from Settings → ChatGPT account, which clears the login session " +
-        "from the device.",
+        "from the device. Qwen runs as a guest with no login, so there is no session to clear.",
     "Children" to
         "This app is not directed at children under 13.",
     "Contact" to
