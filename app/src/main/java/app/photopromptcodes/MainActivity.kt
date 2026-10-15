@@ -38,6 +38,7 @@ import app.photopromptcodes.ui.FavoritesScreen
 import app.photopromptcodes.ui.GalleryScreen
 import app.photopromptcodes.ui.HistoryScreen
 import app.photopromptcodes.ui.LoginScreen
+import app.photopromptcodes.ui.QwenLoginScreen
 import app.photopromptcodes.ui.OnboardingScreen
 import app.photopromptcodes.ui.PrivacyPolicyScreen
 import app.photopromptcodes.ui.ResultDetailScreen
@@ -177,6 +178,7 @@ fun AppNav() {
         composable("settings") {
             SettingsScreen(
                 onSignIn = { nav.navigate("signin") },
+                onQwenSignIn = { nav.navigate("qwen_signin") },
                 onPrivacy = { nav.navigate("privacy") },
                 onAbout = { nav.navigate("about") }
             )
@@ -186,6 +188,11 @@ fun AppNav() {
         }
         composable("signin") {
             LoginScreen(
+                onDone = { nav.popBackStack() }
+            )
+        }
+        composable("qwen_signin") {
+            QwenLoginScreen(
                 onDone = { nav.popBackStack() }
             )
         }

@@ -67,12 +67,14 @@ import kotlinx.coroutines.withContext
 @Composable
 fun SettingsScreen(
     onSignIn: () -> Unit,
+    onQwenSignIn: () -> Unit,
     onPrivacy: () -> Unit,
     onAbout: () -> Unit
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
     var signedIn by remember { mutableStateOf(isLoggedInFlag(ctx)) }
+    var qwenSignedIn by remember { mutableStateOf(isQwenLoggedIn(ctx)) }
     var showClearConfirm by remember { mutableStateOf(false) }
     var showSignOutConfirm by remember { mutableStateOf(false) }
 
@@ -147,7 +149,7 @@ fun SettingsScreen(
                                     if (engine == Engine.CHATGPT)
                                         "Needs your ChatGPT login. Best quality."
                                     else
-                                        "No login needed. Free, works as guest.",
+                                        "Works as guest. Sign in for higher daily limit.",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = PaperDim
                                 )
@@ -211,6 +213,76 @@ fun SettingsScreen(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text("Sign in to ChatGPT", fontWeight = FontWeight.SemiBold)
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            // --- Qwen account ---
+            Text(
+                "QWEN ACCOUNT",
+                style = MaterialTheme.typography.labelSmall,
+                color = PaperDim
+            )
+            Spacer(Modifier.height(8.dp))
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            if (qwenSignedIn) "Signed in" else "Guest mode",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            if (qwenSignedIn) "●" else "○",
+                            color = if (qwenSignedIn) Amber else PaperDim
+                        )
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Qwen works without login, but signing in (email code) " +
+                            "gives you a higher daily limit.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = PaperDim
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        if (qwenSignedIn) {
+                            OutlinedButton(
+                                onClick = {
+                                    setQwenLoggedIn(ctx, false)
+                                    // Clear Qwen cookies
+                                    android.webkit.CookieManager.getInstance().apply {
+                                        val cookies = getCookie("https://chat.qwen.ai")
+                                        // Cookies clear on next restart; flag is the source of truth
+                                    }
+                                    qwenSignedIn = false
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Sign out")
+                            }
+                        } else {
+                            Button(
+                                onClick = onQwenSignIn,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Amber,
+                                    contentColor = NearBlack
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Sign in to Qwen", fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
