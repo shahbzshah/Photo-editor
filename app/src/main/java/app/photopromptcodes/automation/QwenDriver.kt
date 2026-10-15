@@ -490,6 +490,7 @@ class QwenDriver : EngineDriver {
         val wv = webView ?: throw DriverException("Browser not ready.")
         val deadline = System.currentTimeMillis() + GENERATION_TIMEOUT_MS
         var lastCount = 0
+        var nullStreak = 0
         while (System.currentTimeMillis() < deadline) {
             // Ask the page for all candidate result image URLs
             val json = evalJs(wv, """(function(){
@@ -504,6 +505,18 @@ class QwenDriver : EngineDriver {
               }
               return JSON.stringify(urls);
             })()""")
+            // If the page stops responding (frozen WebView), fail fast
+            // instead of hanging until the deadline.
+            if (json == null) {
+                nullStreak++
+                if (nullStreak >= 4) {
+                    throw DriverException(
+                        "Qwen stopped responding. Please retry."
+                    )
+                }
+            } else {
+                nullStreak = 0
+            }
             val urls = try {
                 val arr = org.json.JSONArray(json)
                 (0 until arr.length()).map { arr.getString(it) }
@@ -569,13 +582,17 @@ class QwenDriver : EngineDriver {
     }
 
     private suspend fun evalJs(wv: WebView, js: String): String? {
-        return suspendCancellableCoroutine { cont ->
-            try {
-                wv.evaluateJavascript(js) { result ->
-                    if (cont.isActive) cont.resume(result?.removeSurrounding("\""))
+        // Timeout guard: if the WebView is frozen/dead, evaluateJavascript
+        // never calls back. Without this, the driver hangs forever.
+        return withTimeoutOrNull(15000) {
+            suspendCancellableCoroutine { cont ->
+                try {
+                    wv.evaluateJavascript(js) { result ->
+                        if (cont.isActive) cont.resume(result?.removeSurrounding("\""))
+                    }
+                } catch (e: Exception) {
+                    if (cont.isActive) cont.resume(null)
                 }
-            } catch (e: Exception) {
-                if (cont.isActive) cont.resume(null)
             }
         }
     }

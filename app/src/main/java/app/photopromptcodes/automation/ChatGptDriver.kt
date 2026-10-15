@@ -698,9 +698,12 @@ class ChatGptDriver : EngineDriver {
     /** evaluateJavascript must run on the UI thread; results come back JSON-quoted. */
     private suspend fun evalJs(js: String): String? = withContext(Dispatchers.Main) {
         val wv = webView ?: return@withContext null
-        suspendCancellableCoroutine { cont ->
-            wv.evaluateJavascript(js) { result ->
-                if (!cont.isCompleted) cont.resume(result)
+        // Timeout guard: a frozen WebView never calls back.
+        withTimeoutOrNull(15000) {
+            suspendCancellableCoroutine { cont ->
+                wv.evaluateJavascript(js) { result ->
+                    if (!cont.isCompleted) cont.resume(result)
+                }
             }
         }
     }
