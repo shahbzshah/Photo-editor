@@ -146,36 +146,51 @@ class QwenDriver : EngineDriver {
         val wv = webView ?: throw DriverException("Browser not ready. Please retry.")
         currentPhoto = photo
 
-        emit(DriverEvent.Step(RunStep.OPENING_ENGINE))
-        withContext(Dispatchers.Main) { wv.loadUrl(QWEN_URL) }
-        val loaded = waitFor(PAGE_TIMEOUT_MS) { pageReady() }
-        if (!loaded) throw DriverException(
-            "Qwen didn't finish loading. Check your connection and retry."
-        )
+        // Watch for the age gate throughout the run — it can pop up at any
+        // point (page load, after send, during generation) and blocks the page.
+        val gateWatcher = scope.launch {
+            while (true) {
+                try {
+                    dismissAgeGate()
+                } catch (_: Exception) {}
+                delay(3000)
+            }
+        }
 
-        // Dismiss the age gate if it appears
-        dismissAgeGate()
+        try {
+            emit(DriverEvent.Step(RunStep.OPENING_ENGINE))
+            withContext(Dispatchers.Main) { wv.loadUrl(QWEN_URL) }
+            val loaded = waitFor(PAGE_TIMEOUT_MS) { pageReady() }
+            if (!loaded) throw DriverException(
+                "Qwen didn't finish loading. Check your connection and retry."
+            )
 
-        emit(DriverEvent.Step(RunStep.ATTACHING_PHOTO))
-        selectImageMode()
-        attachPhoto()
+            // Dismiss the age gate if it appears
+            dismissAgeGate()
 
-        emit(DriverEvent.Step(RunStep.SENDING_PROMPT))
-        sendPrompt(prompt)
+            emit(DriverEvent.Step(RunStep.ATTACHING_PHOTO))
+            selectImageMode()
+            attachPhoto()
 
-        // Dismiss age gate again — it can appear on first send
-        delay(2000)
-        dismissAgeGate()
+            emit(DriverEvent.Step(RunStep.SENDING_PROMPT))
+            sendPrompt(prompt)
 
-        delay(5000)
+            // Dismiss age gate again — it can appear on first send
+            delay(2000)
+            dismissAgeGate()
 
-        emit(DriverEvent.Step(RunStep.GENERATING))
-        val dataUrl = waitForImage()
-        val bytes = dataUrlToBytes(dataUrl)
-            ?: throw DriverException("Got the image back but couldn't decode it. Please retry.")
+            delay(5000)
 
-        emit(DriverEvent.Step(RunStep.DONE))
-        emit(DriverEvent.Finished(bytes))
+            emit(DriverEvent.Step(RunStep.GENERATING))
+            val dataUrl = waitForImage()
+            val bytes = dataUrlToBytes(dataUrl)
+                ?: throw DriverException("Got the image back but couldn't decode it. Please retry.")
+
+            emit(DriverEvent.Step(RunStep.DONE))
+            emit(DriverEvent.Finished(bytes))
+        } finally {
+            gateWatcher.cancel()
+        }
     }
 
     /** True when the composer is present AND the app has finished hydrating. */

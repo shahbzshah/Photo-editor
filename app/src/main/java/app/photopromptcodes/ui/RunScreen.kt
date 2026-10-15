@@ -7,6 +7,7 @@ import android.content.Context
 import android.net.Uri
 import android.webkit.WebView
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -234,6 +235,8 @@ fun RunScreen(
             )
             // Progress overlay docked at the bottom; the WebView stays
             // interactive behind it (needed for the manual sign-in step).
+            // Collapsible via the header tap — so it never blocks page dialogs.
+            var progressCollapsed by remember { mutableStateOf(false) }
             Card(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -244,6 +247,31 @@ fun RunScreen(
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
+                    // Collapsible header (only when running, not on error/login)
+                    if (ui.error == null && !ui.loginRequired) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { progressCollapsed = !progressCollapsed },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                ui.step.label,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Text(
+                                if (progressCollapsed) "Show" else "Hide",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = Amber
+                            )
+                        }
+                        if (!progressCollapsed) {
+                            Spacer(Modifier.height(8.dp))
+                        }
+                    }
+                    if (!progressCollapsed) {
                     if (ui.error != null) {
                         Text(
                             "Something went wrong",
@@ -305,6 +333,7 @@ fun RunScreen(
                     } else {
                         StepList(current = ui.step)
                     }
+                    } // end if (!progressCollapsed)
                 }
             }
         }
