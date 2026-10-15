@@ -178,12 +178,18 @@ class QwenDriver : EngineDriver {
         emit(DriverEvent.Finished(bytes))
     }
 
-    /** True when the composer textarea is present. */
+    /** True when the composer is present AND the app has finished hydrating. */
     private suspend fun pageReady(): Boolean {
         val js = """(function(){
           var sels=[${QwenSelectors.composer.joinToString(",") { JSONObject.quote(it) }}];
-          for(var i=0;i<sels.length;i++){ if(document.querySelector(sels[i])) return true; }
-          return false;
+          var hasComposer=false;
+          for(var i=0;i<sels.length;i++){ if(document.querySelector(sels[i])){ hasComposer=true; break; } }
+          if(!hasComposer) return false;
+          // The React app shows "Model loading..." while hydrating — clicks
+          // during this window hit a dead page. Wait for it to clear.
+          var bodyText=(document.body?document.body.innerText:'');
+          if(bodyText.indexOf('Model loading')>=0) return false;
+          return true;
         })()"""
         return evalJs(webView!!, js) == "true"
     }
@@ -227,21 +233,39 @@ class QwenDriver : EngineDriver {
             Log.d(TAG, "already in image mode")
             return
         }
-        // Click the "+" mode button (try several selector strategies).
-        // NOTE: it is a DIV with role="button", not a <button> element.
-        val opened = evalJs(wv, """(function(){
-          var sels=[${QwenSelectors.modeButton.joinToString(",") { JSONObject.quote(it) }}];
-          for(var i=0;i<sels.length;i++){
-            var el=document.querySelector(sels[i]);
-            if(el){ el.click(); return true; }
-          }
-          // Fallback: find any element with the mode-select-open class
-          var ms=document.querySelector('.mode-select-open');
-          if(ms){ ms.click(); return true; }
-          return false;
-        })()""") == "true"
-        if (!opened) throw DriverException("Couldn't open the mode menu. Please retry.")
-        delay(2000)
+        // Click the "+" mode button with realistic mouse events (React needs
+        // proper event bubbling — a bare .click() on a div can be ignored).
+        // Retry up to 3 times, verifying the menu actually opened each time.
+        var menuOpened = false
+        repeat(3) {
+            evalJs(wv, """(function(){
+              function realClick(el){
+                var r=el.getBoundingClientRect();
+                var x=r.left+r.width/2, y=r.top+r.height/2;
+                var opts={bubbles:true,cancelable:true,view:window,clientX:x,clientY:y};
+                el.dispatchEvent(new MouseEvent('mousedown',opts));
+                el.dispatchEvent(new MouseEvent('mouseup',opts));
+                el.dispatchEvent(new MouseEvent('click',opts));
+              }
+              var sels=[${QwenSelectors.modeButton.joinToString(",") { JSONObject.quote(it) }}];
+              for(var i=0;i<sels.length;i++){
+                var el=document.querySelector(sels[i]);
+                if(el){ realClick(el); return true; }
+              }
+              var ms=document.querySelector('.mode-select-open');
+              if(ms){ realClick(ms); return true; }
+              return false;
+            })()""")
+            delay(2500)
+            menuOpened = evalJs(wv,
+                "document.querySelectorAll('[role=\"menuitem\"]').length>0"
+            ) == "true"
+            if (menuOpened) return@repeat
+            Log.d(TAG, "menu did not open, retrying (${it + 1}/3)")
+        }
+        if (!menuOpened) throw DriverException(
+            "Couldn't open the mode menu. Please retry."
+        )
         // Click "Create Image" — search broadly for any element with that text
         val selected = evalJs(wv, """(function(){
           function clickCreateImage(){
