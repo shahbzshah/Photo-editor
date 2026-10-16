@@ -187,6 +187,7 @@ fun RunScreen(
     customPrompt: String? = null,
     onBack: () -> Unit,
     onDone: (String) -> Unit,
+    onSignIn: () -> Unit,
     vm: RunViewModel = viewModel()
 ) {
     LaunchedEffect(code, photoUriString) { vm.ensureStarted(code, photoUriString, customPrompt) }
@@ -310,25 +311,35 @@ fun RunScreen(
                             }
                         }
                     } else if (ui.loginRequired) {
+                        val ctx = LocalContext.current
+                        val engine = remember { EnginePrefs.get(ctx) }
                         Text(
                             "Sign in required",
                             style = MaterialTheme.typography.titleMedium
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "ChatGPT isn't signed in. Sign in in the browser above, then tap Continue.",
+                            "${engine.displayName} isn't signed in. Sign in to continue, " +
+                                "or switch engines in Settings.",
                             style = MaterialTheme.typography.bodySmall
                         )
                         Spacer(Modifier.height(12.dp))
                         Button(
-                            onClick = vm::continueAfterLogin,
+                            onClick = onSignIn,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Amber,
                                 contentColor = NearBlack
                             ),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Continue", fontWeight = FontWeight.SemiBold)
+                            Text("Sign in to ${engine.displayName}", fontWeight = FontWeight.SemiBold)
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = vm::continueAfterLogin,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("I've signed in — Continue")
                         }
                     } else {
                         StepList(current = ui.step)

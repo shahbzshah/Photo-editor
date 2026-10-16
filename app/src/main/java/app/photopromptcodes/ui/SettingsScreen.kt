@@ -73,8 +73,8 @@ fun SettingsScreen(
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
-    var signedIn by remember { mutableStateOf(isLoggedInFlag(ctx)) }
-    var qwenSignedIn by remember { mutableStateOf(isQwenLoggedIn(ctx)) }
+    var chatgptIn by remember { mutableStateOf(isLoggedInFlag(ctx)) }
+    var qwenIn by remember { mutableStateOf(isQwenLoggedIn(ctx)) }
     var showClearConfirm by remember { mutableStateOf(false) }
     var showSignOutConfirm by remember { mutableStateOf(false) }
 
@@ -94,7 +94,7 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // --- AI Engine selector ---
+            // --- AI Engine selector (with per-engine sign-in) ---
             Text(
                 "AI ENGINE",
                 style = MaterialTheme.typography.labelSmall,
@@ -110,15 +110,20 @@ fun SettingsScreen(
                     var selectedEngine by remember {
                         mutableStateOf(EnginePrefs.get(ctx))
                     }
+                    // Refresh sign-in states when returning from login screens
+                    androidx.compose.runtime.LaunchedEffect(Unit) {
+                        chatgptIn = isLoggedInFlag(ctx)
+                        qwenIn = isQwenLoggedIn(ctx)
+                    }
                     Text(
-                        "Choose which AI edits your photos.",
+                        "Choose which AI edits your photos. Sign in for higher limits.",
                         style = MaterialTheme.typography.bodySmall,
                         color = PaperDim
                     )
                     Spacer(Modifier.height(12.dp))
                     Engine.values().forEach { engine ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                        val isSignedIn = if (engine == Engine.CHATGPT) chatgptIn else qwenIn
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
@@ -127,168 +132,86 @@ fun SettingsScreen(
                                 }
                                 .padding(vertical = 8.dp)
                         ) {
-                            RadioButton(
-                                selected = selectedEngine == engine,
-                                onClick = {
-                                    selectedEngine = engine
-                                    EnginePrefs.set(ctx, engine)
-                                },
-                                colors = RadioButtonDefaults.colors(
-                                    selectedColor = Amber,
-                                    unselectedColor = PaperDim
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                RadioButton(
+                                    selected = selectedEngine == engine,
+                                    onClick = {
+                                        selectedEngine = engine
+                                        EnginePrefs.set(ctx, engine)
+                                    },
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = Amber,
+                                        unselectedColor = PaperDim
+                                    )
                                 )
-                            )
-                            Spacer(Modifier.width(8.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    engine.displayName,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                                Text(
-                                    if (engine == Engine.CHATGPT)
-                                        "Needs your ChatGPT login. Best quality."
-                                    else
-                                        "Works as guest. Sign in for higher daily limit.",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = PaperDim
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            Spacer(Modifier.height(24.dp))
-            // --- ChatGPT account ---
-            Text(
-                "CHATGPT ACCOUNT",
-                style = MaterialTheme.typography.labelSmall,
-                color = PaperDim
-            )
-            Spacer(Modifier.height(8.dp))
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            if (signedIn) "Signed in" else "Not signed in",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            if (signedIn) "●" else "○",
-                            color = if (signedIn) Amber else PaperDim
-                        )
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        "The app uses your ChatGPT account to generate edits. " +
-                            "Sign in once — the app remembers you.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = PaperDim
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        if (signedIn) {
-                            OutlinedButton(
-                                onClick = { showSignOutConfirm = true },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text("Sign out")
-                            }
-                        } else {
-                            Button(
-                                onClick = onSignIn,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Amber,
-                                    contentColor = NearBlack
-                                ),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Sign in to ChatGPT", fontWeight = FontWeight.SemiBold)
-                            }
-                        }
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            // --- Qwen account ---
-            Text(
-                "QWEN ACCOUNT",
-                style = MaterialTheme.typography.labelSmall,
-                color = PaperDim
-            )
-            Spacer(Modifier.height(8.dp))
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            if (qwenSignedIn) "Signed in" else "Guest mode",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            if (qwenSignedIn) "●" else "○",
-                            color = if (qwenSignedIn) Amber else PaperDim
-                        )
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        "Qwen works without login, but signing in (email code) " +
-                            "gives you a higher daily limit.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = PaperDim
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        if (qwenSignedIn) {
-                            OutlinedButton(
-                                onClick = {
-                                    setQwenLoggedIn(ctx, false)
-                                    // Clear Qwen cookies
-                                    android.webkit.CookieManager.getInstance().apply {
-                                        val cookies = getCookie("https://chat.qwen.ai")
-                                        // Cookies clear on next restart; flag is the source of truth
+                                Spacer(Modifier.width(8.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            engine.displayName,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(
+                                            if (isSignedIn) "●" else "○",
+                                            color = if (isSignedIn) Amber else PaperDim,
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
                                     }
-                                    qwenSignedIn = false
-                                },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text("Sign out")
+                                    Text(
+                                        if (engine == Engine.CHATGPT)
+                                            if (isSignedIn) "Signed in. Best quality."
+                                            else "Sign in required. Best quality."
+                                        else
+                                            if (isSignedIn) "Signed in. Higher daily limit."
+                                            else "Works as guest. Sign in for higher daily limit.",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = PaperDim
+                                    )
+                                }
                             }
-                        } else {
-                            Button(
-                                onClick = onQwenSignIn,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Amber,
-                                    contentColor = NearBlack
-                                ),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Sign in to Qwen", fontWeight = FontWeight.SemiBold)
+                            Spacer(Modifier.height(8.dp))
+                            if (isSignedIn) {
+                                OutlinedButton(
+                                    onClick = {
+                                        if (engine == Engine.CHATGPT) {
+                                            showSignOutConfirm = true
+                                        } else {
+                                            setQwenLoggedIn(ctx, false)
+                                            qwenIn = false
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text("Sign out of ${engine.displayName}")
+                                }
+                            } else {
+                                Button(
+                                    onClick = {
+                                        if (engine == Engine.CHATGPT) onSignIn()
+                                        else onQwenSignIn()
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Amber,
+                                        contentColor = NearBlack
+                                    ),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        "Sign in to ${engine.displayName}",
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
                             }
+                        }
+                        if (engine != Engine.values().last()) {
+                            Spacer(Modifier.height(8.dp))
                         }
                     }
                 }
             }
-
+            Spacer(Modifier.height(24.dp))
             Spacer(Modifier.height(24.dp))
 
             // --- Storage ---
@@ -621,7 +544,7 @@ fun SettingsScreen(
                     CookieManager.getInstance().removeAllCookies(null)
                     CookieManager.getInstance().flush()
                     clearLoggedInFlag(ctx)
-                    signedIn = false
+                    chatgptIn = false
                 }) {
                     Text("Sign out")
                 }

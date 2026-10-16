@@ -97,7 +97,6 @@ fun AppNav() {
     val start = remember {
         when {
             !isOnboarded(ctx) -> "onboarding"
-            !isLoggedInFlag(ctx) -> "login"
             else -> "gallery"
         }
     }
@@ -152,7 +151,7 @@ fun AppNav() {
         composable("onboarding") {
             OnboardingScreen(
                 onDone = {
-                    nav.navigate(if (isLoggedInFlag(ctx)) "gallery" else "login") {
+                    nav.navigate("gallery") {
                         popUpTo("onboarding") { inclusive = true }
                     }
                 }
@@ -228,6 +227,10 @@ fun AppNav() {
                 onBack = { nav.popBackStack() },
                 onDone = { recordId ->
                     nav.navigate("result/$recordId") { popUpTo("gallery") }
+                },
+                onSignIn = {
+                    val engine = app.photopromptcodes.data.EnginePrefs.get(ctx)
+                    nav.navigate(if (engine == app.photopromptcodes.automation.Engine.QWEN) "qwen_signin" else "signin")
                 }
             )
         }
@@ -247,6 +250,10 @@ fun AppNav() {
                 onBack = { nav.popBackStack() },
                 onDone = { recordId ->
                     nav.navigate("result/$recordId") { popUpTo("gallery") }
+                },
+                onSignIn = {
+                    val engine = app.photopromptcodes.data.EnginePrefs.get(ctx)
+                    nav.navigate(if (engine == app.photopromptcodes.automation.Engine.QWEN) "qwen_signin" else "signin")
                 }
             )
         }
