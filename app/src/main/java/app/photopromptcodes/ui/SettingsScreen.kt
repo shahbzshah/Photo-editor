@@ -281,6 +281,38 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = PaperDim
                     )
+                    Spacer(Modifier.height(4.dp))
+                    var downloadCount by remember { mutableStateOf<Int?>(null) }
+                    LaunchedEffect(Unit) {
+                        downloadCount = withContext(Dispatchers.IO) {
+                            try {
+                                val url = java.net.URL(
+                                    "https://api.github.com/repos/shahbzshah/Photo-editor/releases?per_page=100"
+                                )
+                                val conn = url.openConnection() as java.net.HttpURLConnection
+                                conn.setRequestProperty("Accept", "application/vnd.github+json")
+                                conn.connectTimeout = 10000
+                                conn.readTimeout = 10000
+                                if (conn.responseCode != 200) return@withContext null
+                                val json = conn.inputStream.bufferedReader().readText()
+                                val arr = org.json.JSONArray(json)
+                                var total = 0
+                                for (i in 0 until arr.length()) {
+                                    val assets = arr.getJSONObject(i).optJSONArray("assets") ?: continue
+                                    for (j in 0 until assets.length()) {
+                                        total += assets.getJSONObject(j).optInt("download_count", 0)
+                                    }
+                                }
+                                total
+                            } catch (_: Exception) { null }
+                        }
+                    }
+                    Text(
+                        if (downloadCount != null) "Total downloads: $downloadCount"
+                        else "Total downloads: …",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = PaperDim
+                    )
                     Spacer(Modifier.height(12.dp))
                     Row(modifier = Modifier.fillMaxWidth()) {
                         TextButton(onClick = onAbout) {

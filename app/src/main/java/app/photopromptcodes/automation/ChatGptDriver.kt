@@ -534,6 +534,7 @@ class ChatGptDriver : EngineDriver {
             // Skip UI icons/logos by checking the src
             var ls=src.toLowerCase();
             if(ls.indexOf('logo')>-1||ls.indexOf('icon')>-1||ls.indexOf('avatar')>-1)continue;
+            try{ if(img.closest('[data-message-author-role="user"]'))continue; }catch(e){}
             candidates.push({img:img,src:src});
           }
           if(candidates.length===0)return 'none';
@@ -654,6 +655,9 @@ class ChatGptDriver : EngineDriver {
               if(r.width<150||r.height<150) continue;
               var ls=src.toLowerCase();
               if(ls.indexOf('logo')>-1||ls.indexOf('icon')>-1||ls.indexOf('avatar')>-1) continue;
+              // Never harvest the user's own uploaded photo: skip anything
+              // inside a user-authored message bubble.
+              try{ if(img.closest('[data-message-author-role="user"]')) continue; }catch(e){}
               // Keep the LAST match in DOM order (newest in chat)
               best={img:img,src:src};
             }
