@@ -55,7 +55,7 @@ private data class Page(val emoji: String, val title: String, val body: String)
 private val PAGES = listOf(
     Page(
         "◈",
-        "167 AI photo prompts",
+        "172 AI photo prompts",
         "A curated gallery of viral photo-editing prompts — golden hour, clone effects, portraits, sky swaps and more. Just browse and tap one."
     ),
     Page(

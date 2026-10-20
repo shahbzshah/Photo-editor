@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
-/** Loads the 167 prompt codes from app/src/main/assets/codes.json (converted from the web app's codes.ts). */
+/** Loads the 172 prompt codes from app/src/main/assets/codes.json (converted from the web app's codes.ts). */
 object CodeRepository {
     private val json = Json { ignoreUnknownKeys = true }
     @Volatile private var cache: List<PromptCode>? = null
