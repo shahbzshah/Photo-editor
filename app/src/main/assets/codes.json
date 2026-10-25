@@ -753,19 +753,19 @@
     "code": "/polaroid",
     "category": "Formats",
     "description": "Instant Polaroid look: soft, nostalgic, imperfect.",
-    "prompt": "Edit this photo with an authentic Polaroid instant-film look: soft slightly hazy focus, gentle color shifts, creamy highlights, the intimate imperfect charm of instant photography. Keep the subject's identity, pose and composition unchanged. Nostalgic, tender, photorealistic — the image itself, not a frame border."
+    "prompt": "Edit this photo into a candid Polaroid instant snapshot: thick white Polaroid border with a wider base, harsh on-camera flash in a slightly dim room, soft blur, golden film grain and slightly faded colors. Keep the subject's face, pose and identity exactly the same. Nostalgic, intimate, like a real instant photo pulled from an album."
   },
   {
     "code": "/disposablecamera",
     "category": "Formats",
     "description": "Disposable camera flash aesthetic: raw and candid.",
-    "prompt": "Edit this photo with a disposable-camera aesthetic: harsh direct flash, raw candid energy, slightly gritty colors and the unpolished honesty of a single-use camera. Keep the subject's identity, pose and composition unchanged. Real, spontaneous, photorealistic."
+    "prompt": "Edit this photo with a 1990s disposable-camera look: harsh direct flash, slightly overexposed skin, mild red-eye, visible film grain, faded colors, and a small corner date stamp reading 1994. Candid unposed energy, like a house-party snapshot. Keep the subject's face, pose and identity exactly the same. Real, spontaneous, photorealistic."
   },
   {
     "code": "/35mmfilm",
     "category": "Formats",
     "description": "Classic 35mm film stock character and grain.",
-    "prompt": "Edit this photo with classic 35mm film character: the beloved color science of analog film — rich organic tones, gentle highlight rolloff, fine authentic grain. Keep the subject's identity, pose and composition unchanged. Timeless, tactile, photorealistic film photography."
+    "prompt": "Edit this photo with a Kodak Portra 400 film look: warm natural skin tones, soft halation around highlights, gentle highlight rolloff, fine authentic 35mm grain and slightly lifted blacks. Keep the subject's identity, pose and composition unchanged. Timeless, tactile, photorealistic film photography."
   },
   {
     "code": "/instantphoto",
@@ -1030,5 +1030,155 @@
     "category": "Enhance",
     "description": "Remove grain and noise from a dark or high-ISO photo.",
     "prompt": "Edit this photo: remove all digital noise, grain and color speckling — especially in shadows and flat areas. Restore smooth clean tones while preserving real texture and fine detail. Keep the subject's identity, pose, clothing and the scene composition exactly the same; only clean the noise. Photorealistic, no waxy over-smoothing."
+  },
+  {
+    "code": "/figurine",
+    "category": "Viral",
+    "description": "Realistic collectible figurine on a desk, next to its box.",
+    "prompt": "Edit this photo: turn the subject into a realistic 1/7 scale collectible figurine standing on a round transparent acrylic base on a computer desk, next to its toy packaging box printed with original artwork of the figure. Keep the subject's face, hairstyle and outfit exactly recognizable, rendered in glossy PVC-plastic detail. Soft indoor lighting, realistic product photography."
+  },
+  {
+    "code": "/barbiebox",
+    "category": "Viral",
+    "description": "Collectible doll inside a bright pink toy display box.",
+    "prompt": "Edit this photo: turn the subject into a collectible doll inside a bright pink toy display box with a clear plastic window, styled like a classic doll commercial. Keep the subject's face and pose recognizable, with a glossy plastic finish, voluminous styled hair, and small accessories (sunglasses, handbag, heels) arranged beside the figure. Bright studio lighting, playful and glamorous."
+  },
+  {
+    "code": "/funkopop",
+    "category": "Viral",
+    "description": "Vinyl collectible figure with oversized head, in its box.",
+    "prompt": "Edit this photo: turn the subject into a vinyl collectible figure in the Funko Pop style — oversized head, large simple eyes, small body — standing in its window display box. Keep the subject's hairstyle, outfit and defining features recognizable in the simplified vinyl form. Clean studio lighting, bold solid colors, cute and collectible."
+  },
+  {
+    "code": "/lego",
+    "category": "Viral",
+    "description": "LEGO minifigure version of you in a brick-built scene.",
+    "prompt": "Edit this photo: turn the subject into a LEGO minifigure version of themselves — yellow head, simplified printed smile, molded hands and movable limbs — dressed in their outfit from the photo and placed in a small brick-built scene. Keep the hairstyle, glasses and outfit details recognizable in LEGO form. Clean bright lighting, sharp plastic-brick detail, playful product-shot look."
+  },
+  {
+    "code": "/yearbook",
+    "category": "Styles & Eras",
+    "description": "Classic 1990s American high school yearbook portrait.",
+    "prompt": "Edit this photo into a classic 1990s American high school yearbook portrait: chest-up pose, soft feathered 90s hair and a simple sweater, against the iconic mottled blue-gray studio backdrop with a soft vignette at the edges. Keep the subject's face, eyes and smile exactly the same. Light film grain and the soft, slightly warm lighting of real 90s school photography, like an authentic scanned yearbook page."
+  },
+  {
+    "code": "/ghibli",
+    "category": "Art Styles",
+    "description": "Hand-painted Ghibli-style animation still.",
+    "prompt": "Edit this photo into a hand-painted Japanese animation illustration in the Studio Ghibli style: soft watercolor textures, lush painterly background, warm golden-hour light, expressive gentle eyes. Keep the subject's facial features, hair color, clothing and pose recognizable. Dreamy, nostalgic, peaceful — a still from a beloved animated film."
+  },
+  {
+    "code": "/simpsons",
+    "category": "Art Styles",
+    "description": "Yellow-skinned cartoon character, TV animation look.",
+    "prompt": "Edit this photo into a Simpsons-style cartoon character: yellow skin, large white eyes, overbite smile, flat cel-shaded TV animation look. Keep the subject's hairstyle, glasses, outfit and pose accurate to the photo, translated into the show's simple bold shapes. Bright, funny, instantly recognizable cartoon portrait."
+  },
+  {
+    "code": "/gta",
+    "category": "Art Styles",
+    "description": "GTA-style video game loading screen illustration.",
+    "prompt": "Edit this photo into a GTA-style video game loading screen illustration: bold cel-shaded comic art, thick outlines, saturated colors, dramatic urban backdrop with palm trees and city glow. Keep the subject's face, hairstyle and outfit recognizable in the game's illustrated style. Confident posed composition, like official game key art."
+  },
+  {
+    "code": "/pixar",
+    "category": "Art Styles",
+    "description": "Pixar-style 3D animated character portrait.",
+    "prompt": "Edit this photo into a Pixar-style 3D animated character: big expressive eyes, soft rounded features, smooth subsurface skin shading, warm cinematic lighting. Keep the subject's face shape, hairstyle and outfit recognizable in the animated form. Joyful, polished, big-studio animation quality."
+  },
+  {
+    "code": "/muppet",
+    "category": "Art Styles",
+    "description": "Felt puppet character, classic Muppet charm.",
+    "prompt": "Edit this photo into a felt puppet character in the classic Muppet style: soft felt and fur textures, large expressive eyes, wide articulated mouth, stitched seams. Keep the subject's hairstyle, glasses, outfit and expression recognizable in puppet form. Whimsical, warm, handmade charm."
+  },
+  {
+    "code": "/voxel",
+    "category": "Art Styles",
+    "description": "Blocky voxel-game world, Minecraft style.",
+    "prompt": "Edit this photo into a blocky voxel-game world in the Minecraft style: the subject and environment rebuilt from cubes with pixel-art textures, blocky trees and terrain, soft cubic shadows. Keep the subject's pose, outfit colors and overall composition recognizable in block form. Playful, crisp, game-screenshot look."
+  },
+  {
+    "code": "/plushie",
+    "category": "Art Styles",
+    "description": "Soft cute plush toy version of you.",
+    "prompt": "Edit this photo: turn the subject into a soft, cute plush toy — stitched fabric, button or embroidered eyes, fluffy stuffing, sitting upright like a store-bought stuffed animal. Keep the subject's colors, hairstyle and outfit recognizable in plush form. Cozy, huggable, adorable product-photo look."
+  },
+  {
+    "code": "/statue",
+    "category": "Art Styles",
+    "description": "Monumental classical marble statue.",
+    "prompt": "Edit this photo: turn the subject into a monumental classical marble statue — fine-grained white marble with subtle gray veins, carved hair ridges, draped clothing, standing on a stone plinth in a grand hall. Keep the subject's face, pose and proportions recognizable in sculpted form. Timeless, dignified, museum-quality sculpture."
+  },
+  {
+    "code": "/headshot",
+    "category": "Formats",
+    "description": "Professional corporate headshot, LinkedIn-ready.",
+    "prompt": "Edit this photo into a professional corporate headshot: chest-up, tailored blazer over a crisp shirt, clean neutral gray studio backdrop, soft key light with gentle fill and a subtle rim light. Keep the subject's face, bone structure, skin texture and hairline exactly the same — no beautifying or smoothing. Confident slight smile, eyes sharp, LinkedIn-ready studio quality."
+  },
+  {
+    "code": "/passport",
+    "category": "Formats",
+    "description": "Clean official ID / passport-style portrait.",
+    "prompt": "Edit this photo into a clean official ID/passport-style portrait: straight-on, head and shoulders centered, plain white background, even flat lighting with no shadows, neutral expression. Keep the subject's face exactly the same, natural skin texture, no retouching. Sharp, formal, document-photo standard."
+  },
+  {
+    "code": "/tradingcard",
+    "category": "Formats",
+    "description": "Collectible trading card with stats and shine.",
+    "prompt": "Edit this photo into a collectible trading card: the subject as dynamic illustrated card art in the center, framed by a bold card border with a name banner at the top, stat numbers and a small ability text box at the bottom. Keep the subject's face, pose and outfit recognizable in the card artwork. Glossy holographic shine, crisp print quality, ready to share."
+  },
+  {
+    "code": "/movieposter",
+    "category": "Formats",
+    "description": "Dramatic cinematic movie poster key art.",
+    "prompt": "Edit this photo into a dramatic cinematic movie poster: the subject in a heroic pose, large in frame, against an epic backdrop with volumetric smoke, rim lighting and glowing accents, with empty space at the top and bottom for title text. Keep the subject's face and identity exactly the same. Bold, theatrical, blockbuster key-art quality."
+  },
+  {
+    "code": "/paparazzi",
+    "category": "Formats",
+    "description": "Candid celebrity paparazzi shot, night flash.",
+    "prompt": "Edit this photo into a candid celebrity paparazzi shot: harsh on-camera flash at night, slightly grainy, caught mid-stride on a city street with blurred bystanders and car lights behind. Keep the subject's face, outfit and identity exactly the same. Raw, unposed, tabloid-photo energy."
+  },
+  {
+    "code": "/royalportrait",
+    "category": "Styles & Eras",
+    "description": "Grand royal oil portrait in a palace hall.",
+    "prompt": "Edit this photo into a grand royal oil portrait: the subject in regal attire — velvet gown or tailored ceremonial suit, gold crown or jeweled accessories — posed in a palace hall with columns and draped curtains. Keep the subject's face and identity exactly the same, painted with rich classical brushwork and dramatic chiaroscuro light. Majestic, timeless, museum-piece grandeur."
+  },
+  {
+    "code": "/y2k",
+    "category": "Styles & Eras",
+    "description": "Early-2000s Y2K portrait, harsh flash.",
+    "prompt": "Edit this photo into an early-2000s Y2K portrait: glossy lips, frosted eyeshadow, thin brows, chunky highlights, low-rise denim or a metallic baby tee, shot with a harsh flash against a plain backdrop. Keep the subject's face and identity exactly the same. Slightly overexposed, early-digital-camera color, pure 2000s pop energy."
+  },
+  {
+    "code": "/pumpkinhead",
+    "category": "Viral",
+    "description": "Carved jack-o'-lantern head, glowing from inside.",
+    "prompt": "Edit this photo: replace the head of every person with a carved jack-o'-lantern — a real round orange pumpkin with triangle eyes, triangle nose and jagged grinning mouth, lit from inside by a candle so the carved face glows warm orange. Each pumpkin sits naturally on the neck at the same size, angle and position as the original head, with a short green stem on top. Keep the outfit, body and scene unchanged, with the warm candle glow spilling lightly onto collar and shoulders."
+  },
+  {
+    "code": "/ghostface",
+    "category": "Viral",
+    "description": "Grainy 90s horror-film still, masked figure behind.",
+    "prompt": "Edit this photo into a grainy still from a late-90s horror film: keep the subject's face, pose and outfit exactly the same, standing in a dark hallway or empty street at night lit by one flickering light — while a figure in a black hooded robe and white ghost mask watches from the dark background. Cold blue night tones, film grain, soft focus, genuinely creepy but clearly the same person."
+  },
+  {
+    "code": "/ghostsheet",
+    "category": "Viral",
+    "description": "Classic sheet-ghost photoshoot with sunglasses.",
+    "prompt": "Edit this photo into the classic sheet-ghost photoshoot: drape the subject head-to-toe in a plain white bedsheet with two eye holes, round black sunglasses worn on top of the sheet, their own jeans and shoes visible below. Keep the subject's body, outfit below the sheet and pose the same, standing in a fall setting with pumpkins and autumn leaves. Playful, cozy, spooky-season charm."
+  },
+  {
+    "code": "/christmas",
+    "category": "Viral",
+    "description": "Warm festive Christmas portrait, fairy lights.",
+    "prompt": "Edit this photo into a warm festive Christmas portrait: cozy knit sweater, Santa hat, wrapped in soft fairy lights, with a decorated tree, falling snow outside the window and warm golden indoor light. Keep the subject's face, pose and identity exactly the same. Cheerful, glowing, holiday-card ready."
+  },
+  {
+    "code": "/youngerself",
+    "category": "Viral",
+    "description": "Split-time portrait meeting your younger self.",
+    "prompt": "Edit this photo into a split-time portrait of the same person meeting their younger self: the frame divided vertically, the left half a black-and-white childhood photo of the same person (same facial features, natural smile, grainy film texture), the right half the present-day adult from this photo in color, both looking at each other with warm smiles. Keep both faces clearly the same person, with soft cinematic lighting and a small birthday cake with lit candles at the center line. Emotional, nostalgic, ultra-realistic."
   }
 ]
