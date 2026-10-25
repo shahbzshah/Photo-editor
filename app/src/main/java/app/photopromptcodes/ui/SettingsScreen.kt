@@ -27,8 +27,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -48,8 +46,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.photopromptcodes.PpcApplication
-import app.photopromptcodes.automation.Engine
-import app.photopromptcodes.data.EnginePrefs
 import app.photopromptcodes.data.HistoryRepository
 import app.photopromptcodes.update.UpdateChecker
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -67,14 +63,12 @@ import kotlinx.coroutines.withContext
 @Composable
 fun SettingsScreen(
     onSignIn: () -> Unit,
-    onQwenSignIn: () -> Unit,
     onPrivacy: () -> Unit,
     onAbout: () -> Unit
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
     var chatgptIn by remember { mutableStateOf(isLoggedInFlag(ctx)) }
-    var qwenIn by remember { mutableStateOf(isQwenLoggedIn(ctx)) }
     var showClearConfirm by remember { mutableStateOf(false) }
     var showSignOutConfirm by remember { mutableStateOf(false) }
 
@@ -94,9 +88,9 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // --- AI Engine selector (with per-engine sign-in) ---
+            // --- ChatGPT account ---
             Text(
-                "AI ENGINE",
+                "CHATGPT ACCOUNT",
                 style = MaterialTheme.typography.labelSmall,
                 color = PaperDim
             )
@@ -107,106 +101,50 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    var selectedEngine by remember {
-                        mutableStateOf(EnginePrefs.get(ctx))
-                    }
-                    // Refresh sign-in states when returning from login screens
+                    // Refresh sign-in state when returning from the login screen
                     androidx.compose.runtime.LaunchedEffect(Unit) {
                         chatgptIn = isLoggedInFlag(ctx)
-                        qwenIn = isQwenLoggedIn(ctx)
                     }
-                    Text(
-                        "Choose which AI edits your photos. Sign in for higher limits.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = PaperDim
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    Engine.values().forEach { engine ->
-                        val isSignedIn = if (engine == Engine.CHATGPT) chatgptIn else qwenIn
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    selectedEngine = engine
-                                    EnginePrefs.set(ctx, engine)
-                                }
-                                .padding(vertical = 8.dp)
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(
-                                    selected = selectedEngine == engine,
-                                    onClick = {
-                                        selectedEngine = engine
-                                        EnginePrefs.set(ctx, engine)
-                                    },
-                                    colors = RadioButtonDefaults.colors(
-                                        selectedColor = Amber,
-                                        unselectedColor = PaperDim
-                                    )
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(
-                                            engine.displayName,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-                                        Spacer(Modifier.width(8.dp))
-                                        Text(
-                                            if (isSignedIn) "●" else "○",
-                                            color = if (isSignedIn) Amber else PaperDim,
-                                            style = MaterialTheme.typography.labelMedium
-                                        )
-                                    }
-                                    Text(
-                                        if (engine == Engine.CHATGPT)
-                                            if (isSignedIn) "Signed in. Best quality."
-                                            else "Sign in required. Best quality."
-                                        else
-                                            if (isSignedIn) "Signed in. Higher daily limit."
-                                            else "Works as guest. Sign in for higher daily limit.",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = PaperDim
-                                    )
-                                }
-                            }
-                            Spacer(Modifier.height(8.dp))
-                            if (isSignedIn) {
-                                OutlinedButton(
-                                    onClick = {
-                                        if (engine == Engine.CHATGPT) {
-                                            showSignOutConfirm = true
-                                        } else {
-                                            setQwenLoggedIn(ctx, false)
-                                            qwenIn = false
-                                        }
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text("Sign out of ${engine.displayName}")
-                                }
-                            } else {
-                                Button(
-                                    onClick = {
-                                        if (engine == Engine.CHATGPT) onSignIn()
-                                        else onQwenSignIn()
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Amber,
-                                        contentColor = NearBlack
-                                    ),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(
-                                        "Sign in to ${engine.displayName}",
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                }
-                            }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "ChatGPT",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                if (chatgptIn) "Signed in. Best quality."
+                                else "Sign in required. Best quality.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = PaperDim
+                            )
                         }
-                        if (engine != Engine.values().last()) {
-                            Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            if (chatgptIn) "●" else "○",
+                            color = if (chatgptIn) Amber else PaperDim,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    if (chatgptIn) {
+                        OutlinedButton(
+                            onClick = { showSignOutConfirm = true },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Sign out of ChatGPT")
+                        }
+                    } else {
+                        Button(
+                            onClick = onSignIn,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Amber,
+                                contentColor = NearBlack
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Sign in to ChatGPT", fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }

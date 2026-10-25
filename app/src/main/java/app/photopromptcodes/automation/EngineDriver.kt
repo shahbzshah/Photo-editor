@@ -4,9 +4,9 @@ import android.net.Uri
 import android.webkit.WebView
 
 /**
- * Common interface for AI image-engine drivers (ChatGPT, Qwen, ...).
+ * Common interface for the AI image-engine driver (ChatGPT).
  *
- * Each engine drives its website inside a WebView: attach photo, send prompt,
+ * The driver drives its website inside a WebView: attach photo, send prompt,
  * harvest the result image. Events are delivered via [DriverEvent].
  */
 interface EngineDriver {
@@ -18,13 +18,3 @@ interface EngineDriver {
     fun notifyLoginCompleted()
 }
 
-/** Which AI engine to use for edits. Persisted in SharedPreferences. */
-enum class Engine(val id: String, val displayName: String) {
-    CHATGPT("chatgpt", "ChatGPT"),
-    QWEN("qwen", "Qwen");
-
-    companion object {
-        fun fromId(id: String?): Engine =
-            values().firstOrNull { it.id == id } ?: CHATGPT
-    }
-}

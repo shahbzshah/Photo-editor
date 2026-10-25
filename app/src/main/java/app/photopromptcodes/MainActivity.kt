@@ -38,7 +38,6 @@ import app.photopromptcodes.ui.FavoritesScreen
 import app.photopromptcodes.ui.GalleryScreen
 import app.photopromptcodes.ui.HistoryScreen
 import app.photopromptcodes.ui.LoginScreen
-import app.photopromptcodes.ui.QwenLoginScreen
 import app.photopromptcodes.ui.OnboardingScreen
 import app.photopromptcodes.ui.PrivacyPolicyScreen
 import app.photopromptcodes.ui.ResultDetailScreen
@@ -177,7 +176,6 @@ fun AppNav() {
         composable("settings") {
             SettingsScreen(
                 onSignIn = { nav.navigate("signin") },
-                onQwenSignIn = { nav.navigate("qwen_signin") },
                 onPrivacy = { nav.navigate("privacy") },
                 onAbout = { nav.navigate("about") }
             )
@@ -187,11 +185,6 @@ fun AppNav() {
         }
         composable("signin") {
             LoginScreen(
-                onDone = { nav.popBackStack() }
-            )
-        }
-        composable("qwen_signin") {
-            QwenLoginScreen(
                 onDone = { nav.popBackStack() }
             )
         }
@@ -228,10 +221,7 @@ fun AppNav() {
                 onDone = { recordId ->
                     nav.navigate("result/$recordId") { popUpTo("gallery") }
                 },
-                onSignIn = {
-                    val engine = app.photopromptcodes.data.EnginePrefs.get(ctx)
-                    nav.navigate(if (engine == app.photopromptcodes.automation.Engine.QWEN) "qwen_signin" else "signin")
-                }
+                onSignIn = { nav.navigate("signin") }
             )
         }
         composable(
@@ -251,10 +241,7 @@ fun AppNav() {
                 onDone = { recordId ->
                     nav.navigate("result/$recordId") { popUpTo("gallery") }
                 },
-                onSignIn = {
-                    val engine = app.photopromptcodes.data.EnginePrefs.get(ctx)
-                    nav.navigate(if (engine == app.photopromptcodes.automation.Engine.QWEN) "qwen_signin" else "signin")
-                }
+                onSignIn = { nav.navigate("signin") }
             )
         }
         composable(

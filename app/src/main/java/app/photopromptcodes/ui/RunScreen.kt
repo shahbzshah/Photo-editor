@@ -54,10 +54,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.photopromptcodes.automation.ChatGptDriver
-import app.photopromptcodes.automation.Engine
 import app.photopromptcodes.automation.EngineDriver
-import app.photopromptcodes.automation.QwenDriver
-import app.photopromptcodes.data.EnginePrefs
 import app.photopromptcodes.automation.DriverEvent
 import app.photopromptcodes.automation.RunStep
 import app.photopromptcodes.data.CodeRepository
@@ -96,8 +93,7 @@ class RunViewModel(app: Application) : AndroidViewModel(app) {
 
     fun attachWebView(wv: WebView) {
         if (driver != null) return
-        val engine = EnginePrefs.get(getApplication())
-        driver = (if (engine == Engine.QWEN) QwenDriver() else ChatGptDriver()).also {
+        driver = ChatGptDriver().also {
             it.setListener(::onEvent)
             it.attach(wv)
         }
@@ -311,16 +307,13 @@ fun RunScreen(
                             }
                         }
                     } else if (ui.loginRequired) {
-                        val ctx = LocalContext.current
-                        val engine = remember { EnginePrefs.get(ctx) }
                         Text(
                             "Sign in required",
                             style = MaterialTheme.typography.titleMedium
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "${engine.displayName} isn't signed in. Sign in to continue, " +
-                                "or switch engines in Settings.",
+                            "ChatGPT isn't signed in. Sign in to continue.",
                             style = MaterialTheme.typography.bodySmall
                         )
                         Spacer(Modifier.height(12.dp))
@@ -332,7 +325,7 @@ fun RunScreen(
                             ),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Sign in to ${engine.displayName}", fontWeight = FontWeight.SemiBold)
+                            Text("Sign in to ChatGPT", fontWeight = FontWeight.SemiBold)
                         }
                         Spacer(Modifier.height(8.dp))
                         OutlinedButton(
