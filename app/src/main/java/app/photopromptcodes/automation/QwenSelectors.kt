@@ -52,6 +52,7 @@ object QwenSelectors {
     /** The prompt textarea. */
     val composer: List<String> = listOf(
         "textarea.message-input-textarea",
+        "textarea[placeholder=\"How can I help you today?\"]",
         "textarea[placeholder=\"Ask Qwen\"]",
         "textarea.message-input-textarea-separation"
     )
@@ -75,10 +76,13 @@ object QwenSelectors {
         "[aria-label*=\"download\" i]"
     )
 
-    /** Loading/generating indicator. */
+    /** Loading/generating indicator. NOTE: deliberately narrow — a broad
+     *  [class*="loading"] match used to stay true forever (lazy-load and
+     *  skeleton elements carry "loading" classes permanently), which made
+     *  the driver wait the full 12 minutes even after the image was ready.
+     *  The Stop button exists only while a generation is actually running. */
     val generating: List<String> = listOf(
         "button[aria-label=\"Stop\"]",
-        "[class*=\"shimmer\"]",
-        "[class*=\"loading\"]"
+        ".message-item-assistant [class*=\"shimmer\"]"
     )
 }

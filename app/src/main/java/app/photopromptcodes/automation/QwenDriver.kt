@@ -491,6 +491,11 @@ class QwenDriver : EngineDriver {
         val deadline = System.currentTimeMillis() + GENERATION_TIMEOUT_MS
         var lastCount = 0
         var nullStreak = 0
+        // Stall-breaker: if the result set is unchanged for 2 polls while a
+        // (possibly stale) spinner still claims "generating", the image is
+        // done — harvest it instead of waiting out the full 12 minutes.
+        var lastCandidates: List<String> = emptyList()
+        var stablePolls = 0
         while (System.currentTimeMillis() < deadline) {
             // Ask the page for all candidate result image URLs
             val json = evalJs(wv, """(function(){
@@ -529,13 +534,22 @@ class QwenDriver : EngineDriver {
                 Log.d(TAG, "found ${candidates.size} candidate images")
                 lastCount = candidates.size
             }
+            // Track whether the result set has gone stable: the spinner
+            // selectors can go stale and claim "generating" forever, so a
+            // stable, non-empty result set is itself proof generation ended.
+            if (candidates.isNotEmpty() && candidates == lastCandidates) {
+                stablePolls++
+            } else {
+                stablePolls = 0
+            }
+            lastCandidates = candidates
             // Wait until generation finishes (no spinner) and we have an image
             val generating = evalJs(wv, """(function(){
               var sels=[${QwenSelectors.generating.joinToString(",") { JSONObject.quote(it) }}];
               for(var i=0;i<sels.length;i++){ if(document.querySelector(sels[i])) return true; }
               return false;
             })()""") == "true"
-            if (!generating && candidates.isNotEmpty()) {
+            if (candidates.isNotEmpty() && (!generating || stablePolls >= 2)) {
                 val url = candidates.last()
                 Log.d(TAG, "harvesting $url")
                 // Download the image directly (alicdn CDN needs no auth)

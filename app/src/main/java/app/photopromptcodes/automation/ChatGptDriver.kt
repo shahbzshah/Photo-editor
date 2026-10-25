@@ -547,7 +547,8 @@ class ChatGptDriver : EngineDriver {
             .then(function(b){return new Promise(function(res,rej){
               var fr=new FileReader();fr.onload=function(){res(fr.result);};fr.onerror=rej;fr.readAsDataURL(b);});})
             .then(function(d){PpcBridge.onImage(d);})
-            .catch(function(e){PpcBridge.onLog('poll fetch failed: '+e);});
+            .catch(function(e){PpcBridge.onLog('poll fetch failed: '+e);
+              var ix=window.__ppcSeen.indexOf(bsrc); if(ix>-1) window.__ppcSeen.splice(ix,1);});
           return 'fetching';
         })()"""
     }
@@ -673,7 +674,8 @@ class ChatGptDriver : EngineDriver {
                   fr.readAsDataURL(b);
               });})
               .then(function(d){ PpcBridge.onImage(d); })
-              .catch(function(e){ PpcBridge.onLog('image fetch failed: '+e); });
+              .catch(function(e){ PpcBridge.onLog('image fetch failed: '+e);
+                var ix=window.__ppcSeen.indexOf(best.src); if(ix>-1) window.__ppcSeen.splice(ix,1); });
             return true;
           }
           var obs=new MutationObserver(function(){ tryHarvest(); });
