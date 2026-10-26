@@ -63,6 +63,8 @@ class ChatGptDriver : EngineDriver {
         private const val TAG = "ChatGptDriver"
         private const val CHATGPT_URL = "https://chatgpt.com/"
         private const val PAGE_TIMEOUT_MS = 60_000L
+        // Opening ChatGPT's heavy page on a slow connection can take a while.
+        private const val OPEN_TIMEOUT_MS = 180_000L
         private const val ATTACH_TIMEOUT_MS = 30_000L
         private const val GENERATION_TIMEOUT_MS = 12 * 60_000L
         private const val LOGIN_TIMEOUT_MS = 15 * 60_000L
@@ -306,19 +308,56 @@ class ChatGptDriver : EngineDriver {
 
     // ------------------------------------------------------------------ flow
 
+    /**
+     * Detects Cloudflare / human-verification interstitial pages. These show
+     * neither the composer nor login buttons, so without this check the open
+     * phase just burns its whole timeout looking "stuck".
+     */
+    private suspend fun isChallengePage(): Boolean {
+        val js = """(function(){
+          var t=(document.body?document.body.innerText:'').toLowerCase();
+          var h=['verify you are human','attention required','checking your browser','verify your identity'];
+          for(var i=0;i<h.length;i++){ if(t.indexOf(h[i])>-1) return true; }
+          return !!document.querySelector('iframe[src*="challenges.cloudflare.com"], [id*="cf-challenge"], [class*="cf-challenge"]');
+        })()"""
+        return unquote(evalJs(js)) == "true"
+    }
+
+    /**
+     * Waits for ChatGPT's open phase to resolve. Returns "in", "out",
+     * "challenge" (human-verification interstitial — the user can complete it
+     * in the visible browser), or "timeout".
+     */
+    private suspend fun waitForOpen(timeoutMs: Long): String {
+        val deadline = android.os.SystemClock.uptimeMillis() + timeoutMs
+        while (android.os.SystemClock.uptimeMillis() < deadline) {
+            try {
+                if (isChallengePage()) return "challenge"
+                val state = loginState()
+                if (state == "in" || state == "out") return state
+            } catch (_: Exception) {
+                // Page mid-navigation — keep polling.
+            }
+            delay(1000)
+        }
+        return "timeout"
+    }
+
     private suspend fun runEdit(photo: Uri, prompt: String) {
         val wv = webView ?: throw DriverException("Browser not ready. Please retry.")
         currentPhoto = photo
 
         emit(DriverEvent.Step(RunStep.OPENING_ENGINE))
         withContext(Dispatchers.Main) { wv.loadUrl(CHATGPT_URL) }
-        val settled = waitFor(PAGE_TIMEOUT_MS) {
-            val state = loginState()
-            state == "in" || state == "out"
+        when (waitForOpen(OPEN_TIMEOUT_MS)) {
+            "challenge" -> throw DriverException(
+                "ChatGPT is showing a human-verification check. Tap the checkbox in the browser above, " +
+                "wait for ChatGPT to finish loading, then retry the edit."
+            )
+            "timeout" -> throw DriverException(
+                "ChatGPT didn't finish loading after 3 minutes. Check your connection and retry."
+            )
         }
-        if (!settled) throw DriverException(
-            "ChatGPT didn't finish loading. Check your connection and retry."
-        )
 
         emit(DriverEvent.Step(RunStep.CHECKING_LOGIN))
         if (loginState() == "out") {
@@ -360,13 +399,26 @@ class ChatGptDriver : EngineDriver {
     }
 
     private suspend fun loginState(): String {
+        // ChatGPT now shows a working-looking composer even when logged out,
+        // and its "Log in" controls are buttons (not links), so neither the
+        // old composer check nor the old link selectors can be trusted alone.
+        // Rule: composer counts as signed-in ONLY when no login affordance
+        // is present; a login button/text always wins (a false "out" just
+        // asks the user to confirm sign-in, while a false "in" sends their
+        // photo into a login wall and hangs the run).
         val js = """(function(){
           var loginSels=[${Selectors.loginIndicators.joinToString(",") { JSONObject.quote(it) }}];
           var composerSels=[${Selectors.composer.joinToString(",") { JSONObject.quote(it) }}];
           function any(sels){ for(var i=0;i<sels.length;i++){ if(document.querySelector(sels[i])) return true; } return false; }
           var bodyText=(document.body?document.body.innerText:'').slice(0,3000);
-          if(any(composerSels)) return 'in';
-          if(any(loginSels) || /log\s*in/i.test(bodyText)) return 'out';
+          var loginBtn=false;
+          try{
+            var btns=document.querySelectorAll('button');
+            for(var b=0;b<btns.length;b++){ if(/^\s*log\s*in\s*$/i.test(btns[b].textContent||'')){ loginBtn=true; break; } }
+          }catch(e){}
+          var loggedOut = any(loginSels) || loginBtn || /log\s*in/i.test(bodyText);
+          if(any(composerSels) && !loggedOut) return 'in';
+          if(loggedOut) return 'out';
           return 'unknown';
         })()"""
         return unquote(evalJs(js)) ?: "unknown"
