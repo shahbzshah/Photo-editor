@@ -55,55 +55,55 @@
   },
   {
     "code": "/goldenhour",
-    "category": "Lighting & Color",
+    "category": "Lighting",
     "description": "Bathe the photo in warm, low golden-hour sunlight.",
     "prompt": "Edit this photo to look as if it was taken during golden hour: bathe the scene in warm, low amber sunlight from a low angle. Add a soft golden glow on skin and surfaces, long gentle shadows, warm highlights with slightly lifted shadows, and a sun-kissed color grade — honey tones in the highlights, gentle warmth in the midtones. Keep the subject's identity, pose, clothing and the scene composition exactly the same; only relight and recolor. Photorealistic, no lens flare artifacts on faces."
   },
   {
     "code": "/bluehour",
-    "category": "Lighting & Color",
+    "category": "Lighting",
     "description": "Recolor into the deep blue tones of twilight.",
     "prompt": "Edit this photo to look as if it was taken during blue hour, just after sunset: wash the scene in deep, cool cobalt and indigo tones. Skies go rich blue, shadows deepen to cool navy, and any artificial lights in the scene glow warm amber by contrast. Keep the subject's identity, pose and composition unchanged; only shift the light and color mood. Moody, cinematic, photorealistic twilight grade."
   },
   {
     "code": "/cinematiccolor",
-    "category": "Lighting & Color",
+    "category": "Lighting",
     "description": "Teal-and-orange blockbuster film color grade.",
     "prompt": "Edit this photo with a cinematic blockbuster color grade: push shadows toward deep teal and highlights toward warm amber-orange, add gentle contrast with rich blacks, and give skin tones a healthy warm glow that pops against the cooler background. Keep the subject's identity, pose and composition exactly the same. The result should look like a still from a big-budget film — polished, dramatic, photorealistic."
   },
   {
     "code": "/vintagecolor",
-    "category": "Lighting & Color",
+    "category": "Lighting",
     "description": "Faded, warm analog film color grade.",
     "prompt": "Edit this photo with a vintage analog film grade: fade the blacks slightly, warm up the midtones, add a subtle yellow-green cast reminiscent of aged 1970s film stock, soften contrast and micro-detail just a touch. Keep the subject's identity, pose and composition unchanged. It should feel like a well-preserved photograph from decades ago — nostalgic, warm, photorealistic with authentic film character, no heavy filters or borders."
   },
   {
     "code": "/pastelcolor",
-    "category": "Lighting & Color",
+    "category": "Lighting",
     "description": "Soft, dreamy pastel color palette.",
     "prompt": "Edit this photo into a soft pastel grade: lift the shadows, desaturate strong colors into powdery pastels — blush pink, mint, baby blue, lavender — while keeping skin tones natural and flattering. Bright, airy, dreamy mood with gentle contrast. Keep the subject's identity, pose and composition exactly the same; only the color palette shifts. Clean, modern, photorealistic pastel aesthetic."
   },
   {
     "code": "/warmcolor",
-    "category": "Lighting & Color",
+    "category": "Lighting",
     "description": "Overall warm, cozy color temperature shift.",
     "prompt": "Edit this photo with an overall warm color grade: shift the white balance warmer across the whole image — golden highlights, amber midtones, cozy brown-tinged shadows. The scene should feel like late afternoon sun even where the light is neutral. Keep the subject's identity, pose and composition unchanged, and keep skin tones natural rather than orange. Warm, inviting, photorealistic."
   },
   {
     "code": "/coolcolor",
-    "category": "Lighting & Color",
+    "category": "Lighting",
     "description": "Overall cool, crisp color temperature shift.",
     "prompt": "Edit this photo with an overall cool color grade: shift the white balance cooler — icy blue-tinted highlights, steel-gray midtones, deep blue-green shadows. The scene should feel crisp and fresh, like an overcast morning or a modern minimalist interior. Keep the subject's identity, pose and composition unchanged, and keep skin tones believable rather than blue. Clean, cool, photorealistic."
   },
   {
     "code": "/moodycolor",
-    "category": "Lighting & Color",
+    "category": "Lighting",
     "description": "Dark, desaturated, dramatic moody grade.",
     "prompt": "Edit this photo with a dark, moody grade: crush the blacks gently, desaturate colors by about half, deepen shadows with a cold undertone, and let only the key light on the subject stay luminous. The mood should feel dramatic and introspective, like a prestige TV drama still. Keep the subject's identity, pose and composition unchanged. Photorealistic, no crushed detail on the subject's face."
   },
   {
     "code": "/vibrantcolor",
-    "category": "Lighting & Color",
+    "category": "Lighting",
     "description": "Punchy, saturated, high-energy color pop.",
     "prompt": "Edit this photo with a vibrant, punchy grade: boost saturation and color separation so every hue pops — lush greens, electric blues, vivid warm tones — while protecting skin tones from looking artificial. Add crisp micro-contrast and clean, bright exposure. Keep the subject's identity, pose and composition unchanged. High-energy, ultra-clean commercial photography look, photorealistic."
   },
@@ -271,97 +271,97 @@
   },
   {
     "code": "/topangle",
-    "category": "Angles",
+    "category": "Angles & Perspective",
     "description": "High top-down angle looking over the scene.",
     "prompt": "Edit this photo to a high top-down angle: reframe as if the camera looks down at the scene from above at roughly 45 degrees, revealing the layout — the subject from above, the ground plane spreading out, objects arranged in the frame. Keep the subject's identity, clothing and the scene's content unchanged, only the viewpoint shifts. Clean, revealing, photorealistic high-angle photography."
   },
   {
     "code": "/lowangle",
-    "category": "Angles",
+    "category": "Angles & Perspective",
     "description": "Low angle looking up: powerful, heroic, monumental.",
     "prompt": "Edit this photo to a low camera angle: reframe as if shot from near the ground looking up at the subject, making them appear powerful, heroic and monumental against the sky or ceiling. Elongate the subject's presence with the slight perspective exaggeration of a true low angle. Keep the subject's identity, clothing and expression unchanged. Dramatic, empowering, photorealistic."
   },
   {
     "code": "/wideangle",
-    "category": "Angles",
+    "category": "Angles & Perspective",
     "description": "Expansive wide-angle view packed with environment.",
     "prompt": "Edit this photo into an expansive wide-angle view: pull back to reveal much more of the environment around the subject — the full scene, the architecture, the landscape — with the subject placed deliberately within it. Keep the subject's identity and the scene's content unchanged. Grand, contextual, immersive wide photography, photorealistic."
   },
   {
     "code": "/overhead",
-    "category": "Angles",
+    "category": "Angles & Perspective",
     "description": "Directly overhead flat-lay style composition.",
     "prompt": "Edit this photo into a directly overhead composition: camera pointing straight down, the scene arranged like a flat-lay — subject and objects seen from directly above in a clean, graphic arrangement. Keep the subject's identity and the scene's content recognizable, translated faithfully to the top-down view. Striking, orderly, photorealistic overhead photography."
   },
   {
     "code": "/birdsview",
-    "category": "Angles",
+    "category": "Angles & Perspective",
     "description": "Bird's-eye view from high above the world.",
     "prompt": "Edit this photo into a bird's-eye view: reframe as if captured from high above — a drone's perspective — the subject small within a sweeping view of the terrain, streets or interior below, with rich topographical detail. Keep the subject and scene content recognizable from above. Majestic, map-like, photorealistic aerial photography."
   },
   {
     "code": "/wormsview",
-    "category": "Angles",
+    "category": "Angles & Perspective",
     "description": "Worm's-eye view from ground level looking straight up.",
     "prompt": "Edit this photo into a worm's-eye view: camera at ground level pointing straight up — towering subject, soaring architecture or trees converging overhead, sky dominating the frame. Extreme low-angle drama with strong vertical energy. Keep the subject's identity and the scene's content unchanged. Dizzying, monumental, photorealistic."
   },
   {
     "code": "/closeup",
-    "category": "Angles",
+    "category": "Angles & Perspective",
     "description": "Intimate close-up on the subject's face or key detail.",
     "prompt": "Edit this photo into an intimate close-up: move in tight on the subject's face (or the photo's most important detail), filling the frame with expressive features — eyes sharp, skin texture real, every nuance visible. Keep the subject's identity and expression exactly unchanged. Background falls away into soft blur. Raw, personal, photorealistic close-up photography."
   },
   {
     "code": "/threequarter",
-    "category": "Angles",
+    "category": "Angles & Perspective",
     "description": "Flattering three-quarter turn portrait angle.",
     "prompt": "Edit this photo to a three-quarter portrait angle: turn the subject slightly so we see them at roughly 45 degrees — the most flattering classic portrait angle — with dimensional modeling of the face, gentle shadow shaping the features. Keep the subject's identity and expression unchanged. Timeless, refined portraiture, photorealistic."
   },
   {
     "code": "/dutchangle",
-    "category": "Angles",
+    "category": "Angles & Perspective",
     "description": "Tilted Dutch angle for unease and edgy energy.",
     "prompt": "Edit this photo with a Dutch angle: tilt the horizon and the whole frame diagonally for a sense of unease, tension and edgy energy — the world feels off-kilter while the subject stays sharp and compelling within it. Keep the subject's identity and the scene's content unchanged. Stylized, psychological, cinematic tilt, photorealistic."
   },
   {
     "code": "/forcedperspective",
-    "category": "Perspective",
+    "category": "Angles & Perspective",
     "description": "Playful forced-perspective optical illusion.",
     "prompt": "Edit this photo into a playful forced-perspective illusion: rearrange the apparent scale and positions so the subject appears to interact impossibly with distant objects — holding up a building, pinching the sun, standing on a friend's hand. Keep the subject's identity and the scene's content unchanged; only the alignment creates the trick. Clever, fun, seamlessly photorealistic so the illusion reads instantly."
   },
   {
     "code": "/microworld",
-    "category": "Perspective",
+    "category": "Angles & Perspective",
     "description": "Tiny-planet effect: the world curves into a little globe.",
     "prompt": "Edit this photo into a tiny-planet microworld: warp the scene's horizon into a perfect circle so the entire world curves into a small floating globe, with the subject standing on its surface and the sky wrapping around outside it. Keep the subject's identity and the scene's content recognizable within the warp. Whimsical, mind-bending, photorealistic tiny-planet photography."
   },
   {
     "code": "/reflectionhack",
-    "category": "Perspective",
+    "category": "Angles & Perspective",
     "description": "Fake a stunning reflection with a phone-under-lens trick look.",
     "prompt": "Edit this photo to look like the classic phone-under-the-lens reflection hack: add a flawless mirror reflection of the scene along the bottom of the frame, as if the photo was taken with a phone screen held under the lens — crisp symmetrical doubling with realistic water-like or glass-like reflection behavior. Keep the subject and scene unchanged above the reflection line. Sleek, viral, photorealistic."
   },
   {
     "code": "/throughobject",
-    "category": "Perspective",
+    "category": "Angles & Perspective",
     "description": "Shoot through glass, leaves or fabric for textured framing.",
     "prompt": "Edit this photo as if shot through an object: place a textured foreground layer — rain-streaked glass, out-of-focus leaves, sheer fabric, a fence — between the viewer and the sharp subject, with the texture softly blurring at the frame's edges. Keep the subject's identity and the scene unchanged behind the layer. Artistic, layered, voyeuristic depth, photorealistic."
   },
   {
     "code": "/foregroundframe",
-    "category": "Perspective",
+    "category": "Angles & Perspective",
     "description": "Use foreground shapes as a natural frame for the subject.",
     "prompt": "Edit this photo so foreground shapes form a natural frame around the subject: branches, arches, hands, or architectural edges encircle the subject, drawing all attention inward. The frame elements sit close to the lens, softly blurred, while the subject stays tack-sharp. Keep the subject's identity and the scene unchanged. Elegant, deliberate, photorealistic natural framing."
   },
   {
     "code": "/groundreflection",
-    "category": "Perspective",
+    "category": "Angles & Perspective",
     "description": "Turn wet ground into a perfect mirror under the subject.",
     "prompt": "Edit this photo so the ground becomes a perfect mirror: render the floor, street or earth beneath the subject as wet, polished and reflective, carrying a crisp mirror image of the subject and the scene with realistic reflection physics — slight blur with distance, accurate angles. Keep the subject's identity and the upper scene unchanged. Sleek, dramatic, photorealistic wet-street aesthetic."
   },
   {
     "code": "/parallaxshot",
-    "category": "Perspective",
+    "category": "Angles & Perspective",
     "description": "Layered parallax depth, ready for a 3D Ken Burns drift.",
     "prompt": "Edit this photo with pronounced layered parallax depth: separate the scene into distinct depth planes — sharp foreground, midground subject, distant background — each cleanly delineated with natural atmospheric haze increasing with distance, as if prepared for a slow 3D Ken Burns camera drift. Keep the subject's identity and the scene unchanged. Deep, dimensional, photorealistic."
   },
@@ -469,91 +469,91 @@
   },
   {
     "code": "/hdreal",
-    "category": "Angles & Views",
+    "category": "Angles & Perspective",
     "description": "Crisp HD realism with clean, true-to-life detail.",
     "prompt": "Edit this photo for crisp HD realism: enhance clarity and micro-detail to clean high-definition standards — sharp textures, accurate colors, balanced exposure — while keeping the subject's identity, pose and the scene exactly the same. No stylization, no beauty-filter smoothing; just pristine, true-to-life photographic realism."
   },
   {
     "code": "/4k",
-    "category": "Angles & Views",
+    "category": "Angles & Perspective",
     "description": "Ultra-detailed 4K sharpness and clarity.",
     "prompt": "Edit this photo to 4K ultra-definition quality: maximize fine detail and sharpness — every texture, strand and surface rendered with pristine clarity — while keeping the subject's identity, pose and composition unchanged. Clean, premium, hyper-detailed photographic quality with no artifacts or over-sharpening halos."
   },
   {
     "code": "/8k",
-    "category": "Angles & Views",
+    "category": "Angles & Perspective",
     "description": "Maximum 8K hyper-detail, beyond human-eye sharpness.",
     "prompt": "Edit this photo to 8K hyper-definition: push detail to the absolute maximum — microscopic texture, flawless edges, immense clarity across the entire frame — while keeping the subject's identity, pose and composition unchanged. The pinnacle of digital sharpness, clean and artifact-free, photorealistic."
   },
   {
     "code": "/cinematic",
-    "category": "Angles & Views",
+    "category": "Angles & Perspective",
     "description": "Full cinematic film-still treatment.",
     "prompt": "Edit this photo into a cinematic film still: widescreen compositional polish, filmic contrast curve, rich color depth, subtle grain, and dramatic motivated lighting. Keep the subject's identity, pose and the scene unchanged. It should look like a paused frame from a beautifully shot movie — intentional, atmospheric, photorealistic."
   },
   {
     "code": "/ultrarealistic",
-    "category": "Angles & Views",
+    "category": "Angles & Perspective",
     "description": "Push realism to the extreme: flawless photographic truth.",
     "prompt": "Edit this photo toward ultra-realism: refine every element to flawless photographic truth — perfect exposure, natural color science, true textures, believable light behavior on every surface. Keep the subject's identity, pose and composition unchanged. The image should be indistinguishable from a masterfully captured real photograph."
   },
   {
     "code": "/droneview",
-    "category": "Angles & Views",
+    "category": "Angles & Perspective",
     "description": "Sweeping drone perspective from above.",
     "prompt": "Edit this photo into a sweeping drone perspective: reframe from above at a dynamic three-quarter aerial angle, revealing the scene's layout with the subject placed within a broader landscape or setting. Keep the subject's identity and the scene's content recognizable. Smooth, majestic, photorealistic drone photography with natural atmospheric depth."
   },
   {
     "code": "/topdown",
-    "category": "Angles & Views",
+    "category": "Angles & Perspective",
     "description": "Straight top-down view, graphic and clean.",
     "prompt": "Edit this photo into a straight top-down view: camera pointing directly downward, the scene laid out in a clean graphic composition. Keep the subject's identity and the scene's content recognizable from above. Bold, orderly, photorealistic overhead photography."
   },
   {
     "code": "/highangle",
-    "category": "Angles & Views",
+    "category": "Angles & Perspective",
     "description": "Elevated high angle looking down on the subject.",
     "prompt": "Edit this photo to an elevated high angle: camera raised above eye level looking down at the subject, who appears slightly smaller and more vulnerable within the visible surroundings. Keep the subject's identity, pose and the scene unchanged apart from the viewpoint. Classic, storytelling high-angle photography, photorealistic."
   },
   {
     "code": "/sideview",
-    "category": "Angles & Views",
+    "category": "Angles & Perspective",
     "description": "Pure profile side view of the subject.",
     "prompt": "Edit this photo into a pure side view: reframe to a clean 90-degree profile of the subject — the elegant outline of the profile, strong graphic simplicity. Keep the subject's identity recognizable in profile and the scene's character intact. Minimal, striking, photorealistic profile photography."
   },
   {
     "code": "/aerialview",
-    "category": "Angles & Views",
+    "category": "Angles & Perspective",
     "description": "Grand aerial vista with the world spread below.",
     "prompt": "Edit this photo into a grand aerial vista: high above the world, the landscape, city or interior spread out below in sweeping detail with the subject situated within it. Keep the subject and scene content recognizable. Expansive, awe-inspiring, photorealistic aerial photography."
   },
   {
     "code": "/extremecloseup",
-    "category": "Extreme Angles",
+    "category": "Angles & Perspective",
     "description": "Extreme close-up: a single feature fills the frame.",
     "prompt": "Edit this photo into an extreme close-up: fill the frame with a single powerful feature — an eye, lips, hands, a textured detail — rendered with staggering sharpness and shallow depth of field. Keep the subject's identity consistent with the original. Intense, intimate, photorealistic macro-portrait energy."
   },
   {
     "code": "/pov",
-    "category": "Extreme Angles",
+    "category": "Angles & Perspective",
     "description": "Immersive point-of-view framing.",
     "prompt": "Edit this photo into an immersive point-of-view framing: reframe as if the viewer is a participant in the scene — natural eye-level perspective, slight handheld intimacy, the world arranged around the viewer's gaze. Keep the scene's content and identities unchanged. Immediate, personal, photorealistic POV photography."
   },
   {
     "code": "/overtheshoulder",
-    "category": "Extreme Angles",
+    "category": "Angles & Perspective",
     "description": "Over-the-shoulder shot with layered depth.",
     "prompt": "Edit this photo into an over-the-shoulder composition: place a softly blurred shoulder and partial silhouette in the immediate foreground, looking past them to the sharp subject beyond. Keep the subject's identity and the scene unchanged. Narrative, cinematic, layered depth, photorealistic."
   },
   {
     "code": "/birdseyeview",
-    "category": "Extreme Angles",
+    "category": "Angles & Perspective",
     "description": "Direct bird's-eye view straight down from the sky.",
     "prompt": "Edit this photo into a direct bird's-eye view: straight down from high above, the world flattened into a living map with the subject visible within it. Keep the subject and scene recognizable from directly overhead. Stunning, cartographic, photorealistic."
   },
   {
     "code": "/wormseyeview",
-    "category": "Extreme Angles",
+    "category": "Angles & Perspective",
     "description": "Extreme worm's-eye view from the ground up.",
     "prompt": "Edit this photo into an extreme worm's-eye view: from ground level looking straight up, everything towers — the subject monumental against the sky, verticals converging dramatically overhead. Keep the subject's identity and the scene unchanged. Dizzying, powerful, photorealistic."
   },
@@ -631,61 +631,61 @@
   },
   {
     "code": "/softlighting",
-    "category": "Professional Lighting",
+    "category": "Lighting",
     "description": "Flattering soft, diffused studio lighting.",
     "prompt": "Edit this photo with professional soft lighting: wrap the subject in large, diffused, flattering light — like a big softbox on an overcast day — smoothing skin, opening shadows gently, eliminating harsh highlights. Keep the subject's identity, pose and the scene unchanged. Clean, forgiving, premium portrait light, photorealistic."
   },
   {
     "code": "/dramaticlighting",
-    "category": "Professional Lighting",
+    "category": "Lighting",
     "description": "High-contrast dramatic light with deep shadows.",
     "prompt": "Edit this photo with dramatic lighting: carve the subject with high-contrast light — bright sculpted highlights against deep, rich shadows, chiaroscuro worthy of a film poster. Keep the subject's identity and pose unchanged. Bold, theatrical, photorealistic drama."
   },
   {
     "code": "/rimlight",
-    "category": "Professional Lighting",
+    "category": "Lighting",
     "description": "Glowing rim light tracing the subject's edges.",
     "prompt": "Edit this photo to add a strong rim light: place a bright source behind the subject so a glowing edge of light traces their silhouette — hair, shoulders, contours outlined in radiance — separating them crisply from a darker background. Keep the subject's identity, pose and the front lighting natural. Striking, dimensional, photorealistic."
   },
   {
     "code": "/backlight",
-    "category": "Professional Lighting",
+    "category": "Lighting",
     "description": "Strong backlight with luminous halo and haze.",
     "prompt": "Edit this photo with strong backlighting: position the key light behind the subject so they glow with a luminous halo, lens haze blooming softly around them, foreground falling into gentle shadow. Keep the subject's identity and pose unchanged, features readable through the glow. Dreamy, radiant, photorealistic backlight."
   },
   {
     "code": "/godrays",
-    "category": "Professional Lighting",
+    "category": "Lighting",
     "description": "Volumetric god rays streaming through the scene.",
     "prompt": "Edit this photo to add volumetric god rays: dramatic shafts of light streaming through the scene — through trees, windows or clouds — visible as glowing beams with floating dust particles dancing inside them. Keep the subject's identity, pose and the scene unchanged. Divine, breathtaking, photorealistic light."
   },
   {
     "code": "/volumetriclight",
-    "category": "Professional Lighting",
+    "category": "Lighting",
     "description": "Thick volumetric light with visible atmosphere.",
     "prompt": "Edit this photo with thick volumetric lighting: make the light itself visible — beams with body and texture cutting through light haze, the atmosphere glowing where light passes. Keep the subject's identity, pose and the scene unchanged. Immersive, tangible, photorealistic atmosphere."
   },
   {
     "code": "/studio",
-    "category": "Professional Lighting",
+    "category": "Lighting",
     "description": "Clean studio backdrop with controlled pro lighting.",
     "prompt": "Edit this photo into a clean studio portrait: replace the background with a smooth, seamless studio backdrop (neutral gray or soft gradient), lit with controlled professional three-point lighting — flattering key, gentle fill, subtle rim. Keep the subject's identity, pose and expression exactly unchanged. Polished, commercial, photorealistic studio photography."
   },
   {
     "code": "/filmgrain",
-    "category": "Professional Lighting",
+    "category": "Lighting",
     "description": "Authentic 35mm film grain texture over the image.",
     "prompt": "Edit this photo to add authentic 35mm film grain: overlay fine, organic grain texture across the image — the tactile, living texture of analog film — with a slight softening of digital perfection. Keep the subject's identity, pose and colors unchanged. The grain should feel like real film stock, not digital noise: cinematic, textured, photorealistic."
   },
   {
     "code": "/bokeh",
-    "category": "Professional Lighting",
+    "category": "Lighting",
     "description": "Dreamy bokeh: background lights melt into glowing orbs.",
     "prompt": "Edit this photo for dreamy bokeh: melt every background light into soft glowing orbs — round, luminous, overlapping circles of color — while the subject stays tack-sharp. Keep the subject's identity and pose unchanged. Magical, romantic, photorealistic bokeh."
   },
   {
     "code": "/shallowdepth",
-    "category": "Professional Lighting",
+    "category": "Lighting",
     "description": "Shallow depth: razor focus on subject, soft everything else.",
     "prompt": "Edit this photo with shallow depth of field: hold razor-sharp focus on the subject while everything in front of and behind them falls into smooth, creamy softness. Keep the subject's identity, pose and the scene's content unchanged. Professional subject isolation, photorealistic."
   },
@@ -975,7 +975,7 @@
     "code": "/mirror",
     "category": "Textures & Effects",
     "description": "Kaleidoscopic mirror symmetry across the frame.",
-    "prompt": "Edit this photo with kaleidoscopic mirror symmetry: reflect and repeat the scene into mesmerizing symmetrical patterns — mandala-like, perfectly balanced. Keep the subject's essence at the heart of the pattern. Trippy, gorgeous, precise digital art."
+    "prompt": "Edit this photo with kaleidoscopic mirror symmetry: reflect and repeat the scene into mesmerizing symmetrical patterns — mandala-like, perfectly balanced. Keep the subject's face recognizable at the heart of the pattern, with the mirrored repeats built from the same person. Trippy, gorgeous, precise digital art."
   },
   {
     "code": "/fire",
@@ -1180,5 +1180,509 @@
     "category": "Viral",
     "description": "Split-time portrait meeting your younger self.",
     "prompt": "Edit this photo into a split-time portrait of the same person meeting their younger self: the frame divided vertically, the left half a black-and-white childhood photo of the same person (same facial features, natural smile, grainy film texture), the right half the present-day adult from this photo in color, both looking at each other with warm smiles. Keep both faces clearly the same person, with soft cinematic lighting and a small birthday cake with lit candles at the center line. Emotional, nostalgic, ultra-realistic."
+  },
+  {
+    "code": "/handsinpockets",
+    "category": "Standing — Everyday Cool",
+    "description": "Casual stand with both hands in pockets.",
+    "prompt": "Edit this photo: change the subject's pose to hands in pockets. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/onehandinpocket",
+    "category": "Standing — Everyday Cool",
+    "description": "Relaxed stand with one hand in a pocket.",
+    "prompt": "Edit this photo: change the subject's pose to one hand in pocket. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/armscrossed",
+    "category": "Standing — Everyday Cool",
+    "description": "Confident stand with arms crossed.",
+    "prompt": "Edit this photo: change the subject's pose to arms crossed. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/straightstandingpose",
+    "category": "Standing — Everyday Cool",
+    "description": "Simple straight standing pose.",
+    "prompt": "Edit this photo: change the subject's pose to standing straight. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/feetcrossed",
+    "category": "Standing — Everyday Cool",
+    "description": "Casual stand with feet crossed.",
+    "prompt": "Edit this photo: change the subject's pose to feet crossed. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/standingwithfeetapart",
+    "category": "Standing — Everyday Cool",
+    "description": "Strong stand with feet apart.",
+    "prompt": "Edit this photo: change the subject's pose to standing with feet apart. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/handsclaspedtogether",
+    "category": "Standing — Everyday Cool",
+    "description": "Calm stand with hands clasped.",
+    "prompt": "Edit this photo: change the subject's pose to hands clasped together. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/handsbehindhead",
+    "category": "Standing — Everyday Cool",
+    "description": "Relaxed stand with hands behind the head.",
+    "prompt": "Edit this photo: change the subject's pose to hands behind head. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/fistclenchedatside",
+    "category": "Standing — Everyday Cool",
+    "description": "Determined stand, one fist clenched.",
+    "prompt": "Edit this photo: change the subject's pose to one fist clenched at his side. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/hoodiewithhandsinpockets",
+    "category": "Standing — Everyday Cool",
+    "description": "Hoodie look, hands in pockets.",
+    "prompt": "Edit this photo: change the subject's pose to wearing a hoodie with hands in pockets. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/leaningagainstawall",
+    "category": "Leaning",
+    "description": "Casual lean against a wall.",
+    "prompt": "Edit this photo: change the subject's pose to leaning against a wall. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/shoulderagainstawall",
+    "category": "Leaning",
+    "description": "Lean with one shoulder on the wall.",
+    "prompt": "Edit this photo: change the subject's pose to one shoulder against a wall. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/leaningforward",
+    "category": "Leaning",
+    "description": "Leaning slightly forward toward camera.",
+    "prompt": "Edit this photo: change the subject's pose to leaning forward. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/leaningbackinachair",
+    "category": "Leaning",
+    "description": "Laid-back lean in a chair.",
+    "prompt": "Edit this photo: change the subject's pose to leaning back in a chair. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/leaningagainstarailing",
+    "category": "Leaning",
+    "description": "Easy lean on a railing.",
+    "prompt": "Edit this photo: change the subject's pose to leaning against a railing. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/leaningonamotorcycle",
+    "category": "Leaning",
+    "description": "Cool lean on a motorcycle.",
+    "prompt": "Edit this photo: change the subject's pose to leaning on a motorcycle. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/backagainstagraffitiwall",
+    "category": "Leaning",
+    "description": "Lean with back to a graffiti wall.",
+    "prompt": "Edit this photo: change the subject's pose to back against a graffiti wall. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/sittingonstairs",
+    "category": "Sitting",
+    "description": "Seated on a flight of stairs.",
+    "prompt": "Edit this photo: change the subject's pose to sitting on stairs. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/powersit",
+    "category": "Sitting",
+    "description": "Wide confident seated power pose.",
+    "prompt": "Edit this photo: change the subject's pose to sitting in a confident power pose. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/crossleggedsitting",
+    "category": "Sitting",
+    "description": "Seated cross-legged.",
+    "prompt": "Edit this photo: change the subject's pose to sitting cross-legged. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/onelegraised",
+    "category": "Sitting",
+    "description": "Seated with one leg raised.",
+    "prompt": "Edit this photo: change the subject's pose to sitting with one leg raised. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/sittingonabench",
+    "category": "Sitting",
+    "description": "Seated on a bench.",
+    "prompt": "Edit this photo: change the subject's pose to sitting on a bench. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/sittingsideways",
+    "category": "Sitting",
+    "description": "Seated sideways to the camera.",
+    "prompt": "Edit this photo: change the subject's pose to sitting sideways. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/sittingonaconcreteblock",
+    "category": "Sitting",
+    "description": "Seated on a concrete block.",
+    "prompt": "Edit this photo: change the subject's pose to sitting on a concrete block. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/sittingwithanklescrossed",
+    "category": "Sitting",
+    "description": "Seated with ankles crossed.",
+    "prompt": "Edit this photo: change the subject's pose to sitting with ankles crossed. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/sittingonachair",
+    "category": "Sitting",
+    "description": "Simple seated pose on a chair.",
+    "prompt": "Edit this photo: change the subject's pose to sitting on a chair. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/squattingpose",
+    "category": "Sitting",
+    "description": "Low squatting pose.",
+    "prompt": "Edit this photo: change the subject's pose to squatting. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/walkingtowardcamera",
+    "category": "Walking & Motion",
+    "description": "Walking straight at the camera.",
+    "prompt": "Edit this photo: change the subject's pose to walking toward the camera. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/lookbackwalk",
+    "category": "Walking & Motion",
+    "description": "Walking away, glancing back.",
+    "prompt": "Edit this photo: change the subject's pose to walking and looking back. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/handsinpocketswalk",
+    "category": "Walking & Motion",
+    "description": "Strolling with hands in pockets.",
+    "prompt": "Edit this photo: change the subject's pose to walking with hands in pockets. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/lookingdownwalk",
+    "category": "Walking & Motion",
+    "description": "Walking with head down.",
+    "prompt": "Edit this photo: change the subject's pose to walking while looking down. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/midsteppose",
+    "category": "Walking & Motion",
+    "description": "Frozen mid-step.",
+    "prompt": "Edit this photo: change the subject's pose to captured mid-step. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/walkingwithheadturned",
+    "category": "Walking & Motion",
+    "description": "Walking with head turned aside.",
+    "prompt": "Edit this photo: change the subject's pose to walking with head turned. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/slowmotionwalk",
+    "category": "Walking & Motion",
+    "description": "Slow-motion style walking shot.",
+    "prompt": "Edit this photo: change the subject's pose to walking in slow motion. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/directeyecontact",
+    "category": "Gaze, Face & Head",
+    "description": "Eyes locked on the camera.",
+    "prompt": "Edit this photo: change the subject's pose to looking directly into the camera. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/lookingaway",
+    "category": "Gaze, Face & Head",
+    "description": "Gaze off to the side.",
+    "prompt": "Edit this photo: change the subject's pose to looking away from the camera. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/sideprofile",
+    "category": "Gaze, Face & Head",
+    "description": "Full side profile view.",
+    "prompt": "Edit this photo: change the subject's pose to shown in side profile. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/lookingup",
+    "category": "Gaze, Face & Head",
+    "description": "Face tilted up.",
+    "prompt": "Edit this photo: change the subject's pose to looking up. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/chinslightlydown",
+    "category": "Gaze, Face & Head",
+    "description": "Chin dipped slightly.",
+    "prompt": "Edit this photo: change the subject's pose to chin slightly down. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/headtilt",
+    "category": "Gaze, Face & Head",
+    "description": "Slight playful head tilt.",
+    "prompt": "Edit this photo: change the subject's pose to head tilted slightly. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/handonchin",
+    "category": "Gaze, Face & Head",
+    "description": "Thoughtful hand-on-chin.",
+    "prompt": "Edit this photo: change the subject's pose to one hand on his chin. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/handnearjawline",
+    "category": "Gaze, Face & Head",
+    "description": "Hand resting near the jawline.",
+    "prompt": "Edit this photo: change the subject's pose to one hand near his jawline. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/eyesclosed",
+    "category": "Gaze, Face & Head",
+    "description": "Calm eyes-closed shot.",
+    "prompt": "Edit this photo: change the subject's pose to eyes closed. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/overtheshoulderlook",
+    "category": "Gaze, Face & Head",
+    "description": "Serious look back over the shoulder.",
+    "prompt": "Edit this photo: change the subject's pose to looking back over his shoulder, serious expression. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/lookingoversunglasses",
+    "category": "Gaze, Face & Head",
+    "description": "Peering over the sunglasses.",
+    "prompt": "Edit this photo: change the subject's pose to looking over his sunglasses. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/lookingatthehorizon",
+    "category": "Gaze, Face & Head",
+    "description": "Distant gaze at the horizon.",
+    "prompt": "Edit this photo: change the subject's pose to looking at the horizon. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/lookingupatsky",
+    "category": "Gaze, Face & Head",
+    "description": "Face raised to the sky.",
+    "prompt": "Edit this photo: change the subject's pose to looking up at the sky. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/thinkingpose",
+    "category": "Gaze, Face & Head",
+    "description": "Lost-in-thought pose.",
+    "prompt": "Edit this photo: change the subject's pose to in a thoughtful thinking pose. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/backpose",
+    "category": "Gaze, Face & Head",
+    "description": "Shot from behind.",
+    "prompt": "Edit this photo: change the subject's pose to photographed from behind. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/adjustingwatch",
+    "category": "Hands & Accessories",
+    "description": "Adjusting a wristwatch.",
+    "prompt": "Edit this photo: change the subject's pose to adjusting his watch. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/checkingawatch",
+    "category": "Hands & Accessories",
+    "description": "Glancing at a wristwatch.",
+    "prompt": "Edit this photo: change the subject's pose to checking his watch. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/adjustinghair",
+    "category": "Hands & Accessories",
+    "description": "Running a hand through the hair.",
+    "prompt": "Edit this photo: change the subject's pose to adjusting his hair. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/adjustingsunglasses",
+    "category": "Hands & Accessories",
+    "description": "Adjusting sunglasses on the face.",
+    "prompt": "Edit this photo: change the subject's pose to adjusting his sunglasses. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/touchingremovingsunglasses",
+    "category": "Hands & Accessories",
+    "description": "Hand on the sunglasses, mid-removal.",
+    "prompt": "Edit this photo: change the subject's pose to touching or removing his sunglasses. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/holdingphone",
+    "category": "Hands & Accessories",
+    "description": "Phone in hand.",
+    "prompt": "Edit this photo: change the subject's pose to holding a phone. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/onehandnearface",
+    "category": "Hands & Accessories",
+    "description": "One hand raised near the face.",
+    "prompt": "Edit this photo: change the subject's pose to one hand near his face. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/pointingtowardcamera",
+    "category": "Hands & Accessories",
+    "description": "Pointing at the viewer.",
+    "prompt": "Edit this photo: change the subject's pose to pointing toward the camera. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/onehandraisedtowardcamera",
+    "category": "Hands & Accessories",
+    "description": "One hand raised to the camera.",
+    "prompt": "Edit this photo: change the subject's pose to one hand raised toward the camera. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/sittingonabike",
+    "category": "Street & City",
+    "description": "Seated on a bike.",
+    "prompt": "Edit this photo: change the subject's pose to sitting on a bike. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/standingbesideacar",
+    "category": "Street & City",
+    "description": "Posed next to a car.",
+    "prompt": "Edit this photo: change the subject's pose to standing beside a car. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/lookingthroughashopwindow",
+    "category": "Street & City",
+    "description": "Gazing through a shop window.",
+    "prompt": "Edit this photo: change the subject's pose to looking through a shop window. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/standingunderneonlights",
+    "category": "Street & City",
+    "description": "Lit by neon signs.",
+    "prompt": "Edit this photo: change the subject's pose to standing under neon lights. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/adjustingjacket",
+    "category": "Suits, Blazers & Coats",
+    "description": "Adjusting a jacket.",
+    "prompt": "Edit this photo: change the subject's pose to adjusting his jacket. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/holdingjacketcollar",
+    "category": "Suits, Blazers & Coats",
+    "description": "Hand holding the jacket collar.",
+    "prompt": "Edit this photo: change the subject's pose to holding his jacket collar. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/jacketcoatovershoulder",
+    "category": "Suits, Blazers & Coats",
+    "description": "Jacket carried over one shoulder.",
+    "prompt": "Edit this photo: change the subject's pose to jacket draped over one shoulder. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/buttoningblazer",
+    "category": "Suits, Blazers & Coats",
+    "description": "Buttoning a blazer.",
+    "prompt": "Edit this photo: change the subject's pose to buttoning his blazer. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/suitwithonehandinpocket",
+    "category": "Suits, Blazers & Coats",
+    "description": "Suited, one hand in pocket.",
+    "prompt": "Edit this photo: change the subject's pose to wearing a suit with one hand in pocket. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/onehandholdinglapel",
+    "category": "Suits, Blazers & Coats",
+    "description": "Hand holding a suit lapel.",
+    "prompt": "Edit this photo: change the subject's pose to one hand holding his lapel. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/straighteningshirtcuffs",
+    "category": "Suits, Blazers & Coats",
+    "description": "Straightening shirt cuffs.",
+    "prompt": "Edit this photo: change the subject's pose to straightening his shirt cuffs. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/walkinginalongcoat",
+    "category": "Suits, Blazers & Coats",
+    "description": "Striding in a long coat.",
+    "prompt": "Edit this photo: change the subject's pose to walking in a long coat. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/standinginaflowerfield",
+    "category": "Nature & Outdoors",
+    "description": "Standing among flowers.",
+    "prompt": "Edit this photo: change the subject's pose to standing in a flower field. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/walkingthroughaforest",
+    "category": "Nature & Outdoors",
+    "description": "Walking a forest path.",
+    "prompt": "Edit this photo: change the subject's pose to walking through a forest. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/sittingbesideawaterfall",
+    "category": "Nature & Outdoors",
+    "description": "Seated by a waterfall.",
+    "prompt": "Edit this photo: change the subject's pose to sitting beside a waterfall. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/standingatthebeach",
+    "category": "Nature & Outdoors",
+    "description": "Standing on the beach.",
+    "prompt": "Edit this photo: change the subject's pose to standing at the beach. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/lookingattheocean",
+    "category": "Nature & Outdoors",
+    "description": "Gazing out at the ocean.",
+    "prompt": "Edit this photo: change the subject's pose to looking at the ocean. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/sittingonarock",
+    "category": "Nature & Outdoors",
+    "description": "Seated on a rock outdoors.",
+    "prompt": "Edit this photo: change the subject's pose to sitting on a rock. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/walkingthroughtallgrass",
+    "category": "Nature & Outdoors",
+    "description": "Walking through tall grass.",
+    "prompt": "Edit this photo: change the subject's pose to walking through tall grass. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/underatreewithsunlight",
+    "category": "Nature & Outdoors",
+    "description": "Sunlight filtering through a tree.",
+    "prompt": "Edit this photo: change the subject's pose to standing under a tree in sunlight. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/standingintherain",
+    "category": "Nature & Outdoors",
+    "description": "Standing in falling rain.",
+    "prompt": "Edit this photo: change the subject's pose to standing in the rain. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/armswideopen",
+    "category": "Dramatic & Cinematic",
+    "description": "Arms spread wide open.",
+    "prompt": "Edit this photo: change the subject's pose to arms wide open. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/lowangleherostance",
+    "category": "Dramatic & Cinematic",
+    "description": "Heroic low-angle stance.",
+    "prompt": "Edit this photo: change the subject's pose to in a low-angle hero stance. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/silhouetteagainstsunset",
+    "category": "Dramatic & Cinematic",
+    "description": "Sunset silhouette.",
+    "prompt": "Edit this photo: change the subject's pose to silhouetted against the sunset. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/standinginthewind",
+    "category": "Dramatic & Cinematic",
+    "description": "Wind in clothes and hair.",
+    "prompt": "Edit this photo: change the subject's pose to standing in the wind. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+  },
+  {
+    "code": "/jacketfluttering",
+    "category": "Dramatic & Cinematic",
+    "description": "Jacket caught by the wind.",
+    "prompt": "Edit this photo: change the subject's pose to jacket fluttering in the wind. Keep the person's face, identity, hairstyle and outfit exactly the same — only the pose and body position change. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
   }
 ]
