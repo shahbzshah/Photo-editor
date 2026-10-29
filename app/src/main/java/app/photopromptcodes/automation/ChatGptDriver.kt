@@ -268,6 +268,19 @@ class ChatGptDriver : EngineDriver {
         loginGate?.complete(Unit)
     }
 
+    /**
+     * Runs one rescue scan right now. Only acts while a run is waiting for
+     * its image; safe to call any other time (no-op).
+     */
+    override fun requestRescueScan() {
+        scope.launch {
+            try {
+                if (imageArrived?.isCompleted == false) evalJs(rescueScanJs())
+            } catch (_: Exception) {
+            }
+        }
+    }
+
     /** Loads ChatGPT's home page in the attached WebView (for the login screen). */
     fun loadChatGpt() {
         val wv = webView ?: return
@@ -541,6 +554,8 @@ class ChatGptDriver : EngineDriver {
         // Also try ChatGPT's download button every 15s — the DownloadListener
         // captures the file directly, bypassing URL harvesting entirely.
         var polls = 0
+        val waitStarted = SystemClock.uptimeMillis()
+        var rescueAttempts = 0
         scope.launch {
             while (imageArrived?.isCompleted == false) {
                 delay(5000)
@@ -567,6 +582,27 @@ class ChatGptDriver : EngineDriver {
                         } catch (_: Exception) {}
                     }
                 } catch (_: Exception) {}
+                // Re-arm the observer every 30s: a full page reload (login
+                // refresh, navigation) drops the injected watcher, and the
+                // re-install keeps the existing seen-list on the same
+                // document (see observerJs).
+                if (polls % 6 == 0) {
+                    try { evalJs(observerJs()) } catch (_: Exception) {}
+                }
+                // Rescue: once the turn looks finished (send button back,
+                // no stop button) or 90s have passed, scan with looser
+                // filters for the newest assistant image. At most twice.
+                if (rescueAttempts < 2 &&
+                    SystemClock.uptimeMillis() - waitStarted > 25_000L
+                ) {
+                    val finished = try {
+                        unquote(evalJs(turnFinishedJs())) == "done"
+                    } catch (_: Exception) { false }
+                    if (finished || SystemClock.uptimeMillis() - waitStarted > 90_000L) {
+                        rescueAttempts++
+                        try { evalJs(rescueScanJs()) } catch (_: Exception) {}
+                    }
+                }
             }
         }
         return try {
@@ -611,8 +647,8 @@ class ChatGptDriver : EngineDriver {
             if(!(src.indexOf('http')===0||src.indexOf('blob:')===0||src.indexOf('data:image')===0))continue;
             if(!img.complete)continue;
             if(img.naturalWidth<200||img.naturalHeight<200)continue;
-            var r=img.getBoundingClientRect();
-            if(r.width<150||r.height<150)continue;
+            var inAssistant=false; try{ inAssistant=!!img.closest('[data-message-author-role="assistant"]'); }catch(e){}
+            if(!inAssistant){ var r=img.getBoundingClientRect(); if(r.width<150||r.height<150)continue; }
             // Skip UI icons/logos by checking the src
             var ls=src.toLowerCase();
             if(ls.indexOf('logo')>-1||ls.indexOf('icon')>-1||ls.indexOf('avatar')>-1)continue;
@@ -804,6 +840,57 @@ class ChatGptDriver : EngineDriver {
         })()"""
     }
 
+    /** 'done' when the turn looks finished: stop button gone, send button back. */
+    private fun turnFinishedJs(): String {
+        return """(function(){
+          if(document.querySelector('[data-testid="stop-button"]')) return 'busy';
+          var send=document.querySelector('#composer-submit-button, button[data-testid="send-button"]');
+          return send?'done':'unknown';
+        })()"""
+    }
+
+    /**
+     * Loose rescue scan: the newest large image that is not the user's own
+     * upload, with no on-screen size requirement and no seen-list — for
+     * when the strict watcher missed a finished image (collapsed, lazy,
+     * or rendered before the watcher armed). Prefers images inside an
+     * assistant message. Fetches and hands over via PpcBridge like the
+     * observer does. Safe to run repeatedly: already-rescued URLs are
+     * skipped (unless their fetch failed), and the bridge only accepts
+     * the first image.
+     */
+    private fun rescueScanJs(): String {
+        return """(function(){
+          window.__ppcRescued=window.__ppcRescued||[];
+          var imgs=document.querySelectorAll('img');
+          var fallback=null; var best=null;
+          for(var k=imgs.length-1;k>=0;k--){
+            var img=imgs[k]; var src=img.currentSrc||img.src||'';
+            if(!src) continue;
+            if(window.__ppcRescued.indexOf(src)>-1) continue;
+            if(!(src.indexOf('http')===0||src.indexOf('blob:')===0||src.indexOf('data:image')===0)) continue;
+            if(!img.complete) continue;
+            if(img.naturalWidth<150||img.naturalHeight<150) continue;
+            var ls=src.toLowerCase();
+            if(ls.indexOf('logo')>-1||ls.indexOf('icon')>-1||ls.indexOf('avatar')>-1) continue;
+            try{ if(img.closest('[data-message-author-role="user"]')) continue; }catch(e){}
+            if(!fallback) fallback={img:img,src:src};
+            try{ if(img.closest('[data-message-author-role="assistant"]')){ best={img:img,src:src}; break; } }catch(e){}
+          }
+          best=best||fallback;
+          if(!best) return 'none';
+          window.__ppcRescued.push(best.src);
+          if(best.src.indexOf('data:image')===0){ PpcBridge.onImage(best.src); return 'found'; }
+          fetch(best.src).then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.blob(); })
+            .then(function(b){ return new Promise(function(res,rej){
+                var fr=new FileReader(); fr.onload=function(){res(fr.result);}; fr.onerror=rej; fr.readAsDataURL(b); });})
+            .then(function(d){ PpcBridge.onImage(d); })
+            .catch(function(e){ PpcBridge.onLog('rescue fetch failed: '+e);
+              var ix=window.__ppcRescued.indexOf(best.src); if(ix>-1) window.__ppcRescued.splice(ix,1); });
+          return 'found';
+        })()"""
+    }
+
     /**
      * Watches for a NEW, fully-loaded image inside assistant messages, then
      * fetches it in-page (so ChatGPT's auth cookies apply) and hands a data
@@ -813,10 +900,16 @@ class ChatGptDriver : EngineDriver {
         return """(function(){
           window.__ppcSeen=window.__ppcSeen||[];
           function snap(el){ return el.currentSrc||el.src||''; }
-          // Snapshot ALL images in the DOM (including the user's uploaded
-          // photo) so we never mistake them for the generated result.
-          var all=document.querySelectorAll('img');
-          for(var a=0;a<all.length;a++){ var s0=snap(all[a]); if(s0) window.__ppcSeen.push(s0); }
+          // First install on this document only: snapshot every image already
+          // present (the uploaded photo above all) so a later scan never
+          // mistakes it for the result. Re-installs on the same document
+          // keep the existing list — re-snapshotting would poison it with
+          // a finished-but-unharvested image.
+          if(!window.__ppcSnapDone){
+            window.__ppcSnapDone=true;
+            var all=document.querySelectorAll('img');
+            for(var a=0;a<all.length;a++){ var s0=snap(all[a]); if(s0) window.__ppcSeen.push(s0); }
+          }
           if(window.__ppcObs){ try{window.__ppcObs.disconnect();}catch(e){} }
           function tryHarvest(){
             var imgs=document.querySelectorAll('img');
@@ -827,8 +920,16 @@ class ChatGptDriver : EngineDriver {
               if(!(src.indexOf('http')===0||src.indexOf('blob:')===0||src.indexOf('data:image')===0)) continue;
               if(!img.complete) continue;
               if(img.naturalWidth<200||img.naturalHeight<200) continue;
-              var r=img.getBoundingClientRect();
-              if(r.width<150||r.height<150) continue;
+              // Images inside an assistant message are the result (or an
+              // earlier turn's) even when collapsed or off-screen, so they
+              // skip the on-screen size check. Anything else must be visibly
+              // rendered, or it is a tracking pixel or hidden UI image.
+              var inAssistant=false;
+              try{ inAssistant=!!img.closest('[data-message-author-role="assistant"]'); }catch(e){}
+              if(!inAssistant){
+                var r=img.getBoundingClientRect();
+                if(r.width<150||r.height<150) continue;
+              }
               var ls=src.toLowerCase();
               if(ls.indexOf('logo')>-1||ls.indexOf('icon')>-1||ls.indexOf('avatar')>-1) continue;
               // Never harvest the user's own uploaded photo: skip anything

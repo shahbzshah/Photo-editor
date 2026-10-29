@@ -16,5 +16,7 @@ interface EngineDriver {
     fun destroy()
     /** Called when the user completes a manual login gate (if the engine needs one). */
     fun notifyLoginCompleted()
+    /** Runs one loose rescue scan for a finished image. No-op when no run is waiting. */
+    fun requestRescueScan()
 }
 

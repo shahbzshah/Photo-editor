@@ -11,6 +11,9 @@
     <!-- In-app updater: Android 8+ requires this for an app to hand an APK to the system installer. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <!-- "Notify me when ready" on the run screen (runtime permission on Android 13+). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <!-- Let the app see WhatsApp/TikTok/Instagram for direct sharing (Android 11+ package visibility). -->
     <queries>
         <package android:name="com.whatsapp" />

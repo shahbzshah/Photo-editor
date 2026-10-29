@@ -6,7 +6,21 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
 import android.webkit.WebView
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,7 +58,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat
+import coil.compose.AsyncImage
+import kotlinx.coroutines.delay
+import app.photopromptcodes.notifications.ResultNotifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -64,8 +91,10 @@ import app.photopromptcodes.ui.theme.Amber
 import app.photopromptcodes.ui.theme.Danger
 import app.photopromptcodes.ui.theme.Mono
 import app.photopromptcodes.ui.theme.NearBlack
+import app.photopromptcodes.ui.theme.Paper
 import app.photopromptcodes.ui.theme.PaperDim
 import app.photopromptcodes.ui.theme.SurfaceDark
+import app.photopromptcodes.ui.theme.SurfaceRaised
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
@@ -76,7 +105,8 @@ data class RunUi(
     val error: String? = null,
     val errorDebug: String? = null,
     val code: PromptCode? = null,
-    val photoUri: Uri? = null
+    val photoUri: Uri? = null,
+    val notifyWhenReady: Boolean = false
 )
 
 class RunViewModel(app: Application) : AndroidViewModel(app) {
@@ -156,6 +186,16 @@ class RunViewModel(app: Application) : AndroidViewModel(app) {
         driver?.notifyLoginCompleted()
     }
 
+    /** The user asked to be notified when this run's image lands. */
+    fun requestNotify() {
+        ui = ui.copy(notifyWhenReady = true)
+    }
+
+    /** Runs one rescue scan for a finished image that the watcher missed. */
+    fun checkNow() {
+        driver?.requestRescueScan()
+    }
+
     private fun onEvent(event: DriverEvent) {
         when (event) {
             is DriverEvent.Step -> ui = ui.copy(step = event.step, error = null, errorDebug = null)
@@ -163,6 +203,9 @@ class RunViewModel(app: Application) : AndroidViewModel(app) {
             is DriverEvent.Finished -> viewModelScope.launch {
                 val id = stageId ?: return@launch
                 val record = history.saveResult(id, ui.code?.code.orEmpty(), event.imageBytes)
+                if (ui.notifyWhenReady) {
+                    ResultNotifier.postReady(getApplication(), ui.code?.code.orEmpty())
+                }
                 _done.emit(record.id)
             }
             is DriverEvent.Failed -> ui = ui.copy(error = event.message, errorDebug = event.debugInfo)
@@ -230,10 +273,51 @@ fun RunScreen(
                     }
                 }
             )
-            // Progress overlay docked at the bottom; the WebView stays
-            // interactive behind it (needed for the manual sign-in step).
-            // Collapsible via the header tap — so it never blocks page dialogs.
+            // While the run is past sign-in, the Developing Room covers the
+            // WebView completely: ChatGPT keeps working underneath (it must
+            // stay full-size to render), but the user never sees it. Before
+            // that (opening / sign-in) the browser stays visible and the
+            // old bottom card stays, since the user may need to tap in it.
+            val showWaitingRoom = ui.error == null && !ui.loginRequired &&
+                (ui.step == RunStep.ATTACHING_PHOTO ||
+                    ui.step == RunStep.SENDING_PROMPT ||
+                    ui.step == RunStep.GENERATING)
             var progressCollapsed by remember { mutableStateOf(false) }
+            var notifyRequested by remember { mutableStateOf(false) }
+            var notifyDenied by remember { mutableStateOf(false) }
+            val appCtx = LocalContext.current
+            val notifyLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { granted ->
+                if (granted) {
+                    notifyRequested = true
+                    vm.requestNotify()
+                } else {
+                    notifyDenied = true
+                }
+            }
+            if (showWaitingRoom) {
+                DevelopingRoom(
+                    ui = ui,
+                    notifyRequested = notifyRequested,
+                    notifyDenied = notifyDenied,
+                    onNotifyTap = {
+                        if (!notifyRequested) {
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                                ContextCompat.checkSelfPermission(
+                                    appCtx, Manifest.permission.POST_NOTIFICATIONS
+                                ) == PackageManager.PERMISSION_GRANTED
+                            ) {
+                                notifyRequested = true
+                                vm.requestNotify()
+                            } else {
+                                notifyLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
+                        }
+                    },
+                    onCheckNow = vm::checkNow
+                )
+            } else {
             Card(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -340,6 +424,7 @@ fun RunScreen(
                     } // end if (!progressCollapsed)
                 }
             }
+            } // end else (old bottom card)
         }
     }
 }
@@ -380,6 +465,323 @@ private fun StepList(current: RunStep) {
                     else
                         PaperDim
                 )
+            }
+        }
+    }
+}
+
+/**
+ * The waiting experience while a run is past sign-in: the WebView keeps
+ * working underneath (full-size, so ChatGPT renders and the harvester
+ * sees real layout), but this opaque room is all the user sees — their
+ * photo "developing", honest stage progress with elapsed seconds,
+ * rotating notes, and sample looks to browse. No ChatGPT UI is shown.
+ */
+@Composable
+private fun DevelopingRoom(
+    ui: RunUi,
+    notifyRequested: Boolean,
+    notifyDenied: Boolean,
+    onNotifyTap: () -> Unit,
+    onCheckNow: () -> Unit
+) {
+    val ctx = LocalContext.current
+    var elapsed by remember { mutableStateOf(0) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1000)
+            elapsed++
+        }
+    }
+    var rotate by remember { mutableStateOf(0) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(4000)
+            rotate++
+        }
+    }
+    var allCodes by remember { mutableStateOf(emptyList<PromptCode>()) }
+    LaunchedEffect(Unit) {
+        allCodes = try {
+            CodeRepository.load(ctx)
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+    var zoomed by remember { mutableStateOf<PromptCode?>(null) }
+    var lastCheckAt by remember { mutableStateOf(-1000) }
+    val showCheckNow = ui.step == RunStep.GENERATING && elapsed >= 90 &&
+        elapsed - lastCheckAt >= 20
+
+    val code = ui.code
+    val ideas = remember(allCodes, code?.code) {
+        val rest = allCodes.filter { it.code != code?.code }
+        if (rest.isEmpty()) emptyList()
+        else {
+            val step = maxOf(1, rest.size / 6)
+            (0 until 6).map { rest[(it * step) % rest.size] }.distinct()
+        }
+    }
+    val idea = if (ideas.isEmpty()) null else ideas[rotate % ideas.size]
+    val lines = remember(code) {
+        buildList {
+            add("Your original photo stays untouched — the edit is a brand-new image.")
+            add("Every prompt asks ChatGPT to keep faces natural: no smoothing, no reshaping.")
+            add("Tip: photos with the subject in clear light come out cleanest.")
+            code?.let { add("Sent to ChatGPT: “${it.prompt.take(90)}…”") }
+        }
+    }
+    val line = if (lines.isEmpty()) "" else lines[rotate % lines.size]
+    val progress = when (ui.step) {
+        RunStep.OPENING_ENGINE -> 0.08f
+        RunStep.CHECKING_LOGIN -> 0.18f
+        RunStep.ATTACHING_PHOTO -> 0.32f
+        RunStep.SENDING_PROMPT -> 0.45f
+        RunStep.GENERATING -> 0.55f + (minOf(elapsed, 90) / 90f) * 0.40f
+        RunStep.DONE -> 1f
+    }
+
+    // Slow zoom + breathing light sweep: the photo "developing".
+    val infinite = rememberInfiniteTransition(label = "develop")
+    val zoom by infinite.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(14000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "zoom"
+    )
+    val sheen by infinite.animateFloat(
+        initialValue = 0.05f,
+        targetValue = 0.18f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "sheen"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(NearBlack)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                    .graphicsLayer {
+                        scaleX = zoom
+                        scaleY = zoom
+                    }
+            ) {
+                ui.photoUri?.let { uri ->
+                    AsyncImage(
+                        model = uri,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.White.copy(alpha = sheen),
+                                    Color.Transparent
+                                ),
+                                start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                                end = androidx.compose.ui.geometry.Offset(600f, 600f)
+                            )
+                        )
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.55f)
+                                )
+                            )
+                        )
+                )
+            }
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = code?.code ?: "",
+                    fontFamily = Mono,
+                    fontWeight = FontWeight.Bold,
+                    color = Amber,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Text(
+                    text = code?.description ?: "",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Paper
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = ui.step.label,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = "${elapsed}s",
+                        fontFamily = Mono,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = PaperDim
+                    )
+                }
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp)),
+                    color = Amber,
+                    trackColor = SurfaceRaised
+                )
+                Crossfade(targetState = line, label = "rotating-line") { current ->
+                    Text(
+                        text = current,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = PaperDim
+                    )
+                }
+                Crossfade(targetState = idea, label = "idea") { current ->
+                    if (current != null) {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = "MORE LOOKS TO TRY",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = PaperDim
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(SurfaceRaised)
+                                    .clickable { zoomed = current }
+                                    .padding(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                AsyncImage(
+                                    model = current.sampleAsset,
+                                    contentDescription = "Sample: ${current.code}",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .size(56.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                )
+                                Spacer(Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = current.code,
+                                        fontFamily = Mono,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Amber,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        text = current.description,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = PaperDim,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                OutlinedButton(
+                    onClick = onNotifyTap,
+                    enabled = !notifyRequested,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Filled.Notifications, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        if (notifyRequested) "You'll be notified when it's ready"
+                        else "Notify me when ready"
+                    )
+                }
+                if (showCheckNow) {
+                    Button(
+                        onClick = {
+                            lastCheckAt = elapsed
+                            onCheckNow()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Amber,
+                            contentColor = NearBlack
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Check for the image now", fontWeight = FontWeight.SemiBold)
+                    }
+                }
+                if (notifyDenied) {
+                    Text(
+                        text = "Notifications are off — stay on this screen and the result will appear here.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Danger
+                    )
+                }
+            }
+        }
+    }
+
+    zoomed?.let { z ->
+        Dialog(onDismissRequest = { zoomed = null }) {
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = SurfaceRaised)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    AsyncImage(
+                        model = z.sampleAsset,
+                        contentDescription = "Sample: ${z.code}",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(240.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        text = z.code,
+                        fontFamily = Mono,
+                        fontWeight = FontWeight.Bold,
+                        color = Amber,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(text = z.description, style = MaterialTheme.typography.bodyMedium)
+                    Spacer(Modifier.height(16.dp))
+                    Button(
+                        onClick = { zoomed = null },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Amber,
+                            contentColor = NearBlack
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Close", fontWeight = FontWeight.SemiBold)
+                    }
+                }
             }
         }
     }
