@@ -2,4 +2,8 @@
 <paths>
     <files-path name="history" path="history/" />
     <cache-path name="shared" path="shared/" />
+    <!-- Update APKs are saved directly in cacheDir (update-<versionCode>.apk);
+         without this root FileProvider rejects them and no in-app update
+         can ever reach the installer. -->
+    <cache-path name="updates" path="." />
 </paths>

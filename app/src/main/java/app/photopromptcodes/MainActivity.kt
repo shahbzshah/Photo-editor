@@ -296,6 +296,9 @@ fun AppNav() {
         var downloading by remember {
             mutableStateOf(false)
         }
+        var dlRead by remember { mutableStateOf(0L) }
+        var dlTotal by remember { mutableStateOf(-1L) }
+        var dlError by remember { mutableStateOf<String?>(null) }
         val canInstallNow = app.photopromptcodes.update.UpdateChecker.canInstallPackages(ctx)
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { pendingUpdate = null },
@@ -307,7 +310,8 @@ fun AppNav() {
                         (if (!canInstallNow)
                             "\n\nFirst tap opens a system setting — allow this app " +
                             "to install updates there, then tap Update now again."
-                         else "")
+                         else "") +
+                        (if (dlError != null) "\n\nDownload failed: $dlError" else "")
                 )
             },
             confirmButton = {
@@ -317,23 +321,48 @@ fun AppNav() {
                             app.photopromptcodes.update.UpdateChecker
                                 .openInstallPermissionSettings(ctx)
                         } else {
+                            dlError = null
+                            dlRead = 0L
+                            dlTotal = update.apkSize
                             downloading = true
                             scope.launch {
-                                val ok = app.photopromptcodes.update.UpdateChecker
-                                    .downloadAndInstall(ctx, update)
-                                if (ok) pendingUpdate = null
+                                when (val result = app.photopromptcodes.update.UpdateChecker
+                                    .downloadAndInstall(ctx, update) { read, total ->
+                                        dlRead = read
+                                        if (total > 0) dlTotal = total
+                                    }
+                                ) {
+                                    is app.photopromptcodes.update.UpdateChecker
+                                        .DownloadResult.Installed -> pendingUpdate = null
+                                    is app.photopromptcodes.update.UpdateChecker
+                                        .DownloadResult.Cancelled -> Unit
+                                    is app.photopromptcodes.update.UpdateChecker
+                                        .DownloadResult.Failed ->
+                                        dlError = result.reason
+                                }
                                 downloading = false
                             }
                         }
                     },
                     enabled = !downloading
                 ) {
-                    Text(if (downloading) "Downloading…" else "Update now")
+                    Text(
+                        if (downloading && dlTotal > 0) {
+                            val pct = (dlRead * 100 / dlTotal).coerceIn(0, 100)
+                            "Downloading… $pct%"
+                        } else if (downloading) "Downloading…"
+                        else "Update now"
+                    )
                 }
             },
             dismissButton = {
-                androidx.compose.material3.TextButton(onClick = { pendingUpdate = null }) {
-                    Text("Later")
+                androidx.compose.material3.TextButton(onClick = {
+                    if (downloading) {
+                        app.photopromptcodes.update.UpdateChecker.cancelDownload()
+                    }
+                    pendingUpdate = null
+                }) {
+                    Text(if (downloading) "Cancel download" else "Later")
                 }
             }
         )
