@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.dp
@@ -111,8 +110,11 @@ fun AppNav() {
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
+                // No fixed height: NavigationBar sizes itself around the
+                // system navigation-bar inset. A fixed height (v1.8.5's
+                // 60dp cap) squeezed that inset padding and crushed the
+                // bar underneath the phone's own buttons.
                 NavigationBar(
-                    modifier = Modifier.height(60.dp),
                     containerColor = SurfaceDark
                 ) {
                     TABS.forEach { tab ->
