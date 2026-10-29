@@ -3,12 +3,15 @@ package app.photopromptcodes.ui
 import android.app.Application
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -48,6 +52,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -63,6 +69,7 @@ import app.photopromptcodes.ui.theme.NearBlack
 import app.photopromptcodes.ui.theme.Paper
 import app.photopromptcodes.ui.theme.PaperDim
 import app.photopromptcodes.ui.theme.SurfaceDark
+import app.photopromptcodes.ui.theme.SurfaceRaised
 import kotlinx.coroutines.launch
 
 class GalleryViewModel(app: Application) : AndroidViewModel(app) {
@@ -238,7 +245,14 @@ fun GalleryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Photo Prompt Codes", style = MaterialTheme.typography.titleLarge) },
+                title = {
+                    Text(
+                        "Photo Prompt Codes",
+                        fontFamily = Mono,
+                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                },
                 actions = {
                     TextButton(onClick = { vm.toggleViewMode() }) {
                         Text(
@@ -266,7 +280,8 @@ fun GalleryScreen(
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .height(48.dp)
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Paper,
                     unfocusedTextColor = Paper,
@@ -275,15 +290,15 @@ fun GalleryScreen(
                 )
             )
             LazyRow(
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(bottom = 8.dp)
+                contentPadding = PaddingValues(horizontal = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.padding(bottom = 6.dp)
             ) {
                 item {
                     FilterChip(
                         selected = vm.category == null,
                         onClick = { vm.updateCategory(null) },
-                        label = { Text("All") },
+                        label = { Text("All", style = MaterialTheme.typography.labelMedium) },
                         colors = chipColors(vm.category == null)
                     )
                 }
@@ -291,49 +306,51 @@ fun GalleryScreen(
                     FilterChip(
                         selected = vm.category == cat,
                         onClick = { vm.updateCategory(if (vm.category == cat) null else cat) },
-                        label = { Text(cat) },
+                        label = { Text(cat, style = MaterialTheme.typography.labelMedium) },
                         colors = chipColors(vm.category == cat)
                     )
                 }
             }
             if (vm.recentCodes.isNotEmpty() && vm.query.isBlank() && vm.category == null) {
-                Text(
-                    "RECENTLY USED",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = PaperDim,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                )
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(bottom = 8.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)
+                        .padding(bottom = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    items(vm.recentCodes, key = { it.code }) { code ->
-                        Card(
-                            modifier = Modifier
-                                .width(140.dp)
-                                .clickable { onOpenCode(code.code) },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                        ) {
-                            Column {
-                                AsyncImage(
-                                    model = code.sampleAsset,
-                                    contentDescription = "Sample: ${code.code}",
-                                    contentScale = ContentScale.Crop,
+                    Text(
+                        "RECENT",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = PaperDim,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        items(vm.recentCodes.take(5), key = { it.code }) { code ->
+                            Row(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(50))
+                                    .background(SurfaceRaised)
+                                    .clickable { onOpenCode(code.code) }
+                                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(90.dp)
-                                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                                        .size(6.dp)
+                                        .clip(CircleShape)
+                                        .background(Amber)
                                 )
+                                Spacer(Modifier.width(6.dp))
                                 Text(
                                     text = code.code,
                                     fontFamily = Mono,
                                     fontWeight = FontWeight.SemiBold,
                                     color = Amber,
                                     style = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier.padding(8.dp),
                                     maxLines = 1
                                 )
                             }
@@ -344,20 +361,20 @@ fun GalleryScreen(
             if (vm.viewMode == "grid") {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(vm.filtered, key = { it.code }) { code ->
                         GridCodeCard(code = code, onClick = { onOpenCode(code.code) })
                     }
-                    item { Spacer(Modifier.height(24.dp)) }
+                    item { Spacer(Modifier.height(16.dp)) }
                 }
             } else {
             LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
                 vm.promptOfTheDay?.let { potd ->
@@ -367,14 +384,14 @@ fun GalleryScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable { onOpenCode(potd.code) },
-                                shape = RoundedCornerShape(14.dp),
+                                shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(containerColor = SurfaceDark),
                                 border = BorderStroke(1.dp, Amber)
                             ) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(12.dp),
+                                        .padding(10.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     AsyncImage(
@@ -382,8 +399,8 @@ fun GalleryScreen(
                                         contentDescription = "Prompt of the day",
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
-                                            .size(64.dp)
-                                            .clip(RoundedCornerShape(10.dp))
+                                            .size(44.dp)
+                                            .clip(RoundedCornerShape(8.dp))
                                     )
                                     Spacer(Modifier.width(12.dp))
                                     Column(modifier = Modifier.weight(1f)) {
@@ -417,21 +434,21 @@ fun GalleryScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { showCustomDialog = true },
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-                        border = BorderStroke(1.dp, Amber)
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 Icons.Filled.Edit,
                                 contentDescription = null,
                                 tint = Amber,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                             Spacer(Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
@@ -454,7 +471,7 @@ fun GalleryScreen(
                 items(vm.filtered, key = { it.code }) { code ->
                     CodeCard(code = code, onClick = { onOpenCode(code.code) })
                 }
-                item { Spacer(Modifier.height(24.dp)) }
+                item { Spacer(Modifier.height(16.dp)) }
             }
             } // end list mode
         }
@@ -467,21 +484,44 @@ private fun GridCodeCard(code: PromptCode, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = SurfaceDark),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
-        Column {
+        // Uniform 4:5 thumb with the code overlaid on a bottom fade: no
+        // text block below, so every row is exactly even — no dead space.
+        Box {
             AsyncImage(
                 model = code.sampleAsset,
                 contentDescription = "Sample: ${code.code}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp)
-                    .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
+                    .aspectRatio(4f / 5f)
             )
-            Column(modifier = Modifier.padding(10.dp)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.78f)
+                            )
+                        )
+                    )
+            )
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(8.dp)
+            ) {
+                Text(
+                    text = code.category.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Paper,
+                    maxLines = 1
+                )
                 Text(
                     text = code.code,
                     fontFamily = Mono,
@@ -489,13 +529,6 @@ private fun GridCodeCard(code: PromptCode, onClick: () -> Unit) {
                     color = Amber,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = code.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = PaperDim,
-                    maxLines = 2
                 )
             }
         }
@@ -516,14 +549,14 @@ private fun CodeCard(code: PromptCode, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = SurfaceDark),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Sample thumbnail
@@ -532,8 +565,8 @@ private fun CodeCard(code: PromptCode, onClick: () -> Unit) {
                 contentDescription = "Sample: ${code.code}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(72.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .size(52.dp)
+                    .clip(RoundedCornerShape(8.dp))
             )
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -542,24 +575,28 @@ private fun CodeCard(code: PromptCode, onClick: () -> Unit) {
                     fontFamily = Mono,
                     fontWeight = FontWeight.SemiBold,
                     color = Amber,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.bodyMedium
                 )
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
                 Text(
                     text = code.description,
                     style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2
+                    color = PaperDim,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(2.dp))
                 Text(
                     text = code.category.uppercase(),
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
+                    color = PaperDim
                 )
             }
             Icon(
                 Icons.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                tint = PaperDim
+                tint = PaperDim,
+                modifier = Modifier.size(20.dp)
             )
         }
     }
