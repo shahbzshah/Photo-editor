@@ -7,8 +7,10 @@ import android.content.Context
 import android.net.Uri
 import android.webkit.WebView
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
@@ -72,6 +74,7 @@ import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import kotlinx.coroutines.delay
 import app.photopromptcodes.notifications.ResultNotifier
+import app.photopromptcodes.notifications.RunKeepAliveService
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -189,6 +192,10 @@ class RunViewModel(app: Application) : AndroidViewModel(app) {
     /** The user asked to be notified when this run's image lands. */
     fun requestNotify() {
         ui = ui.copy(notifyWhenReady = true)
+        // Keep the process alive while the edit develops in the background:
+        // without this, Android can kill the run when the user leaves the
+        // app, and the notification could never fire.
+        RunKeepAliveService.start(getApplication())
     }
 
     /** Runs one rescue scan for a finished image that the watcher missed. */
@@ -206,13 +213,18 @@ class RunViewModel(app: Application) : AndroidViewModel(app) {
                 if (ui.notifyWhenReady) {
                     ResultNotifier.postReady(getApplication(), ui.code?.code.orEmpty())
                 }
+                RunKeepAliveService.stop(getApplication())
                 _done.emit(record.id)
             }
-            is DriverEvent.Failed -> ui = ui.copy(error = event.message, errorDebug = event.debugInfo)
+            is DriverEvent.Failed -> {
+                ui = ui.copy(error = event.message, errorDebug = event.debugInfo)
+                RunKeepAliveService.stop(getApplication())
+            }
         }
     }
 
     override fun onCleared() {
+        RunKeepAliveService.stop(getApplication())
         driver?.destroy()
         driver = null
     }
@@ -291,6 +303,7 @@ fun RunScreen(
             ) { granted ->
                 if (granted) {
                     notifyRequested = true
+                    notifyDenied = false
                     vm.requestNotify()
                 } else {
                     notifyDenied = true
@@ -309,7 +322,21 @@ fun RunScreen(
                                 ) == PackageManager.PERMISSION_GRANTED
                             ) {
                                 notifyRequested = true
+                                notifyDenied = false
                                 vm.requestNotify()
+                            } else if (notifyDenied) {
+                                // Said no once: the system won't ask again.
+                                // Take him straight to the app's notification
+                                // settings instead of a dead re-prompt.
+                                try {
+                                    val intent =
+                                        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                            putExtra(Settings.EXTRA_APP_PACKAGE, appCtx.packageName)
+                                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                        }
+                                    appCtx.startActivity(intent)
+                                } catch (_: Exception) {
+                                }
                             } else {
                                 notifyLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                             }
@@ -735,7 +762,7 @@ private fun DevelopingRoom(
                 }
                 if (notifyDenied) {
                     Text(
-                        text = "Notifications are off — stay on this screen and the result will appear here.",
+                        text = "Notifications are off — tap the button above again to open Settings and turn them on.",
                         style = MaterialTheme.typography.bodySmall,
                         color = Danger
                     )

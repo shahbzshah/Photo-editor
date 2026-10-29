@@ -14,6 +14,11 @@
     <!-- "Notify me when ready" on the run screen (runtime permission on Android 13+). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Keep-alive for a run the user asked to be notified about: raises
+         the process priority while the edit develops in the background. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
     <!-- Let the app see WhatsApp/TikTok/Instagram for direct sharing (Android 11+ package visibility). -->
     <queries>
         <package android:name="com.whatsapp" />
@@ -39,6 +44,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".notifications.RunKeepAliveService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
