@@ -45,7 +45,7 @@ sealed interface DriverEvent {
     data class Failed(val message: String, val debugInfo: String? = null) : DriverEvent
 }
 
-open class DriverException(message: String) : Exception(message)
+open class DriverException(message: String, val debugInfo: String? = null) : Exception(message)
 
 /**
  * Drives ChatGPT's web photo editor inside a WebView.
@@ -66,6 +66,7 @@ class ChatGptDriver : EngineDriver {
         // Opening ChatGPT's heavy page on a slow connection can take a while.
         private const val OPEN_TIMEOUT_MS = 180_000L
         private const val ATTACH_TIMEOUT_MS = 30_000L
+        private const val SEND_TIMEOUT_MS = 30_000L
         private const val GENERATION_TIMEOUT_MS = 12 * 60_000L
         private const val LOGIN_TIMEOUT_MS = 15 * 60_000L
     }
@@ -256,7 +257,7 @@ class ChatGptDriver : EngineDriver {
             } catch (e: CancellationException) {
                 // superseded by a newer run — stay silent
             } catch (e: Exception) {
-                emit(DriverEvent.Failed(humanError(e)))
+                emit(DriverEvent.Failed(humanError(e), (e as? DriverException)?.debugInfo))
             }
         }
     }
@@ -490,14 +491,43 @@ class ChatGptDriver : EngineDriver {
     private suspend fun sendPrompt(prompt: String) {
         val setResult = unquote(evalJs(setPromptJs(prompt)))
         if (setResult != "ok") throw DriverException(
-            "Couldn't type into the ChatGPT message box — its layout may have changed (see Selectors.kt)."
+            "Couldn't type into the ChatGPT message box. Please retry — if it keeps happening, copy the error details and send them to me.",
+            unquote(evalJs(diagnoseComposerJs()))
         )
-        delay(1000)
-        val sent = unquote(
-            evalJs("(function(){var b=${qsFirst(Selectors.sendButton)};if(!b)return 'no';b.click();return 'ok';})()")
-        ) == "ok"
+        // Baseline: how many user messages exist before we send, so we can
+        // tell a real send apart from a tap that did nothing.
+        val beforeCount = unquote(evalJs(userMessageCountJs()))?.toIntOrNull() ?: 0
+        // The send button is disabled until the typed text (and the photo
+        // upload) registers in ChatGPT's UI, and the toolbar can re-render
+        // after typing — so poll for an enabled, visible button instead of
+        // looking once and giving up.
+        val deadline = SystemClock.uptimeMillis() + SEND_TIMEOUT_MS
+        var lastDiag: String? = null
+        var sent = false
+        while (SystemClock.uptimeMillis() < deadline && !sent) {
+            val tap = unquote(evalJs(tapSendButtonJs()))
+            if (tap == "ok") {
+                delay(2000)
+                if (unquote(evalJs(sentCheckJs(beforeCount))) == "sent") {
+                    sent = true
+                }
+                // Tapped but nothing sent (upload still processing, button
+                // re-rendered): keep polling, the button comes back enabled.
+            } else if (tap != null && tap.startsWith("diag:")) {
+                lastDiag = tap.removePrefix("diag:")
+            }
+            if (!sent) delay(500)
+        }
+        if (!sent) {
+            // Fallback that needs no button at all: ChatGPT sends on Enter.
+            unquote(evalJs(enterToSendJs()))
+            delay(2000)
+            if (unquote(evalJs(sentCheckJs(beforeCount))) == "sent") sent = true
+        }
         if (!sent) throw DriverException(
-            "Couldn't find the send button — ChatGPT may have changed its layout (see Selectors.kt)."
+            "ChatGPT's send button never became available, so the message didn't go. " +
+                "Please retry — if it keeps happening, copy the error details and send them to me.",
+            "Last button scan: ${lastDiag ?: "none"}\n${unquote(evalJs(diagnoseComposerJs()))}"
         )
         delay(2000)
     }
@@ -678,6 +708,99 @@ class ChatGptDriver : EngineDriver {
           }
           var txt=el.innerText||el.textContent||'';
           return txt.length>10?'ok':'empty';
+        })()"""
+    }
+
+    /**
+     * Finds an enabled, visible send button and taps it with realistic
+     * pointer events (React UIs often ignore a bare .click()). Skips the
+     * stop button (same id while a reply is generating) and disabled or
+     * hidden buttons. Returns 'ok', or 'diag:<button inventory>' so a
+     * failure can say what the page actually had.
+     */
+    private fun tapSendButtonJs(): String {
+        val sels = Selectors.sendButton.joinToString(",") { JSONObject.quote(it) }
+        return """(function(){
+          var sels=[$sels];
+          function visible(el){ var r=el.getBoundingClientRect(); var s=window.getComputedStyle(el);
+            return r.width>0 && r.height>0 && s.display!=='none' && s.visibility!=='hidden'; }
+          function describe(el){ return (el.tagName||'?').toLowerCase()+'#'+(el.id||'')+
+            '[testid='+(el.getAttribute('data-testid')||'')+'][label='+(el.getAttribute('aria-label')||'')+']'+
+            ' disabled='+!!el.disabled+' aria-disabled='+el.getAttribute('aria-disabled')+' visible='+visible(el); }
+          var seen=[]; var inv=[];
+          var stopPresent=false;
+          for(var i=0;i<sels.length;i++){
+            var el=document.querySelector(sels[i]);
+            if(!el) continue;
+            if(el.getAttribute('data-testid')==='stop-button'){ stopPresent=true; inv.push('STOP: '+describe(el)); continue; }
+            var key=describe(el);
+            if(seen.indexOf(key)>-1) continue; seen.push(key); inv.push(key);
+            if(el.disabled || el.getAttribute('aria-disabled')==='true') continue;
+            if(!visible(el)) continue;
+            function realTap(t){
+              function ev(n,o){ var e; try{ e=new PointerEvent(n,o); }catch(_){ e=document.createEvent('Event'); e.initEvent(n,true,true); }
+                try{ Object.assign(e,o); }catch(_){} t.dispatchEvent(e); }
+              var r=t.getBoundingClientRect();
+              var o={bubbles:true,cancelable:true,clientX:r.left+r.width/2,clientY:r.top+r.height/2,pointerId:1,isPrimary:true};
+              ev('pointerdown',o); ev('mousedown',o); ev('pointerup',o); ev('mouseup',o); ev('click',o);
+              try{ t.click(); }catch(_){}
+            }
+            realTap(el);
+            return 'ok';
+          }
+          if(stopPresent) inv.push('note: a previous reply is still generating');
+          return 'diag:'+inv.join(' | ');
+        })()"""
+    }
+
+    /** Sends with the Enter key — needs no send button at all. */
+    private fun enterToSendJs(): String {
+        val composer = qsFirst(Selectors.composer)
+        return """(function(){
+          var el=$composer;
+          if(!el) return 'no-composer';
+          el.focus();
+          function key(t){ var e;
+            try{ e=new KeyboardEvent(t,{key:'Enter',code:'Enter',keyCode:13,which:13,bubbles:true,cancelable:true}); }
+            catch(_){ e=document.createEvent('Event'); e.initEvent(t,true,true); }
+            el.dispatchEvent(e); }
+          key('keydown'); key('keypress'); key('keyup');
+          return 'ok';
+        })()"""
+    }
+
+    private fun userMessageCountJs(): String {
+        return "(function(){return String(document.querySelectorAll('[data-message-author-role=\"user\"]').length);})()"
+    }
+
+    /**
+     * 'sent' when the composer emptied (ChatGPT clears it on send) or a
+     * new user message appeared since [beforeCount].
+     */
+    private fun sentCheckJs(beforeCount: Int): String {
+        val composer = qsFirst(Selectors.composer)
+        return """(function(){
+          var el=$composer;
+          var txt=el?(el.innerText||el.textContent||''):'';
+          var users=document.querySelectorAll('[data-message-author-role="user"]').length;
+          return (txt.trim().length===0 || users>$beforeCount)?'sent':'pending';
+        })()"""
+    }
+
+    /** One-line snapshot of the composer state, for copyable error details. */
+    private fun diagnoseComposerJs(): String {
+        val composer = qsFirst(Selectors.composer)
+        return """(function(){
+          var el=$composer;
+          if(!el) return 'composer: MISSING';
+          var txt=el.innerText||el.textContent||'';
+          var btns=document.querySelectorAll('button');
+          var ids=[];
+          for(var i=0;i<btns.length && ids.length<12;i++){
+            var b=btns[i];
+            ids.push((b.id||'')+'/'+(b.getAttribute('data-testid')||'')+'/'+(b.getAttribute('aria-label')||''));
+          }
+          return 'composer: present, textLen='+txt.trim().length+' buttons['+btns.length+']: '+ids.join(' | ');
         })()"""
     }
 

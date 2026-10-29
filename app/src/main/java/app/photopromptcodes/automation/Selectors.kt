@@ -54,11 +54,23 @@ object Selectors {
         "attach"
     )
 
-    /** The send button. */
+    /**
+     * The send button. Current markup (verified Oct 2026) is a single
+     * button carrying id="composer-submit-button", data-testid="send-button"
+     * and aria-label="Send prompt" — and it is DISABLED until the composer
+     * holds text, so the driver must poll for an enabled one rather than
+     * looking once. Older/alternate forms are kept as fallbacks; the
+     * driver also falls back to sending with the Enter key, so a future
+     * markup change degrades instead of failing outright.
+     */
     val sendButton: List<String> = listOf(
+        "#composer-submit-button",
         "button[data-testid=\"send-button\"]",
+        "button[data-composer-submit]",
+        "button[aria-label=\"Send prompt\"]",
         "button[aria-label=\"Send message\"]",
-        "button[aria-label=\"Send prompt\"]"
+        "button[aria-label^=\"Send\"]",
+        "form button[type=\"submit\"]"
     )
 
     /**
