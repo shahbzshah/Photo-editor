@@ -73,7 +73,6 @@ class ChatGptDriver : EngineDriver {
 
     private var webView: WebView? = null
     private var listener: ((DriverEvent) -> Unit)? = null
-    private var pendingPhoto: Uri? = null
     private var loginGate: CompletableDeferred<Unit>? = null
     private var imageArrived: CompletableDeferred<String>? = null
     private val imageHandled = AtomicBoolean(false)
@@ -119,17 +118,16 @@ class ChatGptDriver : EngineDriver {
                 filePathCallback: ValueCallback<Array<Uri>>,
                 fileChooserParams: FileChooserParams
             ): Boolean {
-                val uri = pendingPhoto
-                return if (uri != null) {
-                    pendingPhoto = null
-                    Log.d(TAG, "supplying photo to file chooser")
-                    filePathCallback.onReceiveValue(arrayOf(uri))
-                    true
-                } else {
-                    Log.w(TAG, "file chooser opened with no pending photo")
-                    filePathCallback.onReceiveValue(null)
-                    false
-                }
+                // The photo is attached by JS injection (attachPhoto), never
+                // through this chooser — there is nothing to supply here.
+                // Resolve exactly once with null (cancel) and ALWAYS return
+                // true. The old code returned false after resolving, which
+                // tells WebView we didn't handle it: it then shows its own
+                // chooser and delivers a SECOND result to the same
+                // callback — "Duplicate showFileChooser result", a native
+                // crash (2026-10-16, Lenovo TB310FU, v1.0).
+                filePathCallback.onReceiveValue(null)
+                return true
             }
         }
         wv.addJavascriptInterface(Bridge(), "PpcBridge")
