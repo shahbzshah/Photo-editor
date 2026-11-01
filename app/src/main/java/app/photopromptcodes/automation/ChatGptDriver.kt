@@ -355,6 +355,46 @@ class ChatGptDriver : EngineDriver {
     }
 
     /**
+     * Dismisses ChatGPT's cookie-consent screen ("Cookie preferences" +
+     * Continue) when it is the thing in the way. Scoped to pages that
+     * actually say "cookie preferences", so it never touches the login
+     * flow (which has its own Continue buttons). Returns true when it
+     * tapped something.
+     */
+    private suspend fun dismissCookieConsentIfPresent(): Boolean {
+        val js = """(function(){
+          var t=(document.body?document.body.innerText:'').toLowerCase();
+          if(t.indexOf('cookie preferences')===-1) return 'no';
+          function visible(el){ var r=el.getBoundingClientRect(); var s=window.getComputedStyle(el);
+            return r.width>0 && r.height>0 && s.display!=='none' && s.visibility!=='hidden'; }
+          function realTap(el){
+            function ev(n,o){ var e; try{ e=new PointerEvent(n,o); }catch(_){ e=document.createEvent('Event'); e.initEvent(n,true,true); }
+              try{Object.assign(e,o);}catch(_){} el.dispatchEvent(e);}
+            var r=el.getBoundingClientRect(); var o={bubbles:true,cancelable:true,clientX:r.left+r.width/2,clientY:r.top+r.height/2,pointerId:1,isPrimary:true};
+            ev('pointerdown',o);ev('mousedown',o);ev('pointerup',o);ev('mouseup',o);ev('click',o);
+            try{el.click();}catch(_){}
+          }
+          var els=document.querySelectorAll('button, [role="button"], a');
+          var cont=null;
+          for(var i=0;i<els.length;i++){
+            var txt=(els[i].textContent||'').trim().toLowerCase();
+            if(!visible(els[i])) continue;
+            if(txt==='accept all' || txt==='accept all cookies'){ realTap(els[i]); return 'tapped'; }
+            if(txt==='continue' && !cont) cont=els[i];
+          }
+          if(cont){ realTap(cont); return 'tapped'; }
+          return 'no-btn';
+        })()"""
+        val r = try { unquote(evalJs(js)) } catch (_: Exception) { null }
+        if (r == "tapped") {
+            // Let the consent navigation settle before re-checking state.
+            delay(2000)
+            return true
+        }
+        return false
+    }
+
+    /**
      * Waits for ChatGPT's open phase to resolve. Returns "in", "out",
      * "challenge" (human-verification interstitial — the user can complete it
      * in the visible browser), or "timeout".
@@ -364,6 +404,7 @@ class ChatGptDriver : EngineDriver {
         while (android.os.SystemClock.uptimeMillis() < deadline) {
             try {
                 if (isChallengePage()) return "challenge"
+                dismissCookieConsentIfPresent()
                 val state = loginState()
                 if (state == "in" || state == "out") return state
             } catch (_: Exception) {
@@ -401,7 +442,11 @@ class ChatGptDriver : EngineDriver {
             loginGate = null
             if (!done) throw DriverException("Sign-in timed out. Please try again.")
             withContext(Dispatchers.Main) { wv.loadUrl(CHATGPT_URL) }
-            val signedIn = waitFor(PAGE_TIMEOUT_MS) { loginState() == "in" }
+            // The cookie screen can appear again after sign-in.
+            val signedIn = waitFor(PAGE_TIMEOUT_MS) {
+                dismissCookieConsentIfPresent()
+                loginState() == "in"
+            }
             if (!signedIn) throw DriverException(
                 "Still not signed in to ChatGPT. Sign in in the browser above, then retry."
             )
