@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -52,9 +53,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -313,30 +315,36 @@ fun ResultDetailScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // Compact padding: the default 24dp side padding leaves
+                // too little room in a third-width button, so "WhatsApp"
+                // wrapped to two lines and spilled over the date below.
                 OutlinedButton(
                     onClick = {
                         vm.resultFile()?.let {
                             shareImageToApp(context, it, "com.whatsapp", "WhatsApp")
                         }
                     },
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
                     modifier = Modifier.weight(1f)
-                ) { Text("WhatsApp") }
+                ) { ShareLabel("WhatsApp") }
                 OutlinedButton(
                     onClick = {
                         vm.resultFile()?.let {
                             shareImageToApp(context, it, "com.zhiliaoapp.musically", "TikTok")
                         }
                     },
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
                     modifier = Modifier.weight(1f)
-                ) { Text("TikTok") }
+                ) { ShareLabel("TikTok") }
                 OutlinedButton(
                     onClick = {
                         vm.resultFile()?.let {
                             shareImageToApp(context, it, "com.instagram.android", "Instagram")
                         }
                     },
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
                     modifier = Modifier.weight(1f)
-                ) { Text("Instagram") }
+                ) { ShareLabel("Instagram") }
             }
             Spacer(Modifier.height(8.dp))
             Text(
@@ -347,4 +355,17 @@ fun ResultDetailScreen(
             Spacer(Modifier.height(24.dp))
         }
     }
+}
+
+/** Single-line share label: 13sp + no wrap, so the longest label
+ * ("Instagram") still fits a third-width button on narrow phones. */
+@Composable
+private fun ShareLabel(text: String) {
+    Text(
+        text,
+        maxLines = 1,
+        softWrap = false,
+        overflow = TextOverflow.Ellipsis,
+        fontSize = 13.sp
+    )
 }
