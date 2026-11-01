@@ -71,7 +71,8 @@ import kotlinx.coroutines.withContext
 fun SettingsScreen(
     onSignIn: () -> Unit,
     onPrivacy: () -> Unit,
-    onAbout: () -> Unit
+    onAbout: () -> Unit,
+    onUpdateFound: (UpdateChecker.UpdateInfo) -> Unit = {}
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -349,37 +350,10 @@ fun SettingsScreen(
             Spacer(Modifier.height(24.dp))
 
             // --- Updates ---
-            var updateState by remember { mutableStateOf("idle") } // idle|checking|available|none|downloading|done|error
-            var updateInfo by remember { mutableStateOf<UpdateChecker.UpdateInfo?>(null) }
-            var downloadBytes by remember { mutableStateOf(0L) }
-            var downloadTotal by remember { mutableStateOf(-1L) }
-            var downloadError by remember { mutableStateOf<String?>(null) }
-            val startDownload: () -> Unit = {
-                val info = updateInfo
-                if (info != null) {
-                    downloadBytes = 0L
-                    downloadTotal = info.apkSize
-                    downloadError = null
-                    updateState = "downloading"
-                    scope.launch {
-                        when (val result = UpdateChecker.downloadAndInstall(
-                            ctx, info
-                        ) { read, total ->
-                            downloadBytes = read
-                            if (total > 0) downloadTotal = total
-                        }) {
-                            is UpdateChecker.DownloadResult.Installed ->
-                                updateState = "done"
-                            is UpdateChecker.DownloadResult.Cancelled ->
-                                updateState = "available"
-                            is UpdateChecker.DownloadResult.Failed -> {
-                                downloadError = result.reason
-                                updateState = "error"
-                            }
-                        }
-                    }
-                }
-            }
+            // Finding an update here hands it to the forced-update gate
+            // (MainActivity): there is no dismissible download path —
+            // the app is blocked until the update is installed.
+            var updateState by remember { mutableStateOf("idle") } // idle|checking|none
             Text(
                 "UPDATES",
                 style = MaterialTheme.typography.labelSmall,
@@ -401,158 +375,27 @@ fun SettingsScreen(
                     Text(
                         when (updateState) {
                             "checking" -> "Checking for updates…"
-                            "available" -> "Version ${updateInfo?.versionName} is available."
                             "none" -> "You're on the latest version."
-                            "downloading" -> if (downloadTotal > 0) {
-                                val pct =
-                                    (downloadBytes * 100 / downloadTotal).coerceIn(0, 100)
-                                "Downloading update… ${"%.1f".format(downloadBytes / 1048576.0)} / " +
-                                    "${"%.1f".format(downloadTotal / 1048576.0)} MB ($pct%)"
-                            } else if (downloadBytes > 0) {
-                                "Downloading update… ${"%.1f".format(downloadBytes / 1048576.0)} MB"
-                            } else {
-                                "Downloading update…"
-                            }
-                            "done" -> "Download complete — tap Install below."
-                            "error" -> "Download failed. ${downloadError ?: "Try again or use the browser."}"
                             else -> "Check for new versions of the app."
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = PaperDim
                     )
-                    if (updateInfo?.notes?.isNotBlank() == true && updateState == "available") {
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            updateInfo!!.notes.take(300),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = PaperDim
-                        )
-                    }
                     Spacer(Modifier.height(12.dp))
-                    when (updateState) {
-                        "error" -> {
-                            Button(
-                                onClick = { startDownload() },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Amber,
-                                    contentColor = NearBlack
-                                ),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Retry download", fontWeight = FontWeight.SemiBold)
-                            }
-                            Spacer(Modifier.height(8.dp))
-                            OutlinedButton(
-                                onClick = {
-                                    val url = "https://github.com/shahbzshah/Photo-editor/releases/latest"
-                                    try {
-                                        ctx.startActivity(
-                                            android.content.Intent(
-                                                android.content.Intent.ACTION_VIEW,
-                                                android.net.Uri.parse(url)
-                                            )
-                                        )
-                                    } catch (_: Exception) { }
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Open in browser", color = Amber)
-                            }
-                        }
-                        "available" -> {
-                            val canInstall = UpdateChecker.canInstallPackages(ctx)
-                            Button(
-                                onClick = {
-                                    if (!canInstall) {
-                                        // First tap: take him to the system toggle.
-                                        // After he allows it, tapping again downloads & installs.
-                                        UpdateChecker.openInstallPermissionSettings(ctx)
-                                    } else {
-                                        startDownload()
-                                    }
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Amber,
-                                    contentColor = NearBlack
-                                ),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    if (canInstall) "Download & install"
-                                    else "Allow app installs",
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                            if (!canInstall) {
-                                Spacer(Modifier.height(8.dp))
-                                Text(
-                                    "One-time step: Android asks you to allow this app " +
-                                        "to install updates. Turn it on, come back here, " +
-                                        "and tap the button again.",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = PaperDim
-                                )
-                            }
-                        }
-                        "downloading" -> {
-                            if (downloadTotal > 0) {
-                                androidx.compose.material3.LinearProgressIndicator(
-                                    progress = {
-                                        (downloadBytes.toFloat() / downloadTotal.toFloat())
-                                            .coerceIn(0f, 1f)
-                                    },
-                                    color = Amber,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            } else {
-                                androidx.compose.material3.LinearProgressIndicator(
-                                    color = Amber,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                            Spacer(Modifier.height(12.dp))
-                            OutlinedButton(
-                                onClick = { UpdateChecker.cancelDownload() },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Cancel download", color = Amber)
-                            }
-                        }
-                        "done" -> {
-                            Button(
-                                onClick = {
-                                    val info = updateInfo
-                                    if (info == null ||
-                                        !UpdateChecker.launchInstall(ctx, info.versionCode)
-                                    ) {
-                                        downloadError = "The saved update file is missing " +
-                                            "or damaged. Download it again."
-                                        updateState = "error"
-                                    }
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Amber,
-                                    contentColor = NearBlack
-                                ),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Install update", fontWeight = FontWeight.SemiBold)
-                            }
-                        }
-                        "checking" -> {
-                            androidx.compose.material3.CircularProgressIndicator(
-                                color = Amber,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        else -> OutlinedButton(
+                    if (updateState == "checking") {
+                        androidx.compose.material3.CircularProgressIndicator(
+                            color = Amber,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    } else {
+                        OutlinedButton(
                             onClick = {
                                 updateState = "checking"
                                 scope.launch {
                                     val info = UpdateChecker.checkForUpdate(ctx)
                                     if (info != null) {
-                                        updateInfo = info
-                                        updateState = "available"
+                                        onUpdateFound(info)
+                                        updateState = "idle"
                                     } else {
                                         updateState = "none"
                                     }
@@ -566,6 +409,7 @@ fun SettingsScreen(
                 }
             }
 
+            Spacer(Modifier.height(24.dp))
             Spacer(Modifier.height(24.dp))
 
             // --- Diagnostics ---

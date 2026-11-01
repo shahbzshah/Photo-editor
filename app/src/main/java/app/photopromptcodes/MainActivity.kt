@@ -34,7 +34,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import kotlinx.coroutines.launch
 import app.photopromptcodes.ui.AboutScreen
 import app.photopromptcodes.ui.BatchRunScreen
 import app.photopromptcodes.ui.CodeDetailScreen
@@ -56,12 +55,19 @@ import app.photopromptcodes.ui.theme.PhotoPromptCodesTheme
 import app.photopromptcodes.ui.theme.SurfaceDark
 
 class MainActivity : ComponentActivity() {
+    private val resumeTick = mutableStateOf(0)
+
+    override fun onResume() {
+        super.onResume()
+        resumeTick.value++
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             PhotoPromptCodesTheme {
-                AppNav()
+                AppNav(resumeTick = resumeTick.value)
             }
         }
     }
@@ -79,23 +85,32 @@ private val TABS = listOf(
 private val TAB_ROUTES = TABS.map { it.route }.toSet()
 
 @Composable
-fun AppNav() {
+fun AppNav(resumeTick: Int) {
     val nav = rememberNavController()
     val ctx = androidx.compose.ui.platform.LocalContext.current
-    val scope = androidx.compose.runtime.rememberCoroutineScope()
     var pendingUpdate by remember {
         mutableStateOf<app.photopromptcodes.update.UpdateChecker.UpdateInfo?>(null)
     }
-    // Silent update check on launch
-    androidx.compose.runtime.LaunchedEffect(Unit) {
-        // Only auto-check once per day
+    // Forced-update check: on every launch and every return from the
+    // background. At most once per 15 minutes (GitHub's unauthenticated
+    // API allows 60 calls/hour), and never while the gate is already up.
+    // A failed check (no network, GitHub down) returns null, so the app
+    // opens normally instead of locking the user out.
+    androidx.compose.runtime.LaunchedEffect(resumeTick) {
+        if (pendingUpdate != null) return@LaunchedEffect
         val prefs = ctx.getSharedPreferences("ppc_prefs", android.content.Context.MODE_PRIVATE)
         val lastCheck = prefs.getLong("last_update_check", 0)
-        if (System.currentTimeMillis() - lastCheck > 24 * 60 * 60 * 1000) {
-            val info = app.photopromptcodes.update.UpdateChecker.checkForUpdate(ctx)
-            prefs.edit().putLong("last_update_check", System.currentTimeMillis()).apply()
-            if (info != null) pendingUpdate = info
-        }
+        if (System.currentTimeMillis() - lastCheck < 15 * 60 * 1000L) return@LaunchedEffect
+        val info = app.photopromptcodes.update.UpdateChecker.checkForUpdate(ctx)
+        prefs.edit().putLong("last_update_check", System.currentTimeMillis()).apply()
+        if (info != null) pendingUpdate = info
+    }
+    // The gate replaces the whole app: no gallery, no runs, no back
+    // door until the update is installed.
+    val update = pendingUpdate
+    if (update != null) {
+        app.photopromptcodes.ui.ForceUpdateGate(update = update)
+        return
     }
     val start = remember {
         when {
@@ -189,7 +204,8 @@ fun AppNav() {
             SettingsScreen(
                 onSignIn = { nav.navigate("signin") },
                 onPrivacy = { nav.navigate("privacy") },
-                onAbout = { nav.navigate("about") }
+                onAbout = { nav.navigate("about") },
+                onUpdateFound = { pendingUpdate = it }
             )
         }
         composable("privacy") {
@@ -302,81 +318,4 @@ fun AppNav() {
         }
     }
 
-    // Update-available dialog
-    val update = pendingUpdate
-    if (update != null) {
-        var downloading by remember {
-            mutableStateOf(false)
-        }
-        var dlRead by remember { mutableStateOf(0L) }
-        var dlTotal by remember { mutableStateOf(-1L) }
-        var dlError by remember { mutableStateOf<String?>(null) }
-        val canInstallNow = app.photopromptcodes.update.UpdateChecker.canInstallPackages(ctx)
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { pendingUpdate = null },
-            title = { Text("Update available") },
-            text = {
-                Text(
-                    "Version ${update.versionName} is ready." +
-                        (if (update.notes.isNotBlank()) "\n\n${update.notes.take(300)}" else "") +
-                        (if (!canInstallNow)
-                            "\n\nFirst tap opens a system setting — allow this app " +
-                            "to install updates there, then tap Update now again."
-                         else "") +
-                        (if (dlError != null) "\n\nDownload failed: $dlError" else "")
-                )
-            },
-            confirmButton = {
-                androidx.compose.material3.TextButton(
-                    onClick = {
-                        if (!app.photopromptcodes.update.UpdateChecker.canInstallPackages(ctx)) {
-                            app.photopromptcodes.update.UpdateChecker
-                                .openInstallPermissionSettings(ctx)
-                        } else {
-                            dlError = null
-                            dlRead = 0L
-                            dlTotal = update.apkSize
-                            downloading = true
-                            scope.launch {
-                                when (val result = app.photopromptcodes.update.UpdateChecker
-                                    .downloadAndInstall(ctx, update) { read, total ->
-                                        dlRead = read
-                                        if (total > 0) dlTotal = total
-                                    }
-                                ) {
-                                    is app.photopromptcodes.update.UpdateChecker
-                                        .DownloadResult.Installed -> pendingUpdate = null
-                                    is app.photopromptcodes.update.UpdateChecker
-                                        .DownloadResult.Cancelled -> Unit
-                                    is app.photopromptcodes.update.UpdateChecker
-                                        .DownloadResult.Failed ->
-                                        dlError = result.reason
-                                }
-                                downloading = false
-                            }
-                        }
-                    },
-                    enabled = !downloading
-                ) {
-                    Text(
-                        if (downloading && dlTotal > 0) {
-                            val pct = (dlRead * 100 / dlTotal).coerceIn(0, 100)
-                            "Downloading… $pct%"
-                        } else if (downloading) "Downloading…"
-                        else "Update now"
-                    )
-                }
-            },
-            dismissButton = {
-                androidx.compose.material3.TextButton(onClick = {
-                    if (downloading) {
-                        app.photopromptcodes.update.UpdateChecker.cancelDownload()
-                    }
-                    pendingUpdate = null
-                }) {
-                    Text(if (downloading) "Cancel download" else "Later")
-                }
-            }
-        )
-    }
 }
