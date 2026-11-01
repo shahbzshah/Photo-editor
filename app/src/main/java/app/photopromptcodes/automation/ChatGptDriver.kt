@@ -66,6 +66,7 @@ class ChatGptDriver : EngineDriver {
         // Opening ChatGPT's heavy page on a slow connection can take a while.
         private const val OPEN_TIMEOUT_MS = 180_000L
         private const val ATTACH_TIMEOUT_MS = 30_000L
+        private const val ATTACH_VERIFY_MS = 20_000L
         private const val SEND_TIMEOUT_MS = 30_000L
         private const val GENERATION_TIMEOUT_MS = 12 * 60_000L
         private const val LOGIN_TIMEOUT_MS = 15 * 60_000L
@@ -73,6 +74,7 @@ class ChatGptDriver : EngineDriver {
 
     private var webView: WebView? = null
     private var listener: ((DriverEvent) -> Unit)? = null
+    private var pendingPhoto: Uri? = null
     private var loginGate: CompletableDeferred<Unit>? = null
     private var imageArrived: CompletableDeferred<String>? = null
     private val imageHandled = AtomicBoolean(false)
@@ -118,15 +120,14 @@ class ChatGptDriver : EngineDriver {
                 filePathCallback: ValueCallback<Array<Uri>>,
                 fileChooserParams: FileChooserParams
             ): Boolean {
-                // The photo is attached by JS injection (attachPhoto), never
-                // through this chooser — there is nothing to supply here.
-                // Resolve exactly once with null (cancel) and ALWAYS return
-                // true. The old code returned false after resolving, which
-                // tells WebView we didn't handle it: it then shows its own
-                // chooser and delivers a SECOND result to the same
-                // callback — "Duplicate showFileChooser result", a native
-                // crash (2026-10-16, Lenovo TB310FU, v1.0).
-                filePathCallback.onReceiveValue(null)
+                // Supplies the run's photo when the composer asks for a
+                // file (attachPhoto clicks the file input). Otherwise
+                // cancel. Always resolve exactly once and return true —
+                // returning false after resolving is the v1.8.8
+                // "Duplicate showFileChooser result" crash.
+                val uri = pendingPhoto
+                pendingPhoto = null
+                filePathCallback.onReceiveValue(uri?.let { arrayOf(it) })
                 return true
             }
         }
@@ -439,8 +440,69 @@ class ChatGptDriver : EngineDriver {
     private suspend fun attachPhoto() {
         val photo = currentPhoto
             ?: throw DriverException("No photo to attach. Please pick one again.")
-        // Direct injection: downscale the photo, convert to a File in the page,
-        // and set it on ChatGPT's file input. Bypasses the menu entirely.
+        // Real file-picker path: click the composer's file input so the
+        // native chooser opens, and hand it the photo — the upload then
+        // goes through ChatGPT's normal pipeline. The old JS injection
+        // (set input.files + dispatch change) silently stopped registering
+        // against the current ChatGPT page: the prompt went out as
+        // text-only and ChatGPT just waited for the photo (2026-11-01:
+        // "Please upload the photo you want edited").
+        pendingPhoto = photo
+        var opened = unquote(evalJs(clickFileInputJs()))
+        if (opened == "menu") {
+            delay(2000)
+            opened = unquote(evalJs(clickFileInputJs()))
+        }
+        if (opened != "ok") {
+            // No file input on the page — fall back to injection.
+            pendingPhoto = null
+            injectPhotoJs(photo)
+        }
+        // Never send the prompt on an unattached photo: verify the
+        // composer actually shows the attachment, and fail fast with a
+        // clear message instead of a 12-minute wait for an image that
+        // will never come.
+        val attached = waitFor(ATTACH_VERIFY_MS) { attachmentVisible() }
+        if (!attached) {
+            pendingPhoto = null
+            throw DriverException(
+                "The photo didn't attach to ChatGPT. Please retry — if it keeps happening, " +
+                    "attach the photo in the ChatGPT app instead."
+            )
+        }
+        // Let the upload settle before typing.
+        delay(2000)
+    }
+
+    /** Clicks the composer's file input (opens the native chooser). */
+    private fun clickFileInputJs(): String = """(function(){
+      var input = document.querySelector('form input[type="file"]') ||
+                  document.querySelector('input[type="file"]');
+      if (input) { input.click(); return 'ok'; }
+      var ab = Array.from(document.querySelectorAll('form button')).find(function(b){
+        var l = (b.getAttribute('aria-label') || '') + ' ' + (b.title || '');
+        return /attach|upload/i.test(l);
+      });
+      if (ab) { ab.click(); return 'menu'; }
+      return 'none';
+    })()"""
+
+    /** True once the composer shows the attached photo's thumbnail. */
+    private suspend fun attachmentVisible(): Boolean {
+        val r = unquote(evalJs("""(function(){
+          var form = document.querySelector('form');
+          if (!form) return 'no';
+          return form.querySelector('img') ? 'yes' : 'no';
+        })()"""))
+        return r == "yes"
+    }
+
+    /**
+     * Fallback attach: downscale the photo, convert to a File in the page,
+     * and set it on ChatGPT's file input — using the native files setter
+     * (bypasses React's value tracking) so the change event is seen.
+     */
+    private suspend fun injectPhotoJs(photo: Uri) {
         val ctx = appContext()
         val b64 = downscaleToBase64(ctx, photo)
             ?: throw DriverException("Couldn't read the photo. Please pick it again.")
@@ -450,9 +512,12 @@ class ChatGptDriver : EngineDriver {
           for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
           var file=new File([arr],"photo.jpg",{type:"image/jpeg"});
           var dt=new DataTransfer();dt.items.add(file);
-          var input=document.querySelector('input[type="file"]');
+          var input=document.querySelector('form input[type="file"]') ||
+                    document.querySelector('input[type="file"]');
           if(!input){input=document.createElement('input');input.type='file';input.style.display='none';document.body.appendChild(input);}
-          input.files=dt.files;
+          var setter=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'files').set;
+          setter.call(input, dt.files);
+          input.dispatchEvent(new Event('input',{bubbles:true}));
           input.dispatchEvent(new Event('change',{bubbles:true}));
           return 'ok';
         })()"""
@@ -460,8 +525,6 @@ class ChatGptDriver : EngineDriver {
         if (result != "ok") {
             throw DriverException("Couldn't attach the photo. Try again.")
         }
-        // Best-effort pause so the attachment thumbnail registers before we type.
-        delay(3000)
     }
 
     /**
