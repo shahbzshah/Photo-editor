@@ -78,6 +78,7 @@ class ChatGptDriver : EngineDriver {
     private var loginGate: CompletableDeferred<Unit>? = null
     private var imageArrived: CompletableDeferred<String>? = null
     private val imageHandled = AtomicBoolean(false)
+    private val chooserSupplied = AtomicBoolean(false)
     private var runJob: Job? = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -127,6 +128,7 @@ class ChatGptDriver : EngineDriver {
                 // "Duplicate showFileChooser result" crash.
                 val uri = pendingPhoto
                 pendingPhoto = null
+                if (uri != null) chooserSupplied.set(true)
                 filePathCallback.onReceiveValue(uri?.let { arrayOf(it) })
                 return true
             }
@@ -447,27 +449,39 @@ class ChatGptDriver : EngineDriver {
         // against the current ChatGPT page: the prompt went out as
         // text-only and ChatGPT just waited for the photo (2026-11-01:
         // "Please upload the photo you want edited").
+        val photoName = displayName(photo)
         pendingPhoto = photo
+        chooserSupplied.set(false)
         var opened = unquote(evalJs(clickFileInputJs()))
         if (opened == "menu") {
             delay(2000)
             opened = unquote(evalJs(clickFileInputJs()))
         }
-        if (opened != "ok") {
+        if (opened == "ok") {
+            // The click should have fired the chooser at once. If it
+            // didn't within a few seconds, the programmatic click didn't
+            // take — fall back to injection instead of waiting 20s.
+            if (!waitFor(4000) { chooserSupplied.get() }) {
+                pendingPhoto = null
+                injectPhotoJs(photo)
+            }
+        } else {
             // No file input on the page — fall back to injection.
             pendingPhoto = null
             injectPhotoJs(photo)
         }
         // Never send the prompt on an unattached photo: verify the
-        // composer actually shows the attachment, and fail fast with a
-        // clear message instead of a 12-minute wait for an image that
-        // will never come.
-        val attached = waitFor(ATTACH_VERIFY_MS) { attachmentVisible() }
+        // composer actually registered it, and fail fast with a clear
+        // message (plus diagnostics) instead of a 12-minute wait for an
+        // image that will never come.
+        val attached = waitFor(ATTACH_VERIFY_MS) { attachmentState(photoName) }
         if (!attached) {
+            val diag = attachDiagnostics(photoName)
             pendingPhoto = null
             throw DriverException(
                 "The photo didn't attach to ChatGPT. Please retry — if it keeps happening, " +
-                    "attach the photo in the ChatGPT app instead."
+                    "attach the photo in the ChatGPT app instead.",
+                diag
             )
         }
         // Let the upload settle before typing.
@@ -476,10 +490,9 @@ class ChatGptDriver : EngineDriver {
 
     /** Clicks the composer's file input (opens the native chooser). */
     private fun clickFileInputJs(): String = """(function(){
-      var input = document.querySelector('form input[type="file"]') ||
-                  document.querySelector('input[type="file"]');
+      var input = document.querySelector('input[type="file"]');
       if (input) { input.click(); return 'ok'; }
-      var ab = Array.from(document.querySelectorAll('form button')).find(function(b){
+      var ab = Array.from(document.querySelectorAll('button')).find(function(b){
         var l = (b.getAttribute('aria-label') || '') + ' ' + (b.title || '');
         return /attach|upload/i.test(l);
       });
@@ -487,14 +500,56 @@ class ChatGptDriver : EngineDriver {
       return 'none';
     })()"""
 
-    /** True once the composer shows the attached photo's thumbnail. */
-    private suspend fun attachmentVisible(): Boolean {
-        val r = unquote(evalJs("""(function(){
-          var form = document.querySelector('form');
-          if (!form) return 'no';
-          return form.querySelector('img') ? 'yes' : 'no';
-        })()"""))
-        return r == "yes"
+    /**
+     * Whether the composer registered the attachment. Three signals,
+     * checked document-wide — the composer's layout is not something to
+     * guess at (v1.8.9's `form img` check could never pass if the
+     * composer isn't a form):
+     * - a blob: image (the attachment's local thumbnail preview), or
+     * - the photo's file name visible in the page, or
+     * - the file input holding a file AND the real chooser supplied it
+     *   (a genuine change event — the injection path's `files` alone
+     *   is exactly the old silent failure, so it never counts there).
+     */
+    private suspend fun attachmentState(photoName: String): Boolean {
+        val quoted = JSONObject.quote(photoName)
+        val r = unquote(evalJs("""(function(name){
+          var imgs = Array.from(document.querySelectorAll('img'));
+          if (imgs.some(function(i){ return (i.src || '').indexOf('blob:') === 0; })) return 'yes';
+          if (name && document.body.innerText.indexOf(name) !== -1) return 'yes';
+          var input = document.querySelector('input[type="file"]');
+          if (input && input.files && input.files.length > 0) return 'files';
+          return 'no';
+        })($quoted)"""))
+        return r == "yes" || (r == "files" && chooserSupplied.get())
+    }
+
+    /** One-line trail for "Copy error details" when the attach fails. */
+    private suspend fun attachDiagnostics(photoName: String): String {
+        val files = unquote(evalJs("""(function(){
+          var input = document.querySelector('input[type="file"]');
+          return (input && input.files) ? String(input.files.length) : 'no-input';
+        })()""")) ?: "?"
+        val blobs = unquote(evalJs(
+            "Array.from(document.querySelectorAll('img')).filter(function(i){ return (i.src || '').indexOf('blob:') === 0; }).length"
+        )) ?: "?"
+        val nameFound = unquote(evalJs(
+            "(document.body.innerText.indexOf(${JSONObject.quote(photoName)}) !== -1) ? 'yes' : 'no'"
+        )) ?: "?"
+        return "attach failed: chooserSupplied=${chooserSupplied.get()} inputFiles=$files blobImgs=$blobs nameFound=$nameFound"
+    }
+
+    /** The photo's file name, for the attachment check. */
+    private fun displayName(uri: Uri): String {
+        return try {
+            appContext().contentResolver.query(
+                uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null
+            )?.use { c ->
+                if (c.moveToFirst()) c.getString(0) else null
+            } ?: "photo.jpg"
+        } catch (_: Exception) {
+            "photo.jpg"
+        }
     }
 
     /**
