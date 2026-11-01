@@ -79,6 +79,7 @@ class ChatGptDriver : EngineDriver {
     private var imageArrived: CompletableDeferred<String>? = null
     private val imageHandled = AtomicBoolean(false)
     private val chooserSupplied = AtomicBoolean(false)
+    private val fetchingUrls = mutableSetOf<String>()
     private var runJob: Job? = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -189,6 +190,21 @@ class ChatGptDriver : EngineDriver {
         })()"""
         val res = unquote(evalJs(js))
         Log.d(TAG, "blob download fetch kicked off: $res")
+    }
+
+    /** MIME type from magic bytes, for the data URL the bridge builds. */
+    private fun sniffMime(bytes: ByteArray): String {
+        return when {
+            bytes.size >= 3 && bytes[0] == 0xFF.toByte() && bytes[1] == 0xD8.toByte() &&
+                bytes[2] == 0xFF.toByte() -> "image/jpeg"
+            bytes.size >= 8 && bytes[0] == 0x89.toByte() && bytes[1] == 0x50.toByte() &&
+                bytes[2] == 0x4E.toByte() && bytes[3] == 0x47.toByte() -> "image/png"
+            bytes.size >= 12 && bytes[0] == 0x52.toByte() && bytes[1] == 0x49.toByte() &&
+                bytes[2] == 0x46.toByte() && bytes[3] == 0x46.toByte() &&
+                bytes[8] == 0x57.toByte() && bytes[9] == 0x45.toByte() &&
+                bytes[10] == 0x42.toByte() && bytes[11] == 0x50.toByte() -> "image/webp"
+            else -> "image/jpeg"
+        }
     }
 
     /**
@@ -671,7 +687,6 @@ class ChatGptDriver : EngineDriver {
         // captures the file directly, bypassing URL harvesting entirely.
         var polls = 0
         val waitStarted = SystemClock.uptimeMillis()
-        var rescueAttempts = 0
         scope.launch {
             while (imageArrived?.isCompleted == false) {
                 delay(5000)
@@ -707,15 +722,15 @@ class ChatGptDriver : EngineDriver {
                 }
                 // Rescue: once the turn looks finished (send button back,
                 // no stop button) or 90s have passed, scan with looser
-                // filters for the newest assistant image. At most twice.
-                if (rescueAttempts < 2 &&
+                // filters every 15s. No attempt cap — the old two-try cap
+                // could burn both tries early and then never look again.
+                if (polls % 3 == 0 &&
                     SystemClock.uptimeMillis() - waitStarted > 25_000L
                 ) {
                     val finished = try {
                         unquote(evalJs(turnFinishedJs())) == "done"
                     } catch (_: Exception) { false }
                     if (finished || SystemClock.uptimeMillis() - waitStarted > 90_000L) {
-                        rescueAttempts++
                         try { evalJs(rescueScanJs()) } catch (_: Exception) {}
                     }
                 }
@@ -775,15 +790,23 @@ class ChatGptDriver : EngineDriver {
           // Take the LAST candidate in DOM order (chat order = oldest first,
           // so the generated image, which comes after the upload, is last)
           var best=candidates[candidates.length-1];var bsrc=best.src;
-          window.__ppcSeen.push(bsrc);
+          // http(s) goes to native code: in-page fetch() is the one thing
+          // the observer, the poll and the rescue all share, and if the
+          // page won't let it run (CORS/CSP) all three fail forever.
+          // Native download with the WebView's cookies has no such limit.
+          // No seen-marking here: a failed download must be retried by
+          // the next poll, and a success ends the run.
           if(bsrc.indexOf('data:image')===0){ PpcBridge.onImage(bsrc); return 'direct'; }
-          fetch(bsrc).then(function(r){return r.blob();})
-            .then(function(b){return new Promise(function(res,rej){
-              var fr=new FileReader();fr.onload=function(){res(fr.result);};fr.onerror=rej;fr.readAsDataURL(b);});})
-            .then(function(d){PpcBridge.onImage(d);})
-            .catch(function(e){PpcBridge.onLog('poll fetch failed: '+e);
-              var ix=window.__ppcSeen.indexOf(bsrc); if(ix>-1) window.__ppcSeen.splice(ix,1);});
-          return 'fetching';
+          if(bsrc.indexOf('blob:')===0){
+            fetch(bsrc).then(function(r){return r.blob();})
+              .then(function(b){return new Promise(function(res,rej){
+                var fr=new FileReader();fr.onload=function(){res(fr.result);};fr.onerror=rej;fr.readAsDataURL(b);});})
+              .then(function(d){PpcBridge.onImage(d);})
+              .catch(function(e){PpcBridge.onLog('poll blob fetch failed: '+e);});
+            return 'fetching';
+          }
+          PpcBridge.onImageUrl(bsrc);
+          return 'handed-off';
         })()"""
     }
 
@@ -995,14 +1018,16 @@ class ChatGptDriver : EngineDriver {
           }
           best=best||fallback;
           if(!best) return 'none';
-          window.__ppcRescued.push(best.src);
           if(best.src.indexOf('data:image')===0){ PpcBridge.onImage(best.src); return 'found'; }
-          fetch(best.src).then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.blob(); })
-            .then(function(b){ return new Promise(function(res,rej){
-                var fr=new FileReader(); fr.onload=function(){res(fr.result);}; fr.onerror=rej; fr.readAsDataURL(b); });})
-            .then(function(d){ PpcBridge.onImage(d); })
-            .catch(function(e){ PpcBridge.onLog('rescue fetch failed: '+e);
-              var ix=window.__ppcRescued.indexOf(best.src); if(ix>-1) window.__ppcRescued.splice(ix,1); });
+          if(best.src.indexOf('blob:')===0){
+            fetch(best.src).then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.blob(); })
+              .then(function(b){ return new Promise(function(res,rej){
+                  var fr=new FileReader(); fr.onload=function(){res(fr.result);}; fr.onerror=rej; fr.readAsDataURL(b); });})
+              .then(function(d){ PpcBridge.onImage(d); })
+              .catch(function(e){ PpcBridge.onLog('rescue blob fetch failed: '+e); });
+            return 'found';
+          }
+          PpcBridge.onImageUrl(best.src);
           return 'found';
         })()"""
     }
@@ -1055,19 +1080,24 @@ class ChatGptDriver : EngineDriver {
               best={img:img,src:src};
             }
             if(!best) return false;
-            window.__ppcSeen.push(best.src);
             try{window.__ppcObs.disconnect();}catch(e){}
+            // http(s) goes to native code (see pollImageJs): in-page
+            // fetch() is the shared single point of failure. blob: can
+            // only be read in-page; data: comes straight through.
             if(best.src.indexOf('data:image')===0){ PpcBridge.onImage(best.src); return true; }
-            fetch(best.src).then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.blob(); })
-              .then(function(b){ return new Promise(function(res,rej){
-                  var fr=new FileReader();
-                  fr.onload=function(){res(fr.result);};
-                  fr.onerror=rej;
-                  fr.readAsDataURL(b);
-              });})
-              .then(function(d){ PpcBridge.onImage(d); })
-              .catch(function(e){ PpcBridge.onLog('image fetch failed: '+e);
-                var ix=window.__ppcSeen.indexOf(best.src); if(ix>-1) window.__ppcSeen.splice(ix,1); });
+            if(best.src.indexOf('blob:')===0){
+              fetch(best.src).then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.blob(); })
+                .then(function(b){ return new Promise(function(res,rej){
+                    var fr=new FileReader();
+                    fr.onload=function(){res(fr.result);};
+                    fr.onerror=rej;
+                    fr.readAsDataURL(b);
+                });})
+                .then(function(d){ PpcBridge.onImage(d); })
+                .catch(function(e){ PpcBridge.onLog('image blob fetch failed: '+e); });
+              return true;
+            }
+            PpcBridge.onImageUrl(best.src);
             return true;
           }
           var obs=new MutationObserver(function(){ tryHarvest(); });
@@ -1084,6 +1114,39 @@ class ChatGptDriver : EngineDriver {
         fun onImage(dataUrl: String) {
             if (imageHandled.compareAndSet(false, true)) {
                 imageArrived?.complete(dataUrl)
+            }
+        }
+
+        /**
+         * Native download of a found image URL. In-page fetch() is the
+         * one thing the observer, the poll and the rescue all share — if
+         * the page won't let it run (CORS/CSP) all three fail forever
+         * while ChatGPT sits there with a finished image. Native
+         * download with the WebView's cookies has no such limit.
+         * Failures stay silent: the next poll re-finds the URL and
+         * retries (in-flight duplicates are deduped here).
+         */
+        @JavascriptInterface
+        fun onImageUrl(url: String) {
+            if (imageArrived?.isCompleted == true) return
+            synchronized(fetchingUrls) { if (!fetchingUrls.add(url)) return }
+            scope.launch {
+                try {
+                    val wv = webView ?: return@launch
+                    val bytes = downloadWithCookies(wv, url, wv.settings.userAgentString)
+                    if (bytes != null && bytes.isNotEmpty() &&
+                        imageHandled.compareAndSet(false, true)
+                    ) {
+                        val mime = sniffMime(bytes)
+                        imageArrived?.complete(
+                            "data:$mime;base64," +
+                                android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
+                        )
+                    }
+                } catch (_: Exception) {
+                } finally {
+                    synchronized(fetchingUrls) { fetchingUrls.remove(url) }
+                }
             }
         }
 
