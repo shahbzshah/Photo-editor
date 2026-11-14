@@ -81,8 +81,9 @@ object ChatGptShare {
     /**
      * Sends the photo + prompt to the ChatGPT app. Returns false when the
      * app is not there to receive it (installed check raced, or it was
-     * removed). Call from the main thread — startActivity is cheap; the
-     * photo copy happens in [sharedPhotoUri] before this.
+     * removed). The share is fired from the ViewModel's Application
+     * context, so FLAG_ACTIVITY_NEW_TASK is required — without it Android
+     * throws and the share dies before ChatGPT ever opens.
      */
     fun sendToChatGpt(context: Context, photoUri: Uri, prompt: String): Boolean {
         copyPromptToClipboard(context, prompt)
@@ -92,6 +93,7 @@ object ChatGptShare {
             putExtra(Intent.EXTRA_TEXT, prompt)
             setPackage(PACKAGE_NAME)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         return try {
             context.startActivity(intent)
@@ -108,12 +110,13 @@ object ChatGptShare {
                 Intent(
                     Intent.ACTION_VIEW,
                     Uri.parse("market://details?id=$PACKAGE_NAME")
-                )
+                ).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
             )
         } catch (_: Exception) {
             try {
                 context.startActivity(
                     Intent(Intent.ACTION_VIEW, Uri.parse(PLAY_STORE_URL))
+                        .apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
                 )
             } catch (_: Exception) {
             }
@@ -123,7 +126,10 @@ object ChatGptShare {
     /** chatgpt.com in the user's browser — photo must be attached by hand. */
     fun openBrowser(context: Context) {
         try {
-            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(WEB_URL)))
+            context.startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse(WEB_URL))
+                    .apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+            )
         } catch (_: Exception) {
         }
     }
