@@ -3,7 +3,9 @@ package app.photopromptcodes.ui
 import android.app.Application
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +22,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,7 +50,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import app.photopromptcodes.data.CodeRepository
 import app.photopromptcodes.data.HistoryRepository
 import app.photopromptcodes.data.PromptCode
-import app.photopromptcodes.share.ChatGptShare
+import app.photopromptcodes.share.AiShare
 import app.photopromptcodes.ui.theme.Amber
 import app.photopromptcodes.ui.theme.Danger
 import app.photopromptcodes.ui.theme.Mono
@@ -63,7 +67,9 @@ data class ShareUi(
     val photoUri: Uri? = null,
     val error: String? = null,
     val sent: Boolean = false,
-    val chatGptInstalled: Boolean = true
+    val targets: List<AiShare.Target> = emptyList(),
+    val target: AiShare.Target = AiShare.CHATGPT,
+    val noAppInstalled: Boolean = false
 )
 
 class ShareViewModel(app: Application) : AndroidViewModel(app) {
@@ -94,27 +100,44 @@ class ShareViewModel(app: Application) : AndroidViewModel(app) {
                 return@launch
             }
             app.photopromptcodes.data.RecentCodes.record(ctx, code.code)
+            // Only installed apps are offered; the saved choice wins when
+            // it is still installed, otherwise the first installed one.
+            val installed = AiShare.installedTargets(ctx)
+            val hasApp = installed.any { it.packageName != null }
+            val saved = AiShare.targetById(AiShare.savedTargetId(ctx))
+            val chosen = if (installed.contains(saved)) saved else installed.first()
             ui = ui.copy(
                 code = code,
                 photoUri = photoUri,
-                chatGptInstalled = ChatGptShare.isInstalled(ctx)
+                targets = installed,
+                target = chosen,
+                noAppInstalled = !hasApp
             )
-            if (!ui.chatGptInstalled) return@launch
+            if (!hasApp) return@launch
             sendNow()
         }
     }
 
-    /** Hands the photo + prompt to the ChatGPT app, then records the send. */
+    /** Switching target sends to it right away — one tap, no second step. */
+    fun selectTarget(target: AiShare.Target) {
+        val ctx = getApplication<Application>()
+        AiShare.saveTargetId(ctx, target.id)
+        ui = ui.copy(target = target, error = null, sent = false)
+        viewModelScope.launch { sendNow() }
+    }
+
+    /** Hands the photo + prompt to the chosen app, then records the send. */
     private suspend fun sendNow() {
         val ctx = getApplication<Application>()
         val code = ui.code ?: return
         val photo = ui.photoUri ?: return
+        val target = ui.target
         try {
             val shared = withContext(Dispatchers.IO) {
-                ChatGptShare.sharedPhotoUri(ctx, photo)
+                AiShare.sharedPhotoUri(ctx, photo)
             }
-            if (!ChatGptShare.sendToChatGpt(ctx, shared, code.prompt)) {
-                ui = ui.copy(error = "Couldn't open the ChatGPT app.")
+            if (!AiShare.sendToTarget(ctx, target, shared, code.prompt)) {
+                ui = ui.copy(error = "Couldn't open ${target.label}.")
                 return
             }
             ui = ui.copy(sent = true, error = null)
@@ -216,23 +239,22 @@ fun ShareScreen(
                 return@Column
             }
 
-            if (!ui.chatGptInstalled) {
+            if (ui.noAppInstalled) {
                 Text(
-                    "ChatGPT app isn't installed",
+                    "No AI app installed yet",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "This version hands your photo and prompt to the ChatGPT app — " +
-                        "no sign-in inside this app, no waiting here. Install ChatGPT, " +
-                        "or open it in your browser and attach the photo yourself.",
+                    "Install ChatGPT or Qwen to edit photos, or open ChatGPT in " +
+                        "your browser and attach the photo yourself.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = PaperDim
                 )
                 Spacer(Modifier.height(16.dp))
                 Button(
-                    onClick = { ChatGptShare.openPlayStore(context) },
+                    onClick = { AiShare.openPlayStore(context, AiShare.CHATGPT) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Amber,
                         contentColor = NearBlack
@@ -243,23 +265,64 @@ fun ShareScreen(
                 }
                 Spacer(Modifier.height(8.dp))
                 OutlinedButton(
-                    onClick = { ChatGptShare.openBrowser(context) },
+                    onClick = { AiShare.openPlayStore(context, AiShare.QWEN) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Open in browser instead")
+                    Text("Get Qwen on Play Store")
+                }
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = { AiShare.openBrowser(context, AiShare.CHATGPT) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Open ChatGPT in browser instead")
                 }
                 return@Column
             }
 
+            // Send-to chooser: only installed apps, plus Other.
             Text(
-                if (ui.sent) "Sent to ChatGPT" else "Sending to ChatGPT…",
+                "SEND TO",
+                style = MaterialTheme.typography.labelSmall,
+                color = PaperDim,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ui.targets.forEach { target ->
+                    val selected = target.id == ui.target.id
+                    FilterChip(
+                        selected = selected,
+                        onClick = { if (!selected) vm.selectTarget(target) },
+                        label = { Text(target.label) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = Amber,
+                            selectedLabelColor = NearBlack,
+                            containerColor = SurfaceDark,
+                            labelColor = PaperDim
+                        )
+                    )
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+
+            val target = ui.target
+            Text(
+                if (ui.sent) "Sent to ${target.label}" else "Sending to ${target.label}…",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                "Tap Send in the ChatGPT app to make the edit. The finished photo " +
-                    "stays in ChatGPT — save it from there.",
+                if (target.packageName == null) {
+                    "Pick an app, then tap Send there to make the edit. The " +
+                        "finished photo stays in that app — save it from there."
+                } else {
+                    "Tap Send in the ${target.label} app to make the edit. The " +
+                        "finished photo stays in ${target.label} — save it from there."
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = PaperDim
             )
@@ -274,7 +337,8 @@ fun ShareScreen(
 
             ui.code?.let { c ->
                 Text(
-                    "PROMPT SENT TO CHATGPT",
+                    if (target.packageName == null) "PROMPT TO SEND"
+                    else "PROMPT SENT TO ${target.label.uppercase()}",
                     style = MaterialTheme.typography.labelSmall,
                     color = PaperDim,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -304,14 +368,17 @@ fun ShareScreen(
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Open ChatGPT", fontWeight = FontWeight.SemiBold)
+                Text(
+                    if (target.packageName == null) "Choose app" else "Send to ${target.label}",
+                    fontWeight = FontWeight.SemiBold
+                )
             }
             Spacer(Modifier.height(8.dp))
             var copied by remember { mutableStateOf(false) }
             OutlinedButton(
                 onClick = {
                     ui.code?.let {
-                        ChatGptShare.copyPromptToClipboard(context, it.prompt)
+                        AiShare.copyPromptToClipboard(context, it.prompt)
                         copied = true
                     }
                 },

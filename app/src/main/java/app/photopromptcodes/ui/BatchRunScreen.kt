@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
@@ -43,7 +44,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import app.photopromptcodes.data.CodeRepository
 import app.photopromptcodes.data.HistoryRepository
 import app.photopromptcodes.data.PromptCode
-import app.photopromptcodes.share.ChatGptShare
+import app.photopromptcodes.share.AiShare
 import app.photopromptcodes.ui.theme.Amber
 import app.photopromptcodes.ui.theme.Danger
 import app.photopromptcodes.ui.theme.Mono
@@ -57,9 +58,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Batch in the share-to-ChatGPT world: there is no background driver any
- * more, so each photo is handed to the ChatGPT app one at a time. Send
- * one, come back, send the next. Skipped photos just move on.
+ * Batch in the share-to-AI world: there is no background driver any
+ * more, so each photo is handed to the chosen AI app one at a time.
+ * Send one, come back, send the next. Skipped photos just move on.
+ * The target is the one remembered from the last share (change it on
+ * the single-photo screen).
  */
 data class BatchUi(
     val code: PromptCode? = null,
@@ -69,7 +72,8 @@ data class BatchUi(
     val skippedCount: Int = 0,
     val error: String? = null,
     val isDone: Boolean = false,
-    val chatGptInstalled: Boolean = true
+    val target: AiShare.Target = AiShare.CHATGPT,
+    val targetInstalled: Boolean = true
 )
 
 class BatchRunViewModel(app: Application) : AndroidViewModel(app) {
@@ -92,26 +96,32 @@ class BatchRunViewModel(app: Application) : AndroidViewModel(app) {
                 return@launch
             }
             app.photopromptcodes.data.RecentCodes.record(ctx, code.code)
+            val installed = AiShare.installedTargets(ctx)
+            val saved = AiShare.targetById(AiShare.savedTargetId(ctx))
+            val chosen = if (installed.contains(saved)) saved else installed.first()
             ui = ui.copy(
                 code = code,
                 total = photoQueue.size,
-                chatGptInstalled = ChatGptShare.isInstalled(ctx)
+                target = chosen,
+                targetInstalled = chosen.packageName == null ||
+                    AiShare.isInstalled(ctx, chosen)
             )
         }
     }
 
-    /** Sends the current photo to the ChatGPT app and moves to the next. */
+    /** Sends the current photo to the chosen AI app and moves to the next. */
     fun sendCurrent() {
         val ctx = getApplication<Application>()
         val photo = photoQueue.getOrNull(ui.currentIndex) ?: return
         val code = ui.code ?: return
+        val target = ui.target
         viewModelScope.launch {
             try {
                 val shared = withContext(Dispatchers.IO) {
-                    ChatGptShare.sharedPhotoUri(ctx, photo)
+                    AiShare.sharedPhotoUri(ctx, photo)
                 }
-                if (!ChatGptShare.sendToChatGpt(ctx, shared, code.prompt)) {
-                    ui = ui.copy(error = "Couldn't open the ChatGPT app.")
+                if (!AiShare.sendToTarget(ctx, target, shared, code.prompt)) {
+                    ui = ui.copy(error = "Couldn't open ${target.label}.")
                     return@launch
                 }
                 try {
@@ -206,7 +216,7 @@ fun BatchRunScreen(
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "${ui.sentCount} of ${ui.total} photos sent to ChatGPT" +
+                        "${ui.sentCount} of ${ui.total} photos sent to ${ui.target.label}" +
                             if (ui.skippedCount > 0) " (${ui.skippedCount} skipped)" else "",
                         style = MaterialTheme.typography.bodyMedium,
                         color = PaperDim
@@ -246,35 +256,35 @@ fun BatchRunScreen(
                         ) { Text("Skip this photo") }
                     }
                 }
-                !ui.chatGptInstalled -> {
+                !ui.targetInstalled -> {
                     Text(
-                        "ChatGPT app isn't installed",
+                        "${ui.target.label} app isn't installed",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "Batch sends each photo to the ChatGPT app. Install it from " +
-                            "the Play Store first, or send photos one by one from " +
-                            "the gallery instead.",
+                        "Batch sends each photo to ${ui.target.label}. Install it from " +
+                            "the Play Store first, or pick a different app on the " +
+                            "single-photo screen.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = PaperDim
                     )
                     Spacer(Modifier.height(16.dp))
-                    val ctx = androidx.compose.ui.platform.LocalContext.current
+                    val ctx = LocalContext.current
                     Button(
-                        onClick = { ChatGptShare.openPlayStore(ctx) },
+                        onClick = { AiShare.openPlayStore(ctx, ui.target) },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Amber,
                             contentColor = NearBlack
                         )
                     ) {
-                        Text("Get ChatGPT on Play Store", fontWeight = FontWeight.SemiBold)
+                        Text("Get ${ui.target.label} on Play Store", fontWeight = FontWeight.SemiBold)
                     }
                 }
                 ui.currentIndex < photoUriStrings.size -> {
                     Text(
-                        "Photo ${ui.currentIndex + 1} of ${ui.total}",
+                        "Photo ${ui.currentIndex + 1} of ${ui.total} — sending to ${ui.target.label}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = PaperDim
                     )
@@ -290,8 +300,8 @@ fun BatchRunScreen(
                     )
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        "Tap Send, finish the edit in ChatGPT, then come back " +
-                            "here for the next photo.",
+                        "Tap Send, finish the edit in ${ui.target.label}, then come " +
+                            "back here for the next photo.",
                         style = MaterialTheme.typography.bodySmall,
                         color = PaperDim
                     )
@@ -304,7 +314,7 @@ fun BatchRunScreen(
                         ),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Send to ChatGPT", fontWeight = FontWeight.SemiBold)
+                        Text("Send to ${ui.target.label}", fontWeight = FontWeight.SemiBold)
                     }
                     Spacer(Modifier.height(8.dp))
                     OutlinedButton(

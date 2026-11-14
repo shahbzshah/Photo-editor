@@ -181,13 +181,13 @@ fun ResultDetailScreen(
                 )
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    "Sent to ChatGPT",
+                    "Sent to AI app",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "The edited photo is in the ChatGPT app — save it from there. " +
+                    "The edited photo is in the app you sent it to — save it from there. " +
                         "This app only keeps the photo you sent.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = PaperDim

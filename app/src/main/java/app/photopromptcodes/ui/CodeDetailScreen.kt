@@ -212,7 +212,7 @@ fun CodeDetailScreen(
 
             Spacer(Modifier.height(16.dp))
             Text(
-                "PROMPT SENT TO CHATGPT",
+                "PROMPT",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.padding(bottom = 8.dp)
             )

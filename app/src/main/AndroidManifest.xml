@@ -12,12 +12,14 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- Let the app see WhatsApp/TikTok/Instagram for direct sharing, and
-         ChatGPT for the share-to-ChatGPT flow (Android 11+ package visibility). -->
+         ChatGPT / Qwen for the share-to-AI flow (Android 11+ package visibility). -->
     <queries>
         <package android:name="com.whatsapp" />
         <package android:name="com.zhiliaoapp.musically" />
         <package android:name="com.instagram.android" />
         <package android:name="com.openai.chatgpt" />
+        <package android:name="com.tongyi.intl" />
+        <package android:name="ai.qwenlm.chat.android" />
     </queries>
 
     <application

@@ -118,7 +118,7 @@ fun AboutScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         "$countText viral AI photo-editing prompts in your pocket. " +
-                            "Pick a code, pick a photo — the app sends both to the ChatGPT app. " +
+                            "Pick a code, pick a photo — the app sends both to the ChatGPT or Qwen app. " +
                             "No copying prompts, no typing.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = PaperDim
@@ -143,8 +143,8 @@ fun AboutScreen(
                     listOf(
                         "1. Browse the $countText prompt codes",
                         "2. Tap one and choose your photo",
-                        "3. Tap Send in the ChatGPT app",
-                        "4. Save the edit from ChatGPT"
+                        "3. Tap Send in the app you chose",
+                        "4. Save the edit from that app"
                     ).forEach { step ->
                         Text(
                             step,

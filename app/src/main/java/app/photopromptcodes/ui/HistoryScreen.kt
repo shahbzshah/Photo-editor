@@ -185,7 +185,7 @@ fun HistoryScreen(
                             )
                             if (!record.hasResult) {
                                 Text(
-                                    "Sent to ChatGPT",
+                                    "Sent to AI app",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = PaperDim
                                 )

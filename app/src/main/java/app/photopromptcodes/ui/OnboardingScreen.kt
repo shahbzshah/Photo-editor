@@ -61,12 +61,12 @@ private val PAGES = listOf(
     Page(
         "▣",
         "Pick a photo, we do the rest",
-        "Choose any photo from your gallery. The app hands your photo and the full prompt to the ChatGPT app — you just tap Send there."
+        "Choose any photo from your gallery. The app hands your photo and the full prompt to the ChatGPT or Qwen app — you just tap Send there."
     ),
     Page(
         "✦",
         "Get the edit in seconds",
-        "ChatGPT makes the edit in its own app. Save the result from there — it's yours."
+        "Your chosen app makes the edit. Save the result from there — it's yours."
     )
 )
 
