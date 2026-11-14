@@ -80,6 +80,8 @@ class HistoryViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun resultFile(record: HistoryRecord): File = repo.resultFile(record)
+
+    fun originalFile(record: HistoryRecord): File = repo.originalFile(record)
 }
 
 fun formatDate(timestamp: Long): String =
@@ -156,8 +158,11 @@ fun HistoryScreen(
                         modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Sent records have no result image — show the
+                        // original photo instead.
                         AsyncImage(
-                            model = vm.resultFile(record),
+                            model = if (record.hasResult) vm.resultFile(record)
+                            else vm.originalFile(record),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -178,6 +183,13 @@ fun HistoryScreen(
                                 formatDate(record.timestamp),
                                 style = MaterialTheme.typography.bodySmall
                             )
+                            if (!record.hasResult) {
+                                Text(
+                                    "Sent to ChatGPT",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = PaperDim
+                                )
+                            }
                         }
                         Icon(Icons.Filled.KeyboardArrowRight, contentDescription = null, tint = PaperDim)
                     }

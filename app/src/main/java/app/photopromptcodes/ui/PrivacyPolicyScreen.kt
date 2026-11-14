@@ -27,14 +27,15 @@ import app.photopromptcodes.ui.theme.PaperDim
 private val SECTIONS = listOf(
     "What this app does" to
         "Photo Prompt Codes helps you apply AI photo-editing prompts to your own photos. " +
-        "You pick a prompt code, choose a photo, and the app sends both to ChatGPT " +
-        "(via chatgpt.com), which generates the edited image. " +
-        "The result is saved on your device.",
+        "You pick a prompt code, choose a photo, and the app hands both to the ChatGPT app " +
+        "on your phone, which generates the edited image. " +
+        "The edited image stays in the ChatGPT app — save it from there.",
     "Information we collect" to
         "The app does not run its own servers and does not send your data to us. " +
         "• Photos you choose are sent to ChatGPT (OpenAI) so it can generate the edit. " +
-        "• Your ChatGPT login session (cookies) stays on your device, inside the app's WebView. " +
-        "• Edit history (your photos and results) is stored only on your device.",
+        "• The app does not sign you in to ChatGPT and stores no ChatGPT login. " +
+        "You sign in inside the ChatGPT app itself. " +
+        "• Edit history (the photos you sent and the codes you used) is stored only on your device.",
     "Information we do NOT collect" to
         "We do not create accounts, do not track you, do not use analytics, and do not sell or share " +
         "any personal information. There is nothing to opt out of because nothing leaves your device " +
@@ -45,8 +46,7 @@ private val SECTIONS = listOf(
         "https://openai.com/policies/privacy-policy",
     "Your control" to
         "You can delete your edit history at any time from Settings → Clear history. " +
-        "You can sign out of ChatGPT from Settings → ChatGPT account, which clears the login session " +
-        "from the device.",
+        "ChatGPT itself handles your sign-in — manage it in the ChatGPT app.",
     "Children" to
         "This app is not directed at children under 13.",
     "Contact" to
@@ -84,7 +84,7 @@ fun PrivacyPolicyScreen(onBack: () -> Unit) {
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "Last updated: October 2026",
+                "Last updated: November 2026",
                 style = MaterialTheme.typography.bodySmall,
                 color = PaperDim
             )

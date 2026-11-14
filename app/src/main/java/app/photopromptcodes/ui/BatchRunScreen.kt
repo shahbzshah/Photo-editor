@@ -2,7 +2,6 @@ package app.photopromptcodes.ui
 
 import android.app.Application
 import android.net.Uri
-import android.webkit.WebView
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,22 +10,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -40,20 +35,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import app.photopromptcodes.automation.ChatGptDriver
-import app.photopromptcodes.automation.EngineDriver
-import app.photopromptcodes.automation.DriverEvent
-import app.photopromptcodes.automation.RunStep
 import app.photopromptcodes.data.CodeRepository
 import app.photopromptcodes.data.HistoryRepository
 import app.photopromptcodes.data.PromptCode
+import app.photopromptcodes.share.ChatGptShare
 import app.photopromptcodes.ui.theme.Amber
 import app.photopromptcodes.ui.theme.Danger
 import app.photopromptcodes.ui.theme.Mono
@@ -62,135 +52,91 @@ import app.photopromptcodes.ui.theme.Paper
 import app.photopromptcodes.ui.theme.PaperDim
 import app.photopromptcodes.ui.theme.SurfaceDark
 import coil.compose.AsyncImage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
+/**
+ * Batch in the share-to-ChatGPT world: there is no background driver any
+ * more, so each photo is handed to the ChatGPT app one at a time. Send
+ * one, come back, send the next. Skipped photos just move on.
+ */
 data class BatchUi(
-    val step: RunStep = RunStep.OPENING_ENGINE,
-    val loginRequired: Boolean = false,
-    val error: String? = null,
     val code: PromptCode? = null,
     val currentIndex: Int = 0,
     val total: Int = 0,
-    val completedIds: List<String> = emptyList(),
-    val failedCount: Int = 0,
-    val isDone: Boolean = false
+    val sentCount: Int = 0,
+    val skippedCount: Int = 0,
+    val error: String? = null,
+    val isDone: Boolean = false,
+    val chatGptInstalled: Boolean = true
 )
 
 class BatchRunViewModel(app: Application) : AndroidViewModel(app) {
     var ui by mutableStateOf(BatchUi())
         private set
 
-    private var driver: EngineDriver? = null
     private var started = false
     private val history = HistoryRepository(app)
     private var photoQueue: List<Uri> = emptyList()
-    private var stageId: String? = null
 
-    fun attachWebView(wv: WebView) {
-        if (driver != null) return
-        driver = ChatGptDriver().also {
-            it.setListener(::onEvent)
-            it.attach(wv)
-        }
-    }
-
-    /**
-     * Called when the screen's AndroidView releases the WebView (navigated
-     * away, backstack entry left behind). Frees the browser's native memory
-     * immediately instead of waiting for ViewModel clear — on a 4GB device,
-     * several live WebViews (one per run left in the backstack) add up to an
-     * OOM crash "after some usage".
-     */
-    fun releaseWebView() {
-        driver?.destroy()
-        driver = null
-    }
-
-    fun ensureStarted(codeName: String, photoUriStrings: List<String>, customPrompt: String? = null) {
+    fun ensureStarted(codeName: String, photoUriStrings: List<String>) {
         if (started) return
         started = true
         photoQueue = photoUriStrings.map { Uri.parse(it) }
         viewModelScope.launch {
-            val code = if (codeName == "__custom__" && customPrompt != null) {
-                PromptCode(
-                    code = "/custom",
-                    category = "Custom",
-                    description = customPrompt.take(80),
-                    prompt = "Edit this photo: $customPrompt Keep the subject's identity and pose recognizable unless the instruction says otherwise. Photorealistic."
-                )
-            } else {
-                CodeRepository.load(getApplication()).firstOrNull { it.code == codeName }
-            }
+            val ctx = getApplication<Application>()
+            val code = CodeRepository.load(ctx).firstOrNull { it.code == codeName }
             if (code == null) {
                 ui = ui.copy(error = "Code not found: $codeName")
                 return@launch
             }
-            app.photopromptcodes.data.RecentCodes.record(getApplication(), code.code)
-            ui = ui.copy(code = code, total = photoQueue.size)
-            startNext()
+            app.photopromptcodes.data.RecentCodes.record(ctx, code.code)
+            ui = ui.copy(
+                code = code,
+                total = photoQueue.size,
+                chatGptInstalled = ChatGptShare.isInstalled(ctx)
+            )
         }
     }
 
-    private fun startNext() {
-        val idx = ui.currentIndex
-        if (idx >= photoQueue.size) {
-            ui = ui.copy(isDone = true)
-            return
-        }
-        val photoUri = photoQueue[idx]
+    /** Sends the current photo to the ChatGPT app and moves to the next. */
+    fun sendCurrent() {
+        val ctx = getApplication<Application>()
+        val photo = photoQueue.getOrNull(ui.currentIndex) ?: return
+        val code = ui.code ?: return
         viewModelScope.launch {
-            stageId = try {
-                history.stageOriginal(ui.code?.code ?: "batch", photoUri)
-            } catch (e: Exception) {
-                ui = ui.copy(error = "Couldn't read photo ${idx + 1}. Skipping.")
-                ui = ui.copy(currentIndex = idx + 1, failedCount = ui.failedCount + 1)
-                startNext()
-                return@launch
+            try {
+                val shared = withContext(Dispatchers.IO) {
+                    ChatGptShare.sharedPhotoUri(ctx, photo)
+                }
+                if (!ChatGptShare.sendToChatGpt(ctx, shared, code.prompt)) {
+                    ui = ui.copy(error = "Couldn't open the ChatGPT app.")
+                    return@launch
+                }
+                try {
+                    val id = history.stageOriginal(code.code, photo)
+                    history.saveSent(id, code.code)
+                } catch (_: Exception) {
+                }
+                advance(sent = true)
+            } catch (_: Exception) {
+                ui = ui.copy(error = "Couldn't read photo ${ui.currentIndex + 1}.")
             }
-            ui = ui.copy(step = RunStep.OPENING_ENGINE, error = null, loginRequired = false)
-            driver?.start(photoUri, ui.code?.prompt ?: "")
-                ?: run { ui = ui.copy(error = "Browser not ready. Please retry.") }
         }
     }
 
-    fun retry() {
-        ui = ui.copy(error = null, loginRequired = false, step = RunStep.OPENING_ENGINE)
-        val photoUri = photoQueue.getOrNull(ui.currentIndex) ?: return
-        driver?.start(photoUri, ui.code?.prompt ?: "")
-    }
+    fun skipCurrent() = advance(sent = false)
 
-    fun skipCurrent() {
-        val idx = ui.currentIndex
-        ui = ui.copy(currentIndex = idx + 1, failedCount = ui.failedCount + 1, error = null)
-        startNext()
-    }
-
-    fun continueAfterLogin() {
-        ui = ui.copy(loginRequired = false)
-        driver?.notifyLoginCompleted()
-    }
-
-    private fun onEvent(event: DriverEvent) {
-        when (event) {
-            is DriverEvent.Step -> ui = ui.copy(step = event.step, error = null)
-            DriverEvent.LoginRequired -> ui = ui.copy(loginRequired = true)
-            is DriverEvent.Finished -> viewModelScope.launch {
-                val id = stageId ?: return@launch
-                val record = history.saveResult(id, ui.code?.code.orEmpty(), event.imageBytes)
-                val idx = ui.currentIndex
-                ui = ui.copy(
-                    currentIndex = idx + 1,
-                    completedIds = ui.completedIds + record.id
-                )
-                startNext()
-            }
-            is DriverEvent.Failed -> ui = ui.copy(error = event.message)
-        }
-    }
-
-    override fun onCleared() {
-        driver?.destroy()
-        driver = null
+    private fun advance(sent: Boolean) {
+        val next = ui.currentIndex + 1
+        ui = ui.copy(
+            currentIndex = next,
+            sentCount = ui.sentCount + if (sent) 1 else 0,
+            skippedCount = ui.skippedCount + if (sent) 0 else 1,
+            error = null,
+            isDone = next >= photoQueue.size
+        )
     }
 }
 
@@ -199,13 +145,11 @@ class BatchRunViewModel(app: Application) : AndroidViewModel(app) {
 fun BatchRunScreen(
     code: String,
     photoUriStrings: List<String>,
-    customPrompt: String? = null,
     onBack: () -> Unit,
     onDone: () -> Unit,
     vm: BatchRunViewModel = viewModel()
 ) {
-    val context = LocalContext.current
-    LaunchedEffect(code) { vm.ensureStarted(code, photoUriStrings, customPrompt) }
+    LaunchedEffect(code) { vm.ensureStarted(code, photoUriStrings) }
     val ui = vm.ui
 
     Scaffold(
@@ -262,8 +206,8 @@ fun BatchRunScreen(
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "${ui.completedIds.size} of ${ui.total} photos edited" +
-                            if (ui.failedCount > 0) " (${ui.failedCount} failed)" else "",
+                        "${ui.sentCount} of ${ui.total} photos sent to ChatGPT" +
+                            if (ui.skippedCount > 0) " (${ui.skippedCount} skipped)" else "",
                         style = MaterialTheme.typography.bodyMedium,
                         color = PaperDim
                     )
@@ -287,7 +231,7 @@ fun BatchRunScreen(
                     Spacer(Modifier.height(16.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
-                            onClick = { vm.retry() },
+                            onClick = { vm.sendCurrent() },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Amber,
                                 contentColor = NearBlack
@@ -302,69 +246,75 @@ fun BatchRunScreen(
                         ) { Text("Skip this photo") }
                     }
                 }
-                ui.loginRequired -> {
+                !ui.chatGptInstalled -> {
                     Text(
-                        "Please sign in to ChatGPT to continue the batch.",
+                        "ChatGPT app isn't installed",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Batch sends each photo to the ChatGPT app. Install it from " +
+                            "the Play Store first, or send photos one by one from " +
+                            "the gallery instead.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = PaperDim
                     )
                     Spacer(Modifier.height(16.dp))
+                    val ctx = androidx.compose.ui.platform.LocalContext.current
                     Button(
-                        onClick = { vm.continueAfterLogin() },
+                        onClick = { ChatGptShare.openPlayStore(ctx) },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Amber,
                             contentColor = NearBlack
                         )
-                    ) { Text("Continue") }
-                }
-                else -> {
-                    if (ui.currentIndex < photoUriStrings.size) {
-                        Text(
-                            "Editing photo ${ui.currentIndex + 1} of ${ui.total}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = PaperDim
-                        )
-                        Spacer(Modifier.height(12.dp))
-                        AsyncImage(
-                            model = photoUriStrings.getOrNull(ui.currentIndex),
-                            contentDescription = "Current photo",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                        )
-                        Spacer(Modifier.height(16.dp))
+                    ) {
+                        Text("Get ChatGPT on Play Store", fontWeight = FontWeight.SemiBold)
                     }
-                    CircularProgressIndicator(color = Amber)
-                    Spacer(Modifier.height(12.dp))
+                }
+                ui.currentIndex < photoUriStrings.size -> {
                     Text(
-                        ui.step.label,
+                        "Photo ${ui.currentIndex + 1} of ${ui.total}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = PaperDim
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    AsyncImage(
+                        model = photoUriStrings.getOrNull(ui.currentIndex),
+                        contentDescription = "Current photo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        "Tap Send, finish the edit in ChatGPT, then come back " +
+                            "here for the next photo.",
                         style = MaterialTheme.typography.bodySmall,
                         color = PaperDim
                     )
-                }
-            }
-
-            // WebView (hidden, drives automation)
-            AndroidView(
-                factory = { ctx ->
-                    WebView(ctx).also { vm.attachWebView(it) }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp),
-                onRelease = { wv ->
-                    vm.releaseWebView()
-                    try {
-                        wv.stopLoading()
-                        wv.loadUrl("about:blank")
-                        wv.removeAllViews()
-                        wv.destroy()
-                    } catch (_: Exception) {
+                    Spacer(Modifier.height(16.dp))
+                    Button(
+                        onClick = { vm.sendCurrent() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Amber,
+                            contentColor = NearBlack
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Send to ChatGPT", fontWeight = FontWeight.SemiBold)
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = { vm.skipCurrent() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Skip this photo")
                     }
                 }
-            )
+            }
         }
     }
 }

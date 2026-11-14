@@ -18,7 +18,11 @@ data class HistoryRecord(
     val originalFileName: String,
     val resultFileName: String,
     val favorite: Boolean = false
-)
+) {
+    /** Sent-to-ChatGPT records have no result image — the edit lives in
+     * the ChatGPT app, not here. */
+    val hasResult: Boolean get() = resultFileName.isNotEmpty()
+}
 
 /**
  * File-based history store. Images live in files/history/, the index in
@@ -73,9 +77,24 @@ class HistoryRepository(private val context: Context) {
             record
         }
 
+    /** Records a photo handed to the ChatGPT app. No result image — the
+     * edit stays in ChatGPT, so resultFileName is empty. */
+    suspend fun saveSent(id: String, code: String): HistoryRecord =
+        withContext(Dispatchers.IO) {
+            val record = HistoryRecord(
+                id = id,
+                code = code,
+                timestamp = System.currentTimeMillis(),
+                originalFileName = "${id}_orig.jpg",
+                resultFileName = ""
+            )
+            writeIndex(readIndex().filterNot { it.id == id } + record)
+            record
+        }
+
     suspend fun delete(record: HistoryRecord) = withContext(Dispatchers.IO) {
         originalFile(record).delete()
-        resultFile(record).delete()
+        if (record.hasResult) resultFile(record).delete()
         writeIndex(readIndex().filterNot { it.id == record.id })
     }
 

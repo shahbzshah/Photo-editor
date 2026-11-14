@@ -160,6 +160,48 @@ fun ResultDetailScreen(
             )
             return@Scaffold
         }
+        // Sent records have no result image — the edit lives in the
+        // ChatGPT app. Show the original photo and the note instead of
+        // the before/after slider and the save/share rows.
+        if (!record.hasResult) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+            ) {
+                AsyncImage(
+                    model = vm.originalFile(),
+                    contentDescription = "Original photo",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                )
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "Sent to ChatGPT",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "The edited photo is in the ChatGPT app — save it from there. " +
+                        "This app only keeps the photo you sent.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = PaperDim
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    formatDate(record.timestamp),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                Spacer(Modifier.height(24.dp))
+            }
+            return@Scaffold
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()

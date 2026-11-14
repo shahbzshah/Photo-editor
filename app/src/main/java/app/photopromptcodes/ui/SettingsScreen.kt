@@ -1,12 +1,6 @@
 package app.photopromptcodes.ui
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
-import android.webkit.CookieManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -50,10 +44,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import app.photopromptcodes.PpcApplication
 import app.photopromptcodes.data.HistoryRepository
-import app.photopromptcodes.notifications.ResultNotifier
 import app.photopromptcodes.update.UpdateChecker
 import androidx.compose.foundation.text.selection.SelectionContainer
 import app.photopromptcodes.ui.theme.Amber
@@ -69,27 +61,13 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onSignIn: () -> Unit,
     onPrivacy: () -> Unit,
     onAbout: () -> Unit,
     onUpdateFound: (UpdateChecker.UpdateInfo) -> Unit = {}
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
-    var chatgptIn by remember { mutableStateOf(isLoggedInFlag(ctx)) }
     var showClearConfirm by remember { mutableStateOf(false) }
-    var showSignOutConfirm by remember { mutableStateOf(false) }
-    var notifyTestState by remember { mutableStateOf<String?>(null) } // null|sent|denied
-    val notifyTestLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            ResultNotifier.postTest(ctx)
-            notifyTestState = "sent"
-        } else {
-            notifyTestState = "denied"
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -107,70 +85,6 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // --- ChatGPT account ---
-            Text(
-                "CHATGPT ACCOUNT",
-                style = MaterialTheme.typography.labelSmall,
-                color = PaperDim
-            )
-            Spacer(Modifier.height(8.dp))
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    // Refresh sign-in state when returning from the login screen
-                    androidx.compose.runtime.LaunchedEffect(Unit) {
-                        chatgptIn = isLoggedInFlag(ctx)
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "ChatGPT",
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                if (chatgptIn) "Signed in. Best quality."
-                                else "Sign in required. Best quality.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = PaperDim
-                            )
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            if (chatgptIn) "●" else "○",
-                            color = if (chatgptIn) Amber else PaperDim,
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
-                    Spacer(Modifier.height(12.dp))
-                    if (chatgptIn) {
-                        OutlinedButton(
-                            onClick = { showSignOutConfirm = true },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Sign out of ChatGPT")
-                        }
-                    } else {
-                        Button(
-                            onClick = onSignIn,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Amber,
-                                contentColor = NearBlack
-                            ),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Sign in to ChatGPT", fontWeight = FontWeight.SemiBold)
-                        }
-                    }
-                }
-            }
-            Spacer(Modifier.height(24.dp))
-            Spacer(Modifier.height(24.dp))
-
             // --- Storage ---
             Text(
                 "STORAGE",
@@ -201,71 +115,6 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Clear history")
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            // --- Notifications ---
-            Text(
-                "NOTIFICATIONS",
-                style = MaterialTheme.typography.labelSmall,
-                color = PaperDim
-            )
-            Spacer(Modifier.height(8.dp))
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "Ready alerts",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        "“Notify me when ready” tells you when an edit finishes, " +
-                            "even if you leave the app. Test it here first.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = PaperDim
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    OutlinedButton(
-                        onClick = {
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-                                ContextCompat.checkSelfPermission(
-                                    ctx, Manifest.permission.POST_NOTIFICATIONS
-                                ) == PackageManager.PERMISSION_GRANTED
-                            ) {
-                                ResultNotifier.postTest(ctx)
-                                notifyTestState = "sent"
-                            } else {
-                                notifyTestLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Send a test notification")
-                    }
-                    if (notifyTestState == "sent") {
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            "Test sent — check your notifications.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Amber
-                        )
-                    }
-                    if (notifyTestState == "denied") {
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            "Notifications are off for this app. Open system Settings → " +
-                                "Apps → Photo Prompt Codes → Notifications to turn them on.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = PaperDim
-                        )
                     }
                 }
             }
@@ -516,32 +365,6 @@ fun SettingsScreen(
                 }
             }
         }
-    }
-
-    // Sign-out confirmation
-    if (showSignOutConfirm) {
-        AlertDialog(
-            onDismissRequest = { showSignOutConfirm = false },
-            title = { Text("Sign out of ChatGPT?") },
-            text = { Text("You'll need to sign in again before generating edits.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    showSignOutConfirm = false
-                    // Clear cookies + flag
-                    CookieManager.getInstance().removeAllCookies(null)
-                    CookieManager.getInstance().flush()
-                    clearLoggedInFlag(ctx)
-                    chatgptIn = false
-                }) {
-                    Text("Sign out")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showSignOutConfirm = false }) {
-                    Text("Cancel")
-                }
-            }
-        )
     }
 
     // Clear-history confirmation

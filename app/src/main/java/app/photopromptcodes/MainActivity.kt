@@ -40,13 +40,11 @@ import app.photopromptcodes.ui.CodeDetailScreen
 import app.photopromptcodes.ui.FavoritesScreen
 import app.photopromptcodes.ui.GalleryScreen
 import app.photopromptcodes.ui.HistoryScreen
-import app.photopromptcodes.ui.LoginScreen
 import app.photopromptcodes.ui.OnboardingScreen
 import app.photopromptcodes.ui.PrivacyPolicyScreen
 import app.photopromptcodes.ui.ResultDetailScreen
-import app.photopromptcodes.ui.RunScreen
 import app.photopromptcodes.ui.SettingsScreen
-import app.photopromptcodes.ui.isLoggedInFlag
+import app.photopromptcodes.ui.ShareScreen
 import app.photopromptcodes.ui.isOnboarded
 import app.photopromptcodes.ui.theme.Amber
 import app.photopromptcodes.ui.theme.NearBlack
@@ -183,26 +181,16 @@ fun AppNav(resumeTick: Int) {
                 }
             )
         }
-        composable("login") {
-            LoginScreen(
-                onDone = {
-                    nav.navigate("gallery") {
-                        popUpTo("login") { inclusive = true }
-                    }
-                }
-            )
-        }
         composable("gallery") {
             GalleryScreen(
                 onOpenCode = { code -> nav.navigate("detail/${Uri.encode(code)}") },
                 onCustomPrompt = { prompt, photoUri ->
-                    nav.navigate("runcustom?photo=${Uri.encode(photoUri.toString())}&prompt=${Uri.encode(prompt)}")
+                    nav.navigate("sharecustom?photo=${Uri.encode(photoUri.toString())}&prompt=${Uri.encode(prompt)}")
                 }
             )
         }
         composable("settings") {
             SettingsScreen(
-                onSignIn = { nav.navigate("signin") },
                 onPrivacy = { nav.navigate("privacy") },
                 onAbout = { nav.navigate("about") },
                 onUpdateFound = { pendingUpdate = it }
@@ -210,11 +198,6 @@ fun AppNav(resumeTick: Int) {
         }
         composable("privacy") {
             PrivacyPolicyScreen(onBack = { nav.popBackStack() })
-        }
-        composable("signin") {
-            LoginScreen(
-                onDone = { nav.popBackStack() }
-            )
         }
         composable(
             "detail/{code}",
@@ -225,7 +208,7 @@ fun AppNav(resumeTick: Int) {
                 code = code,
                 onBack = { nav.popBackStack() },
                 onEdit = { photoUri ->
-                    nav.navigate("run/${Uri.encode(code)}?photo=${Uri.encode(photoUri.toString())}")
+                    nav.navigate("share/${Uri.encode(code)}?photo=${Uri.encode(photoUri.toString())}")
                 },
                 onBatch = { uris ->
                     val photos = uris.joinToString(",") { Uri.encode(it.toString()) }
@@ -234,7 +217,7 @@ fun AppNav(resumeTick: Int) {
             )
         }
         composable(
-            "run/{code}?photo={photo}",
+            "share/{code}?photo={photo}",
             arguments = listOf(
                 navArgument("code") { type = NavType.StringType },
                 navArgument("photo") { type = NavType.StringType }
@@ -242,18 +225,15 @@ fun AppNav(resumeTick: Int) {
         ) { entry ->
             val code = Uri.decode(entry.arguments?.getString("code").orEmpty())
             val photo = Uri.decode(entry.arguments?.getString("photo").orEmpty())
-            RunScreen(
+            ShareScreen(
                 code = code,
                 photoUriString = photo,
                 onBack = { nav.popBackStack() },
-                onDone = { recordId ->
-                    nav.navigate("result/$recordId") { popUpTo("gallery") }
-                },
-                onSignIn = { nav.navigate("signin") }
+                onDone = { nav.popBackStack() }
             )
         }
         composable(
-            "runcustom?photo={photo}&prompt={prompt}",
+            "sharecustom?photo={photo}&prompt={prompt}",
             arguments = listOf(
                 navArgument("photo") { type = NavType.StringType },
                 navArgument("prompt") { type = NavType.StringType }
@@ -261,15 +241,12 @@ fun AppNav(resumeTick: Int) {
         ) { entry ->
             val photo = Uri.decode(entry.arguments?.getString("photo").orEmpty())
             val prompt = Uri.decode(entry.arguments?.getString("prompt").orEmpty())
-            RunScreen(
+            ShareScreen(
                 code = "__custom__",
                 photoUriString = photo,
                 customPrompt = prompt,
                 onBack = { nav.popBackStack() },
-                onDone = { recordId ->
-                    nav.navigate("result/$recordId") { popUpTo("gallery") }
-                },
-                onSignIn = { nav.navigate("signin") }
+                onDone = { nav.popBackStack() }
             )
         }
         composable(

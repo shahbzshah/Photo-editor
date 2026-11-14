@@ -11,19 +11,13 @@
     <!-- In-app updater: Android 8+ requires this for an app to hand an APK to the system installer. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <!-- "Notify me when ready" on the run screen (runtime permission on Android 13+). -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-    <!-- Keep-alive for a run the user asked to be notified about: raises
-         the process priority while the edit develops in the background. -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-
-    <!-- Let the app see WhatsApp/TikTok/Instagram for direct sharing (Android 11+ package visibility). -->
+    <!-- Let the app see WhatsApp/TikTok/Instagram for direct sharing, and
+         ChatGPT for the share-to-ChatGPT flow (Android 11+ package visibility). -->
     <queries>
         <package android:name="com.whatsapp" />
         <package android:name="com.zhiliaoapp.musically" />
         <package android:name="com.instagram.android" />
+        <package android:name="com.openai.chatgpt" />
     </queries>
 
     <application
@@ -44,11 +38,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".notifications.RunKeepAliveService"
-            android:exported="false"
-            android:foregroundServiceType="specialUse" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
