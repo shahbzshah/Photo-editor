@@ -747,14 +747,17 @@ class ChatGptDriver : EngineDriver {
                 // Fail fast if ChatGPT shows an upsell/limit wall instead of generating
                 try {
                     val blocked = unquote(evalJs(checkBlockedJs()))
-                    if (blocked == "blocked") {
+                    if (blocked != null && blocked.startsWith("blocked")) {
+                        val reset = blocked.substringAfter("|", "")
+                        val msg = if (reset.isNotEmpty()) {
+                            "You've hit ChatGPT's free image limit — it resets in $reset. " +
+                                "Wait until then or upgrade, then try again."
+                        } else {
+                            "ChatGPT isn't generating images right now — it's showing an upgrade prompt. " +
+                                "You've likely hit the free image limit. Wait a while or upgrade, then try again."
+                        }
                         try {
-                            imageArrived?.completeExceptionally(
-                                DriverException(
-                                    "ChatGPT isn't generating images right now — it's showing an upgrade prompt. " +
-                                    "You've likely hit the free image limit. Wait a while or upgrade, then try again."
-                                )
-                            )
+                            imageArrived?.completeExceptionally(DriverException(msg))
                         } catch (_: Exception) {}
                     }
                 } catch (_: Exception) {}
@@ -795,12 +798,24 @@ class ChatGptDriver : EngineDriver {
      * Detects ChatGPT's upsell / free-limit wall that appears instead of
      * generating an image. Returns 'blocked' if found.
      */
+    /**
+     * Detects ChatGPT's upsell / free-limit wall that appears instead of
+     * generating an image. Returns 'blocked' if found, 'blocked|<when>'
+     * when the page also says when the limit resets ("resets in 8 hours"),
+     * or 'ok'. The 2026-11-14 wall ("You've hit the Free plan limit for
+     * image generations requests… unable to invoke the image-generation
+     * tool") matched none of the old hints, so the run waited the full
+     * 12 minutes in silence — the hints below cover its exact wording.
+     */
     private fun checkBlockedJs(): String {
         return """(function(){
           var t=(document.body?document.body.innerText:'').toLowerCase();
-          var hints=['create richer images from your files','you have reached your image','image generation limit','upgrade to continue generating','daily limit'];
-          for(var i=0;i<hints.length;i++){ if(t.indexOf(hints[i])>-1) return 'blocked'; }
-          return 'ok';
+          var hints=['create richer images from your files','you have reached your image','image generation limit','upgrade to continue generating','daily limit','free plan limit','limit resets in','unable to invoke the image-generation','image generations requests','you have reached your limit'];
+          var hit=false;
+          for(var i=0;i<hints.length;i++){ if(t.indexOf(hints[i])>-1){ hit=true; break; } }
+          if(!hit) return 'ok';
+          var m=t.match(/resets in (\d+\s*(?:hours?|minutes?|days?))/);
+          return m ? 'blocked|'+m[1] : 'blocked';
         })()"""
     }
 
