@@ -69,7 +69,8 @@ data class ShareUi(
     val sent: Boolean = false,
     val targets: List<AiShare.Target> = emptyList(),
     val target: AiShare.Target = AiShare.CHATGPT,
-    val noAppInstalled: Boolean = false
+    val noAppInstalled: Boolean = false,
+    val missingTargets: List<AiShare.Target> = emptyList()
 )
 
 class ShareViewModel(app: Application) : AndroidViewModel(app) {
@@ -102,19 +103,26 @@ class ShareViewModel(app: Application) : AndroidViewModel(app) {
             app.photopromptcodes.data.RecentCodes.record(ctx, code.code)
             // Only installed apps are offered; the saved choice wins when
             // it is still installed, otherwise the first installed one.
+            // Uninstalled apps are listed separately with a Get-it button
+            // instead of being hidden — the user must SEE the options.
             val installed = AiShare.installedTargets(ctx)
             val hasApp = installed.any { it.packageName != null }
             val saved = AiShare.targetById(AiShare.savedTargetId(ctx))
             val chosen = if (installed.contains(saved)) saved else installed.first()
+            val missing = AiShare.TARGETS.filter {
+                it.packageName != null && !installed.contains(it)
+            }
             ui = ui.copy(
                 code = code,
                 photoUri = photoUri,
                 targets = installed,
                 target = chosen,
-                noAppInstalled = !hasApp
+                noAppInstalled = !hasApp,
+                missingTargets = missing
             )
-            if (!hasApp) return@launch
-            sendNow()
+            // Deliberately NO auto-send here: the chooser comes first.
+            // v2.1.0 fired to ChatGPT the moment this screen opened, so
+            // the user never saw the other options at all.
         }
     }
 
@@ -306,11 +314,35 @@ fun ShareScreen(
                     )
                 }
             }
+            // Apps not on the phone yet are shown, not hidden — each
+            // with a one-tap way to install it.
+            ui.missingTargets.forEach { target ->
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        "${target.label} isn't installed",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = PaperDim
+                    )
+                    androidx.compose.material3.TextButton(
+                        onClick = { AiShare.openPlayStore(context, target) }
+                    ) {
+                        Text(
+                            "Get it",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Amber
+                        )
+                    }
+                }
+            }
             Spacer(Modifier.height(16.dp))
 
             val target = ui.target
             Text(
-                if (ui.sent) "Sent to ${target.label}" else "Sending to ${target.label}…",
+                if (ui.sent) "Sent to ${target.label}" else "Ready to send",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
