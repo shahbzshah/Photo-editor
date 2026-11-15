@@ -70,7 +70,9 @@ data class ShareUi(
     val targets: List<AiShare.Target> = emptyList(),
     val target: AiShare.Target = AiShare.CHATGPT,
     val noAppInstalled: Boolean = false,
-    val missingTargets: List<AiShare.Target> = emptyList()
+    val missingTargets: List<AiShare.Target> = emptyList(),
+    val openOnlyTargets: List<AiShare.Target> = emptyList(),
+    val viaOpen: Boolean = false
 )
 
 class ShareViewModel(app: Application) : AndroidViewModel(app) {
@@ -101,16 +103,19 @@ class ShareViewModel(app: Application) : AndroidViewModel(app) {
                 return@launch
             }
             app.photopromptcodes.data.RecentCodes.record(ctx, code.code)
-            // Only installed apps are offered; the saved choice wins when
-            // it is still installed, otherwise the first installed one.
-            // Uninstalled apps are listed separately with a Get-it button
-            // instead of being hidden — the user must SEE the options.
+            // Only shareable apps are offered as send targets; the saved
+            // choice wins when it is still shareable, otherwise the first
+            // shareable one. Installed-but-not-shareable apps (Qwen) are
+            // listed separately with an Open button instead of a doomed
+            // send; apps not on the phone at all get a Get-it button.
             val installed = AiShare.installedTargets(ctx)
-            val hasApp = installed.any { it.packageName != null }
+            val hasApp = AiShare.TARGETS.any {
+                it.packageName != null && AiShare.isInstalled(ctx, it)
+            }
             val saved = AiShare.targetById(AiShare.savedTargetId(ctx))
             val chosen = if (installed.contains(saved)) saved else installed.first()
             val missing = AiShare.TARGETS.filter {
-                it.packageName != null && !installed.contains(it)
+                it.packageName != null && !AiShare.isInstalled(ctx, it)
             }
             ui = ui.copy(
                 code = code,
@@ -118,7 +123,8 @@ class ShareViewModel(app: Application) : AndroidViewModel(app) {
                 targets = installed,
                 target = chosen,
                 noAppInstalled = !hasApp,
-                missingTargets = missing
+                missingTargets = missing,
+                openOnlyTargets = AiShare.openOnlyTargets(ctx)
             )
             // Deliberately NO auto-send here: the chooser comes first.
             // v2.1.0 fired to ChatGPT the moment this screen opened, so
@@ -130,8 +136,37 @@ class ShareViewModel(app: Application) : AndroidViewModel(app) {
     fun selectTarget(target: AiShare.Target) {
         val ctx = getApplication<Application>()
         AiShare.saveTargetId(ctx, target.id)
-        ui = ui.copy(target = target, error = null, sent = false)
+        ui = ui.copy(target = target, error = null, sent = false, viaOpen = false)
         viewModelScope.launch { sendNow() }
+    }
+
+    /**
+     * Opens an app that can't take a share (Qwen). The prompt is already
+     * on the clipboard; the user attaches the photo inside the app.
+     * Recorded in history like a send — the hand-off happened, just by
+     * hand instead of by intent.
+     */
+    fun openTarget(target: AiShare.Target) {
+        val ctx = getApplication<Application>()
+        val code = ui.code ?: return
+        AiShare.saveTargetId(ctx, target.id)
+        AiShare.copyPromptToClipboard(ctx, code.prompt)
+        if (!AiShare.openApp(ctx, target)) {
+            ui = ui.copy(
+                target = target,
+                error = "Couldn't open ${target.label}."
+            )
+            return
+        }
+        ui = ui.copy(target = target, sent = true, viaOpen = true, error = null)
+        viewModelScope.launch {
+            try {
+                val photo = ui.photoUri ?: return@launch
+                val id = history.stageOriginal(code.code, photo)
+                history.saveSent(id, code.code)
+            } catch (_: Exception) {
+            }
+        }
     }
 
     /** Hands the photo + prompt to the chosen app, then records the send. */
@@ -145,10 +180,14 @@ class ShareViewModel(app: Application) : AndroidViewModel(app) {
                 AiShare.sharedPhotoUri(ctx, photo)
             }
             if (!AiShare.sendToTarget(ctx, target, shared, code.prompt)) {
-                ui = ui.copy(error = "Couldn't open ${target.label}.")
+                ui = ui.copy(
+                    error = "Couldn't open ${target.label} — it may not take " +
+                        "photos from other apps. Try opening it and attaching " +
+                        "the photo yourself."
+                )
                 return
             }
-            ui = ui.copy(sent = true, error = null)
+            ui = ui.copy(sent = true, viaOpen = false, error = null)
             // Record the hand-off in history (best effort — the share
             // already happened, so a history failure must not surface).
             try {
@@ -231,7 +270,12 @@ fun ShareScreen(
                 Text(ui.error, style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(16.dp))
                 Button(
-                    onClick = { vm.sendAgain() },
+                    onClick = {
+                        // Retry the same kind of hand-off that failed:
+                        // an open-only target is re-opened, not sent to.
+                        if (ui.openOnlyTargets.contains(ui.target)) vm.openTarget(ui.target)
+                        else vm.sendAgain()
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Amber,
                         contentColor = NearBlack
@@ -338,22 +382,60 @@ fun ShareScreen(
                     }
                 }
             }
+            // Installed but can't take a share (Qwen): open it instead.
+            // The prompt is on the clipboard; the photo is attached
+            // inside the app.
+            ui.openOnlyTargets.forEach { target ->
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        "${target.label} can't take photos directly",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = PaperDim
+                    )
+                    androidx.compose.material3.TextButton(
+                        onClick = { vm.openTarget(target) }
+                    ) {
+                        Text(
+                            "Open ${target.label}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Amber
+                        )
+                    }
+                }
+            }
             Spacer(Modifier.height(16.dp))
 
             val target = ui.target
             Text(
-                if (ui.sent) "Sent to ${target.label}" else "Ready to send",
+                when {
+                    ui.sent && ui.viaOpen -> "Opened ${target.label}"
+                    ui.sent -> "Sent to ${target.label}"
+                    else -> "Ready to send"
+                },
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                if (target.packageName == null) {
-                    "Pick an app, then tap Send there to make the edit. The " +
-                        "finished photo stays in that app — save it from there."
-                } else {
-                    "Tap Send in the ${target.label} app to make the edit. The " +
-                        "finished photo stays in ${target.label} — save it from there."
+                when {
+                    ui.viaOpen -> {
+                        "Attach the photo inside ${target.label} yourself, " +
+                            "then paste the prompt — it's already on your " +
+                            "clipboard. The finished photo stays in " +
+                            "${target.label} — save it from there."
+                    }
+                    target.packageName == null -> {
+                        "Pick an app, then tap Send there to make the edit. The " +
+                            "finished photo stays in that app — save it from there."
+                    }
+                    else -> {
+                        "Tap Send in the ${target.label} app to make the edit. The " +
+                            "finished photo stays in ${target.label} — save it from there."
+                    }
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = PaperDim
@@ -369,8 +451,11 @@ fun ShareScreen(
 
             ui.code?.let { c ->
                 Text(
-                    if (target.packageName == null) "PROMPT TO SEND"
-                    else "PROMPT SENT TO ${target.label.uppercase()}",
+                    when {
+                        ui.viaOpen -> "PROMPT COPIED FOR ${target.label.uppercase()}"
+                        target.packageName == null -> "PROMPT TO SEND"
+                        else -> "PROMPT SENT TO ${target.label.uppercase()}"
+                    },
                     style = MaterialTheme.typography.labelSmall,
                     color = PaperDim,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -393,7 +478,7 @@ fun ShareScreen(
             }
 
             Button(
-                onClick = { vm.sendAgain() },
+                onClick = { if (ui.viaOpen) vm.openTarget(target) else vm.sendAgain() },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Amber,
                     contentColor = NearBlack
@@ -401,7 +486,11 @@ fun ShareScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    if (target.packageName == null) "Choose app" else "Send to ${target.label}",
+                    when {
+                        ui.viaOpen -> "Open ${target.label}"
+                        target.packageName == null -> "Choose app"
+                        else -> "Send to ${target.label}"
+                    },
                     fontWeight = FontWeight.SemiBold
                 )
             }

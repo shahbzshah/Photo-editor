@@ -26,6 +26,19 @@ import java.io.File
  * - Other apps — the system share sheet, for anything else installed
  *   (Gemini, Grok, …).
  *
+ * Installed is NOT the same as shareable. Qwen (com.tongyi.intl) is
+ * installed on Megah's phone yet has no activity for ACTION_SEND with
+ * an image — it only takes photos uploaded from inside itself — so a
+ * direct send dies with ActivityNotFoundException ("Couldn't open
+ * Qwen", 2026-11-15). The chooser therefore distinguishes:
+ * - shareable targets: direct send, photo + prompt together.
+ * - installed-but-not-shareable targets: "Open Qwen" instead — the app
+ *   is launched with the prompt already on the clipboard and the user
+ *   attaches the photo inside it.
+ * canReceiveShare() is the check that decides which side a target is
+ * on: it asks the system whether the exact share intent resolves,
+ * which is the same question startActivity would answer.
+ *
  * The prompt is also copied to the clipboard on every share: if the app
  * takes the photo but not the text, the user pastes it in one tap.
  */
@@ -84,9 +97,13 @@ object AiShare {
             .edit().putString(KEY_TARGET, id).apply()
     }
 
+    /**
+     * Package-exists check only. This does NOT say the app can receive a
+     * share — Qwen proves the difference. See canReceiveShare().
+     */
     fun isInstalled(context: Context, target: Target): Boolean {
         val pkg = target.packageName ?: return true // "Other" is always there
-        try {
+        return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 context.packageManager.getPackageInfo(
                     pkg,
@@ -96,20 +113,58 @@ object AiShare {
                 @Suppress("DEPRECATION")
                 context.packageManager.getPackageInfo(pkg, 0)
             }
-            return true
+            true
         } catch (_: PackageManager.NameNotFoundException) {
-            // Fall through to the explicit-intent probe below.
+            false
         }
+    }
+
+    /**
+     * True when the app has an activity that would actually take the
+     * share — same action, type and package as the real send, asked
+     * before anything is fired. "Other" is always true (the system
+     * sheet only lists apps that can take it).
+     */
+    fun canReceiveShare(context: Context, target: Target): Boolean {
+        val pkg = target.packageName ?: return true
         val probe = Intent(Intent.ACTION_SEND).apply {
             type = "image/*"
             setPackage(pkg)
         }
-        return context.packageManager.resolveActivity(probe, 0) != null
+        return context.packageManager.resolveActivity(
+            probe,
+            PackageManager.MATCH_DEFAULT_ONLY
+        ) != null
     }
 
-    /** Installed app targets plus "Other" — the chooser shows exactly these. */
+    /** Shareable targets: installed app targets that take the share, plus "Other". */
     fun installedTargets(context: Context): List<Target> =
-        TARGETS.filter { it.packageName == null || isInstalled(context, it) }
+        TARGETS.filter { it.packageName == null || canReceiveShare(context, it) }
+
+    /** Installed app targets that CANNOT take a share — opened, not sent to. */
+    fun openOnlyTargets(context: Context): List<Target> =
+        TARGETS.filter {
+            it.packageName != null &&
+                isInstalled(context, it) &&
+                !canReceiveShare(context, it)
+        }
+
+    /**
+     * Launches an installed app (no photo attached — it can't take one).
+     * Returns false when there is no launch intent for it.
+     */
+    fun openApp(context: Context, target: Target): Boolean {
+        val pkg = target.packageName ?: return false
+        val launch = context.packageManager.getLaunchIntentForPackage(pkg)
+            ?.apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+            ?: return false
+        return try {
+            context.startActivity(launch)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
 
     /**
      * Copies the photo into our shared cache dir (FileProvider) unless it
