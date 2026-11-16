@@ -84,6 +84,7 @@ fun CodeDetailScreen(
     LaunchedEffect(code) { vm.load(context, code) }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
+    var cameraUnavailable by remember { mutableStateOf(false) }
 
     val pickVisual = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
@@ -111,13 +112,26 @@ fun CodeDetailScreen(
     }
 
     fun takePhoto() {
+        // No camera app on this device (Lenovo TB310FU, 2026-11-16):
+        // fall back to the gallery instead of crashing.
+        if (!hasCameraApp(context)) {
+            cameraUnavailable = true
+            choosePhoto()
+            return
+        }
         val file = java.io.File(context.cacheDir, "shared/camera_${System.currentTimeMillis()}.jpg")
         file.parentFile?.mkdirs()
         val uri = androidx.core.content.FileProvider.getUriForFile(
             context, "app.photopromptcodes.fileprovider", file
         )
         cameraUri = uri
-        takePicture.launch(uri)
+        try {
+            takePicture.launch(uri)
+        } catch (_: android.content.ActivityNotFoundException) {
+            // Camera app vanished between the check and the launch.
+            cameraUnavailable = true
+            choosePhoto()
+        }
     }
 
     fun batchEdit() {
@@ -267,6 +281,14 @@ fun CodeDetailScreen(
                 }
             }
             Spacer(Modifier.height(12.dp))
+            if (cameraUnavailable) {
+                Text(
+                    "No camera app on this device — pick a photo from your gallery instead.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = PaperDim
+                )
+                Spacer(Modifier.height(12.dp))
+            }
             Button(
                 onClick = { photoUri?.let(onEdit) },
                 enabled = photoUri != null,

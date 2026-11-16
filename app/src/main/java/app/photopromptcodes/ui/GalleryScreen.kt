@@ -176,13 +176,41 @@ fun GalleryScreen(
         pendingCustomText = text
         showCustomDialog = false
         if (useCamera) {
+            // Same guard as CodeDetailScreen: some tablets have no
+            // camera app, and an unguarded launch crashes.
+            if (!hasCameraApp(context)) {
+                android.widget.Toast.makeText(
+                    context,
+                    "No camera app on this device — choose from your gallery instead.",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+                pickVisual.launch(
+                    androidx.activity.result.PickVisualMediaRequest(
+                        androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                )
+                return
+            }
             val file = java.io.File(context.cacheDir, "shared/camera_${System.currentTimeMillis()}.jpg")
             file.parentFile?.mkdirs()
             val uri = androidx.core.content.FileProvider.getUriForFile(
                 context, "app.photopromptcodes.fileprovider", file
             )
             takePictureUri.value = uri
-            takePicture.launch(uri)
+            try {
+                takePicture.launch(uri)
+            } catch (_: android.content.ActivityNotFoundException) {
+                android.widget.Toast.makeText(
+                    context,
+                    "No camera app on this device — choose from your gallery instead.",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+                pickVisual.launch(
+                    androidx.activity.result.PickVisualMediaRequest(
+                        androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                )
+            }
         } else {
             pickVisual.launch(
                 androidx.activity.result.PickVisualMediaRequest(

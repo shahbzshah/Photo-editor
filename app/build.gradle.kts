@@ -24,8 +24,8 @@ android {
         applicationId = "app.photopromptcodes"
         minSdk = 26
         targetSdk = 34
-        versionCode = 49
-        versionName = "2.1.2"
+        versionCode = 50
+        versionName = "2.1.3"
     }
 
     signingConfigs {
