@@ -19,12 +19,15 @@ import java.io.File
  *
  * Targets (only installed ones are offered):
  * - ChatGPT (com.openai.chatgpt) — edits photos.
+ * - Gemini (com.google.android.apps.bard) — Google's app; edits photos
+ *   with Nano Banana. Megah has Gemini Pro, so the Pro models apply
+ *   inside Gemini once the photo lands there.
  * - Qwen (com.tongyi.intl) — Alibaba's consumer app, photo editing is
  *   one of its headline jobs.
  * - Qwen Studio (ai.qwenlm.chat.android) — the chat.qwen.ai app, also
  *   edits images.
  * - Other apps — the system share sheet, for anything else installed
- *   (Gemini, Grok, …).
+ *   (Grok, …).
  *
  * Installed is NOT the same as shareable. Qwen (com.tongyi.intl) is
  * installed on Megah's phone yet has no activity for ACTION_SEND with
@@ -65,6 +68,13 @@ object AiShare {
         playStoreUrl = "https://play.google.com/store/apps/details?id=com.tongyi.intl",
         webUrl = "https://qwen.ai"
     )
+    val GEMINI = Target(
+        id = "gemini",
+        label = "Gemini",
+        packageName = "com.google.android.apps.bard",
+        playStoreUrl = "https://play.google.com/store/apps/details?id=com.google.android.apps.bard",
+        webUrl = "https://gemini.google.com"
+    )
     val QWEN_STUDIO = Target(
         id = "qwen-studio",
         label = "Qwen Studio",
@@ -80,7 +90,7 @@ object AiShare {
         webUrl = null
     )
 
-    val TARGETS = listOf(CHATGPT, QWEN, QWEN_STUDIO, OTHER)
+    val TARGETS = listOf(CHATGPT, GEMINI, QWEN, QWEN_STUDIO, OTHER)
 
     private const val PREFS = "ppc_prefs"
     private const val KEY_TARGET = "share_target"

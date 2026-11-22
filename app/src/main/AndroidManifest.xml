@@ -18,6 +18,7 @@
         <package android:name="com.zhiliaoapp.musically" />
         <package android:name="com.instagram.android" />
         <package android:name="com.openai.chatgpt" />
+        <package android:name="com.google.android.apps.bard" />
         <package android:name="com.tongyi.intl" />
         <package android:name="ai.qwenlm.chat.android" />
     </queries>

@@ -299,8 +299,8 @@ fun ShareScreen(
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Install ChatGPT or Qwen to edit photos, or open ChatGPT in " +
-                        "your browser and attach the photo yourself.",
+                    "Install ChatGPT, Gemini or Qwen to edit photos, or open " +
+                        "ChatGPT in your browser and attach the photo yourself.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = PaperDim
                 )
@@ -314,6 +314,13 @@ fun ShareScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Get ChatGPT on Play Store", fontWeight = FontWeight.SemiBold)
+                }
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = { AiShare.openPlayStore(context, AiShare.GEMINI) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Get Gemini on Play Store")
                 }
                 Spacer(Modifier.height(8.dp))
                 OutlinedButton(
