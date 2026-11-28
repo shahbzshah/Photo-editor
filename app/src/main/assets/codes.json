@@ -1689,108 +1689,126 @@
     "category": "Viral",
     "code": "/lookbook7",
     "description": "Overhead 7-pose fashion lookbook: 7 versions of you, 3-2-2 grid on white.",
-    "prompt": "Edit this photo: create an overhead fashion lookbook collage with 7 versions of the same person from this photo, scattered in a 3-2-2 grid on a seamless pure white background, shot from directly above as a bird's-eye flatlay with no shadows. Keep the same face, skin tone, hair and identity in every figure — only the outfit and pose change. Poses: taking a phone selfie mid-walk; walking away, back view; side profile holding sunglasses; walking left, arms swinging; walking forward on a phone call; playful arm outstretched, head turned; sitting or crouching, looking down. Each figure in a different stylish outfit, photorealistic, crisp studio light. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo: create an overhead fashion lookbook collage with 7 versions of the same person from this photo, scattered in a 3-2-2 grid on a seamless pure white background, shot from directly above as a bird's-eye flatlay with no shadows. Keep the same face, skin tone, hair and identity in every figure — only the outfit and pose change. Poses: taking a phone selfie mid-walk; walking away, back view; side profile holding sunglasses; walking left, arms swinging; walking forward on a phone call; playful arm outstretched, head turned; sitting or crouching, looking down. Each figure in a different stylish outfit, photorealistic, crisp studio light. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.2.0"
   },
   {
     "category": "Viral",
     "code": "/sweaterpop",
     "description": "B&W editorial portrait: only the chunky-knit sweater and your eyes in colour.",
-    "prompt": "Edit this photo: create an ultra-realistic, high-fashion editorial beauty portrait in black and white, with two pops of colour only: the person's own eyes, and an oversized, luxurious chunky-knit sweater in the same colour as their irises. Pose the person with both hands raised toward the face, hands tucked inside the long cuffs, the oversized sleeves covering the mouth and lower face, the top edge of the cuffs resting just below the nose, leaving the eyes beautifully visible. Soft studio light, sharp detail on the knit texture, photorealistic. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo: create an ultra-realistic, high-fashion editorial beauty portrait in black and white, with two pops of colour only: the person's own eyes, and an oversized, luxurious chunky-knit sweater in the same colour as their irises. Pose the person with both hands raised toward the face, hands tucked inside the long cuffs, the oversized sleeves covering the mouth and lower face, the top edge of the cuffs resting just below the nose, leaving the eyes beautifully visible. Soft studio light, sharp detail on the knit texture, photorealistic. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.2.0"
   },
   {
     "category": "Viral",
     "code": "/observemood",
     "description": "Mood board: your photo in the centre, six 'If I was…' tiles around it.",
-    "prompt": "Edit this photo: build a vertical 9:16 mood board with this photo in the centre, surrounded by six image tiles that answer 'If I was…' for the person in the photo: a city, a season, a flower, a painting, an animal, and a natural element — each tile matching their vibe. Clean grid layout, soft neutral background, the centre photo larger than the tiles, photorealistic tiles, no text. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo: build a vertical 9:16 mood board with this photo in the centre, surrounded by six image tiles that answer 'If I was…' for the person in the photo: a city, a season, a flower, a painting, an animal, and a natural element — each tile matching their vibe. Clean grid layout, soft neutral background, the centre photo larger than the tiles, photorealistic tiles, no text. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.2.0"
   },
   {
     "category": "Standing — Everyday Cool",
     "code": "/bicepheart",
     "description": "Flex one arm and curl the other hand over it so they form a small heart.",
-    "prompt": "Edit this photo: change the subject's pose to the bicep heart pose. Keep the person's face, identity, hairstyle and outfit exactly the same — natural and unretouched, with natural skin texture, no beautifying, no smoothing, no reshaping — only the pose and body position change. Raise the right arm and bend it so the fist is beside the head and the bicep is flexed. Bring the left hand across and rest it high on the right upper arm, just below the fist, fingers curved and thumb pointing down, so the gap between the hand and arm forms a small heart. One person, waist-up, facing the camera, smiling. Do not raise both arms over the head. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed."
+    "prompt": "Edit this photo: change the subject's pose to the bicep heart pose. Keep the person's face, identity, hairstyle and outfit exactly the same — natural and unretouched, with natural skin texture, no beautifying, no smoothing, no reshaping — only the pose and body position change. Raise the right arm and bend it so the fist is beside the head and the bicep is flexed. Bring the left hand across and rest it high on the right upper arm, just below the fist, fingers curved and thumb pointing down, so the gap between the hand and arm forms a small heart. One person, waist-up, facing the camera, smiling. Do not raise both arms over the head. Adjust the background only as much as needed to make the new pose look natural. Cinematic lighting, photorealistic, highly detailed.",
+    "addedIn": "2.2.0"
   },
   {
     "category": "Viral",
     "code": "/grandpafish",
     "description": "Muscular grandpa calmly slicing a fish as long as the kitchen island.",
-    "prompt": "Edit this photo: turn the person in the photo into a hugely muscular grey-haired grandpa in his seventies with short grey hair and a grey beard, wearing a plain white tank top, standing behind a long kitchen island in a bright, ordinary home kitchen. On a big wooden cutting board in front of him lies one whole raw fish so long it runs the full length of the kitchen island. He holds a large kitchen knife over the fish and looks at the camera with a calm, proud expression. Natural window light, casual phone-camera photo, no text, no logos. Keep the person's distinguishing features recognizable in the new form — do not redesign, beautify, or smooth the face."
+    "prompt": "Edit this photo: turn the person in the photo into a hugely muscular grey-haired grandpa in his seventies with short grey hair and a grey beard, wearing a plain white tank top, standing behind a long kitchen island in a bright, ordinary home kitchen. On a big wooden cutting board in front of him lies one whole raw fish so long it runs the full length of the kitchen island. He holds a large kitchen knife over the fish and looks at the camera with a calm, proud expression. Natural window light, casual phone-camera photo, no text, no logos. Keep the person's distinguishing features recognizable in the new form — do not redesign, beautify, or smooth the face.",
+    "addedIn": "2.2.0"
   },
   {
     "category": "Viral",
     "code": "/flamingofloat",
     "description": "Lounging on a giant pink flamingo float, drifting toward the pool's edge.",
-    "prompt": "Edit this photo: place the person from this photo lying back on a giant pink flamingo float in a rooftop infinity pool at dusk, eyes on their phone, drifting close to the pool's edge over a city drop, a friend's hand reaching in from the side to push the float back. Warm sunset light, candid phone-photo look, photorealistic. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo: place the person from this photo lying back on a giant pink flamingo float in a rooftop infinity pool at dusk, eyes on their phone, drifting close to the pool's edge over a city drop, a friend's hand reaching in from the side to push the float back. Warm sunset light, candid phone-photo look, photorealistic. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.2.0"
   },
   {
     "category": "Viral",
     "code": "/nicelistframe",
     "description": "Your photo revealed inside a glowing gold frame: you made the nice list.",
-    "prompt": "Edit this photo: place the exact person from this photo inside an ornate gold picture frame that glows softly, hanging in a warm Christmas living room with a fireplace and tree lights. Real photo look, vertical 9:16, no text. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo: place the exact person from this photo inside an ornate gold picture frame that glows softly, hanging in a warm Christmas living room with a fireplace and tree lights. Real photo look, vertical 9:16, no text. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.2.0"
   },
   {
     "category": "Art Styles",
     "code": "/stickersheet",
     "description": "One sheet of 9 die-cut chibi stickers of you, 3×3 grid.",
-    "prompt": "Edit this photo into a die-cut sticker sheet of the person as a cute chibi character on a plain white background. The sheet holds nine stickers in a three by three grid, each with a thick white border and a soft drop shadow. Every sticker shows the same chibi person, with an oversized head, tiny body, big glossy eyes, the same hairstyle, skin tone, glasses if worn and outfit colours, in nine different expressions: waving, laughing, sleepy, heart eyes, thumbs up, angry pout, eating a snack and a peace sign. Flat vector look with clean outlines, soft cel shading, glossy vinyl sticker finish. Avoid photorealism, avoid any text or lettering. Keep the person's distinguishing features recognizable in the new form — do not redesign, beautify, or smooth the face."
+    "prompt": "Edit this photo into a die-cut sticker sheet of the person as a cute chibi character on a plain white background. The sheet holds nine stickers in a three by three grid, each with a thick white border and a soft drop shadow. Every sticker shows the same chibi person, with an oversized head, tiny body, big glossy eyes, the same hairstyle, skin tone, glasses if worn and outfit colours, in nine different expressions: waving, laughing, sleepy, heart eyes, thumbs up, angry pout, eating a snack and a peace sign. Flat vector look with clean outlines, soft cel shading, glossy vinyl sticker finish. Avoid photorealism, avoid any text or lettering. Keep the person's distinguishing features recognizable in the new form — do not redesign, beautify, or smooth the face.",
+    "addedIn": "2.2.0"
   },
   {
     "category": "Formats",
     "code": "/photoboothstrip",
     "description": "Y2K photobooth strip: 4 stacked frames, pastel pink booth, flash look.",
-    "prompt": "Edit this photo into a Y2K photobooth strip with four stacked photo frames of the person wearing a bright oversized graphic sweatshirt and a beanie, against a pastel pink booth background with a flash-camera look. Keep the face, hairstyle and skin tone exactly the same in every frame, do not change the identity. Frame 1: smiling at the camera. Frame 2: peace sign. Frame 3: laughing with head tilted. Frame 4: blowing a kiss. Thin white borders between frames, slight flash glare and early-2000s digital colour, cheerful and candid, vertical 9:16 ratio. No text in the image. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo into a Y2K photobooth strip with four stacked photo frames of the person wearing a bright oversized graphic sweatshirt and a beanie, against a pastel pink booth background with a flash-camera look. Keep the face, hairstyle and skin tone exactly the same in every frame, do not change the identity. Frame 1: smiling at the camera. Frame 2: peace sign. Frame 3: laughing with head tilted. Frame 4: blowing a kiss. Thin white borders between frames, slight flash glare and early-2000s digital colour, cheerful and candid, vertical 9:16 ratio. No text in the image. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.2.0"
   },
   {
     "category": "Formats",
     "code": "/vinylcover",
     "description": "Vinyl album cover: dark blazer, record in hand, title in bold white letters.",
-    "prompt": "Edit this photo into a stylish vinyl record album cover portrait of the person wearing a smart dark blazer, arms crossed, standing against a deep teal studio background with a vinyl record in one hand. At the top, write 'MIDNIGHT DRIVE' in large clean bold white letters, readable and spelled correctly. Keep the face exactly the same as in the photo, do not change the identity, hairstyle or skin tone. Premium music-cover mood, sharp studio lighting, photorealistic, square 1:1 ratio. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo into a stylish vinyl record album cover portrait of the person wearing a smart dark blazer, arms crossed, standing against a deep teal studio background with a vinyl record in one hand. At the top, write 'MIDNIGHT DRIVE' in large clean bold white letters, readable and spelled correctly. Keep the face exactly the same as in the photo, do not change the identity, hairstyle or skin tone. Premium music-cover mood, sharp studio lighting, photorealistic, square 1:1 ratio. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.2.0"
   },
   {
     "category": "Formats",
     "code": "/harshsunlight3",
     "description": "3-panel collage in hard sunlight: portrait, macro eye, three-quarter view.",
-    "prompt": "Edit this photo into a 3-panel vertical collage in harsh afternoon sunlight on a black background. Keep the face exactly as in the photo in all three panels. Panel 1: full portrait in a crimson saree, fist resting on cheek. Panel 2: a macro close-up of one eye. Panel 3: a three-quarter portrait. Hard sun, deep shadows, photorealistic, editorial. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo into a 3-panel vertical collage in harsh afternoon sunlight on a black background. Keep the face exactly as in the photo in all three panels. Panel 1: full portrait in a crimson saree, fist resting on cheek. Panel 2: a macro close-up of one eye. Panel 3: a three-quarter portrait. Hard sun, deep shadows, photorealistic, editorial. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.2.0"
   },
   {
     "code": "/wetlook",
     "category": "Viral",
     "description": "High-contrast black-and-white close-up: soaking wet hair, water droplets on the face, deep black background.",
-    "prompt": "Edit this photo: turn it into a high-contrast black-and-white close-up portrait of the person, with realistic water droplets on their face and soaking wet hair framing it, a proud, serious, strong expression, deep black shadows in the background so only the face is visible and sharply defined, 35mm portrait lens look, sharp 4K quality. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo: turn it into a high-contrast black-and-white close-up portrait of the person, with realistic water droplets on their face and soaking wet hair framing it, a proud, serious, strong expression, deep black shadows in the background so only the face is visible and sharply defined, 35mm portrait lens look, sharp 4K quality. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.4.0"
   },
   {
     "code": "/lucia",
     "category": "Viral",
     "description": "GTA 6's Lucia joins your couple photo, arm around your boyfriend — \"us on November 19th\".",
-    "prompt": "Edit this photo: keep the whole photo exactly as it is — every person, their faces, hair, bodies, clothes, poses and hands, the place, the background, the light, the colors, the camera angle and the framing. The only change: add one new woman into the photo, as if she was there when it was taken — a confident woman of about thirty with warm olive skin, long dark brown hair in loose natural curls, gold hoop earrings and a thin gold chain, wearing a fitted white ribbed crop tank top, loose olive-green cargo pants with a black belt and white sneakers. She stands close on the open side of the man, wraps one arm around his shoulders and leans in to him, looking into the camera with a cool, slightly smug half smile. Match her to the photo perfectly: same light, shadows, color temperature, grain and scale, feet on the same ground, a real shadow where she stands. Photorealistic, not a game render. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo: keep the whole photo exactly as it is — every person, their faces, hair, bodies, clothes, poses and hands, the place, the background, the light, the colors, the camera angle and the framing. The only change: add one new woman into the photo, as if she was there when it was taken — a confident woman of about thirty with warm olive skin, long dark brown hair in loose natural curls, gold hoop earrings and a thin gold chain, wearing a fitted white ribbed crop tank top, loose olive-green cargo pants with a black belt and white sneakers. She stands close on the open side of the man, wraps one arm around his shoulders and leans in to him, looking into the camera with a cool, slightly smug half smile. Match her to the photo perfectly: same light, shadows, color temperature, grain and scale, feet on the same ground, a real shadow where she stands. Photorealistic, not a game render. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.4.0"
   },
   {
     "code": "/flashlight",
     "category": "Viral",
     "description": "Romantic couple photo on pure black, warm rim light outlining hair and shoulders, small white heart above.",
-    "prompt": "Edit this photo: keep the two people, their pose, their faces, their hair, their clothes and the framing exactly as in the photo. Only the background and the light change: the whole background becomes pure, solid black, with no room, wall, furniture, sky or objects. A warm backlight casts a bright golden glow on the edges of their hair and shoulders, a translucent rim light, while their faces stay softly dim but clear and recognizable, fading into darkness, high contrast, clean and minimalist, romantic mood. Place a simple filled small white heart in the empty space above their heads. Photorealistic, vertical 9:16, like a real photo taken at night with one warm light behind them. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo: keep the two people, their pose, their faces, their hair, their clothes and the framing exactly as in the photo. Only the background and the light change: the whole background becomes pure, solid black, with no room, wall, furniture, sky or objects. A warm backlight casts a bright golden glow on the edges of their hair and shoulders, a translucent rim light, while their faces stay softly dim but clear and recognizable, fading into darkness, high contrast, clean and minimalist, romantic mood. Place a simple filled small white heart in the empty space above their heads. Photorealistic, vertical 9:16, like a real photo taken at night with one warm light behind them. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.4.0"
   },
   {
     "code": "/whoville",
     "category": "Viral",
     "description": "You as a Who from Whoville: tall Christmas curls with bows and candy canes, fur-trimmed outfit, snowy storybook town.",
-    "prompt": "Edit this photo: transform the person into a whimsical resident of a snowy Christmas storybook town, like a Who from Whoville — an extravagant, gravity-defying hairstyle of playful curls in their own hair color, festive bows and candy-cane decorations, rosy cheeks and a joyful Christmas expression, dressed in a luxurious colorful Christmas outfit with fluffy fur trim, a festive scarf and bells. Place them in the heart of the town, surrounded by colorful crooked Christmas houses, glowing windows, sparkling decorations, candy canes, Christmas trees, twinkling lights and softly falling snow. Ultra-detailed, cinematic, realistic live-action Christmas fantasy portrait, vibrant Christmas colors, vertical 9:16, chest up, face large and turned to the camera. Keep the person's distinguishing features recognizable in the new form — do not redesign, beautify, or smooth the face."
+    "prompt": "Edit this photo: transform the person into a whimsical resident of a snowy Christmas storybook town, like a Who from Whoville — an extravagant, gravity-defying hairstyle of playful curls in their own hair color, festive bows and candy-cane decorations, rosy cheeks and a joyful Christmas expression, dressed in a luxurious colorful Christmas outfit with fluffy fur trim, a festive scarf and bells. Place them in the heart of the town, surrounded by colorful crooked Christmas houses, glowing windows, sparkling decorations, candy canes, Christmas trees, twinkling lights and softly falling snow. Ultra-detailed, cinematic, realistic live-action Christmas fantasy portrait, vibrant Christmas colors, vertical 9:16, chest up, face large and turned to the camera. Keep the person's distinguishing features recognizable in the new form — do not redesign, beautify, or smooth the face.",
+    "addedIn": "2.4.0"
   },
   {
     "code": "/snowglobe",
     "category": "Viral",
     "description": "You as a cute 3D cartoon figure standing in the snow inside a glass Christmas snow globe.",
-    "prompt": "Edit this photo: transform the person into a cute 3D animated cartoon figure, like a modern animated feature film, standing inside a clear glass Christmas snow globe on a tabletop by a window, with a blurred warm-toned background and sunlight passing through the globe casting golden sparkles. Inside the globe the figure stands from head to feet on soft white snow, smiling at the camera, wearing their own clothes and colors from the photo, with a small decorated Christmas tree with warm lights, a little snowman and a few tiny glowing houses around them, snowflakes drifting inside the glass. The globe sits on a white carved base with small warm lights, the whole globe and base in view, vertical 9:16, no text. Keep the person's distinguishing features recognizable in the new form — do not redesign, beautify, or smooth the face."
+    "prompt": "Edit this photo: transform the person into a cute 3D animated cartoon figure, like a modern animated feature film, standing inside a clear glass Christmas snow globe on a tabletop by a window, with a blurred warm-toned background and sunlight passing through the globe casting golden sparkles. Inside the globe the figure stands from head to feet on soft white snow, smiling at the camera, wearing their own clothes and colors from the photo, with a small decorated Christmas tree with warm lights, a little snowman and a few tiny glowing houses around them, snowflakes drifting inside the glass. The globe sits on a white carved base with small warm lights, the whole globe and base in view, vertical 9:16, no text. Keep the person's distinguishing features recognizable in the new form — do not redesign, beautify, or smooth the face.",
+    "addedIn": "2.4.0"
   },
   {
     "code": "/villaintrend",
     "category": "Viral",
     "description": "Movie-villain portrait: you swivel round in a dark leather armchair to face the camera with a cold stare.",
-    "prompt": "Edit this photo: turn it into a cinematic movie-villain portrait — the person seated in a dark leather armchair in a dim, moody room, swivelling the chair around to face the camera with a cold, confident stare, one hand resting on the armrest, dramatic low-key lighting, deep shadows, film-still quality, vertical 9:16. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo: turn it into a cinematic movie-villain portrait — the person seated in a dark leather armchair in a dim, moody room, swivelling the chair around to face the camera with a cold, confident stare, one hand resting on the armrest, dramatic low-key lighting, deep shadows, film-still quality, vertical 9:16. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.4.0"
   },
   {
     "code": "/christmasbox",
     "category": "Viral",
     "description": "You lean out of a cardboard box framed with tinsel, fairy lights and garland — a handmade Christmas card photo.",
-    "prompt": "Edit this photo: the person leans out of a large cardboard box turned on its side, the box framed with tinsel, fairy lights and garland, warm Christmas living-room light, cozy festive portrait, photorealistic, vertical 9:16, like a handmade Christmas card photo. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+    "prompt": "Edit this photo: the person leans out of a large cardboard box turned on its side, the box framed with tinsel, fairy lights and garland, warm Christmas living-room light, cozy festive portrait, photorealistic, vertical 9:16, like a handmade Christmas card photo. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping.",
+    "addedIn": "2.4.0"
   }
 ]

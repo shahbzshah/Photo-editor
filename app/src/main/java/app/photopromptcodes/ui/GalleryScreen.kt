@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
@@ -85,6 +86,13 @@ class GalleryViewModel(app: Application) : AndroidViewModel(app) {
         private set
 
     val categories: List<String> get() = CodeRepository.categories(codes)
+
+    /** Release of the newest batch, e.g. "2.4.0". */
+    val latestAddedVersion: String? get() = CodeRepository.latestAddedVersion(codes)
+
+    /** The newest batch — shown in a "NEW IN …" section at the top. */
+    val newCodes: List<PromptCode>
+        get() = latestAddedVersion?.let { v -> codes.filter { it.addedIn == v } } ?: emptyList()
 
     val filtered: List<PromptCode>
         get() {
@@ -394,8 +402,34 @@ fun GalleryScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
+                    if (vm.newCodes.isNotEmpty() && vm.query.isBlank() && vm.category == null) {
+                        item(span = { GridItemSpan(2) }) {
+                            Text(
+                                "NEW IN ${vm.latestAddedVersion}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Amber,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        items(vm.newCodes, key = { it.code }) { code ->
+                            GridCodeCard(code = code, isNew = true, onClick = { onOpenCode(code.code) })
+                        }
+                        item(span = { GridItemSpan(2) }) {
+                            Text(
+                                "ALL CODES",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = PaperDim,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+                    }
                     items(vm.filtered, key = { it.code }) { code ->
-                        GridCodeCard(code = code, onClick = { onOpenCode(code.code) })
+                        GridCodeCard(
+                            code = code,
+                            isNew = CodeRepository.isNew(code, vm.latestAddedVersion),
+                            onClick = { onOpenCode(code.code) }
+                        )
                     }
                     item { Spacer(Modifier.height(16.dp)) }
                 }
@@ -405,6 +439,20 @@ fun GalleryScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
+                // Newest batch first: its own section at the top, each card labelled NEW.
+                if (vm.newCodes.isNotEmpty() && vm.query.isBlank() && vm.category == null) {
+                    item {
+                        Text(
+                            "NEW IN ${vm.latestAddedVersion}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Amber,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    items(vm.newCodes, key = { it.code }) { code ->
+                        CodeCard(code = code, isNew = true, onClick = { onOpenCode(code.code) })
+                    }
+                }
                 vm.promptOfTheDay?.let { potd ->
                     if (vm.query.isBlank() && vm.category == null) {
                         item {
@@ -497,7 +545,11 @@ fun GalleryScreen(
                     }
                 }
                 items(vm.filtered, key = { it.code }) { code ->
-                    CodeCard(code = code, onClick = { onOpenCode(code.code) })
+                    CodeCard(
+                        code = code,
+                        isNew = CodeRepository.isNew(code, vm.latestAddedVersion),
+                        onClick = { onOpenCode(code.code) }
+                    )
                 }
                 item { Spacer(Modifier.height(16.dp)) }
             }
@@ -507,7 +559,24 @@ fun GalleryScreen(
 }
 
 @Composable
-private fun GridCodeCard(code: PromptCode, onClick: () -> Unit) {
+private fun NewBadge() {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(Amber)
+            .padding(horizontal = 6.dp, vertical = 2.dp)
+    ) {
+        Text(
+            "NEW",
+            color = NearBlack,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+private fun GridCodeCard(code: PromptCode, isNew: Boolean = false, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -539,6 +608,13 @@ private fun GridCodeCard(code: PromptCode, onClick: () -> Unit) {
                         )
                     )
             )
+            if (isNew) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(8.dp)
+                ) { NewBadge() }
+            }
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -572,7 +648,7 @@ private fun chipColors(selected: Boolean) = FilterChipDefaults.filterChipColors(
 )
 
 @Composable
-private fun CodeCard(code: PromptCode, onClick: () -> Unit) {
+private fun CodeCard(code: PromptCode, isNew: Boolean = false, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -598,13 +674,19 @@ private fun CodeCard(code: PromptCode, onClick: () -> Unit) {
             )
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = code.code,
-                    fontFamily = Mono,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Amber,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = code.code,
+                        fontFamily = Mono,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Amber,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    if (isNew) {
+                        Spacer(Modifier.width(6.dp))
+                        NewBadge()
+                    }
+                }
                 Spacer(Modifier.height(2.dp))
                 Text(
                     text = code.description,
