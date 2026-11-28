@@ -1750,5 +1750,47 @@
     "code": "/harshsunlight3",
     "description": "3-panel collage in hard sunlight: portrait, macro eye, three-quarter view.",
     "prompt": "Edit this photo into a 3-panel vertical collage in harsh afternoon sunlight on a black background. Keep the face exactly as in the photo in all three panels. Panel 1: full portrait in a crimson saree, fist resting on cheek. Panel 2: a macro close-up of one eye. Panel 3: a three-quarter portrait. Hard sun, deep shadows, photorealistic, editorial. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+  },
+  {
+    "code": "/wetlook",
+    "category": "Viral",
+    "description": "High-contrast black-and-white close-up: soaking wet hair, water droplets on the face, deep black background.",
+    "prompt": "Edit this photo: turn it into a high-contrast black-and-white close-up portrait of the person, with realistic water droplets on their face and soaking wet hair framing it, a proud, serious, strong expression, deep black shadows in the background so only the face is visible and sharply defined, 35mm portrait lens look, sharp 4K quality. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+  },
+  {
+    "code": "/lucia",
+    "category": "Viral",
+    "description": "GTA 6's Lucia joins your couple photo, arm around your boyfriend — \"us on November 19th\".",
+    "prompt": "Edit this photo: keep the whole photo exactly as it is — every person, their faces, hair, bodies, clothes, poses and hands, the place, the background, the light, the colors, the camera angle and the framing. The only change: add one new woman into the photo, as if she was there when it was taken — a confident woman of about thirty with warm olive skin, long dark brown hair in loose natural curls, gold hoop earrings and a thin gold chain, wearing a fitted white ribbed crop tank top, loose olive-green cargo pants with a black belt and white sneakers. She stands close on the open side of the man, wraps one arm around his shoulders and leans in to him, looking into the camera with a cool, slightly smug half smile. Match her to the photo perfectly: same light, shadows, color temperature, grain and scale, feet on the same ground, a real shadow where she stands. Photorealistic, not a game render. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+  },
+  {
+    "code": "/flashlight",
+    "category": "Viral",
+    "description": "Romantic couple photo on pure black, warm rim light outlining hair and shoulders, small white heart above.",
+    "prompt": "Edit this photo: keep the two people, their pose, their faces, their hair, their clothes and the framing exactly as in the photo. Only the background and the light change: the whole background becomes pure, solid black, with no room, wall, furniture, sky or objects. A warm backlight casts a bright golden glow on the edges of their hair and shoulders, a translucent rim light, while their faces stay softly dim but clear and recognizable, fading into darkness, high contrast, clean and minimalist, romantic mood. Place a simple filled small white heart in the empty space above their heads. Photorealistic, vertical 9:16, like a real photo taken at night with one warm light behind them. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+  },
+  {
+    "code": "/whoville",
+    "category": "Viral",
+    "description": "You as a Who from Whoville: tall Christmas curls with bows and candy canes, fur-trimmed outfit, snowy storybook town.",
+    "prompt": "Edit this photo: transform the person into a whimsical resident of a snowy Christmas storybook town, like a Who from Whoville — an extravagant, gravity-defying hairstyle of playful curls in their own hair color, festive bows and candy-cane decorations, rosy cheeks and a joyful Christmas expression, dressed in a luxurious colorful Christmas outfit with fluffy fur trim, a festive scarf and bells. Place them in the heart of the town, surrounded by colorful crooked Christmas houses, glowing windows, sparkling decorations, candy canes, Christmas trees, twinkling lights and softly falling snow. Ultra-detailed, cinematic, realistic live-action Christmas fantasy portrait, vibrant Christmas colors, vertical 9:16, chest up, face large and turned to the camera. Keep the person's distinguishing features recognizable in the new form — do not redesign, beautify, or smooth the face."
+  },
+  {
+    "code": "/snowglobe",
+    "category": "Viral",
+    "description": "You as a cute 3D cartoon figure standing in the snow inside a glass Christmas snow globe.",
+    "prompt": "Edit this photo: transform the person into a cute 3D animated cartoon figure, like a modern animated feature film, standing inside a clear glass Christmas snow globe on a tabletop by a window, with a blurred warm-toned background and sunlight passing through the globe casting golden sparkles. Inside the globe the figure stands from head to feet on soft white snow, smiling at the camera, wearing their own clothes and colors from the photo, with a small decorated Christmas tree with warm lights, a little snowman and a few tiny glowing houses around them, snowflakes drifting inside the glass. The globe sits on a white carved base with small warm lights, the whole globe and base in view, vertical 9:16, no text. Keep the person's distinguishing features recognizable in the new form — do not redesign, beautify, or smooth the face."
+  },
+  {
+    "code": "/villaintrend",
+    "category": "Viral",
+    "description": "Movie-villain portrait: you swivel round in a dark leather armchair to face the camera with a cold stare.",
+    "prompt": "Edit this photo: turn it into a cinematic movie-villain portrait — the person seated in a dark leather armchair in a dim, moody room, swivelling the chair around to face the camera with a cold, confident stare, one hand resting on the armrest, dramatic low-key lighting, deep shadows, film-still quality, vertical 9:16. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
+  },
+  {
+    "code": "/christmasbox",
+    "category": "Viral",
+    "description": "You lean out of a cardboard box framed with tinsel, fairy lights and garland — a handmade Christmas card photo.",
+    "prompt": "Edit this photo: the person leans out of a large cardboard box turned on its side, the box framed with tinsel, fairy lights and garland, warm Christmas living-room light, cozy festive portrait, photorealistic, vertical 9:16, like a handmade Christmas card photo. Keep the face and look of any person in the photo exactly as in the original — natural skin texture and natural features, no beautifying, no smoothing, no reshaping."
   }
 ]
